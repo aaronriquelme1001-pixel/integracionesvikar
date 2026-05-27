@@ -1,77 +1,51 @@
-const axios = require('axios');
+const BaseStrategy = require('./BaseStrategy');
 
-/**
- * Parses GPS Server custom params string (e.g. "acc=1|batp=80|") into an object.
- */
-function parseParams(paramsStr) {
-  const result = {};
-  if (!paramsStr) return result;
-  const parts = paramsStr.split('|');
-  for (const part of parts) {
-    if (part) {
-      const kv = part.split('=');
-      if (kv.length === 2) {
-        result[kv[0]] = kv[1];
+class ColunStrategy extends BaseStrategy {
+  /**
+   * Executes the Colun integration.
+   * 
+   * @param {Object} telemetry - Raw telemetry from GPS Server.
+   * @param {Object} deviceConfig - Vehicle metadata from devices.json.
+   * @param {Object} integrationConfig - Colun specific config overrides from devices.json.
+   */
+  async execute(telemetry, deviceConfig, integrationConfig) {
+    const url = integrationConfig.endpoint || process.env.COLUN_API_URL || 'https://services.wing.cl/tracking/receiver/hub/v2';
+    const token = integrationConfig.token || process.env.COLUN_BEARER_TOKEN;
+
+    if (!token) {
+      console.error('[Colun] Error: Bearer token is not configured.');
+      return;
+    }
+
+    const paramsObj = this.parseParams(telemetry.params);
+    const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || telemetry.event === 'ignition_on';
+    const formattedTime = this.formatDate(telemetry.dt_tracker || telemetry.dt_server);
+
+    const payload = {
+      pv: deviceConfig.plate,
+      fh: formattedTime,
+      lt: parseFloat(telemetry.lat),
+      ln: parseFloat(telemetry.lng),
+      vg: Math.round(parseFloat(telemetry.speed || 0)),
+      c: Math.round(parseFloat(telemetry.angle || 0)),
+      tv: {
+        me: isEngineOn ? 1 : 0
       }
+    };
+
+    if (telemetry.odometer !== undefined && telemetry.odometer !== '') {
+      payload.tv.od = Math.round(parseFloat(telemetry.odometer));
     }
-  }
-  return result;
-}
 
-/**
- * Sends telemetry data to Colun (GPS Smart / West Ingeniería).
- * 
- * @param {Object} telemetry - Raw telemetry from GPS Server.
- * @param {Object} deviceConfig - Vehicle metadata from devices.json.
- */
-async function sendToColun(telemetry, deviceConfig) {
-  const url = process.env.COLUN_API_URL || 'https://services.wing.cl/tracking/receiver/hub/v2';
-  const token = process.env.COLUN_BEARER_TOKEN;
+    console.log(`[Colun] Dispatching telemetry for ${deviceConfig.plate} to ${url}...`);
+    const result = await this.sendJSONRequest(url, { 'Authorization': token }, payload);
 
-  if (!token) {
-    console.error('[Colun] Error: COLUN_BEARER_TOKEN is not configured.');
-    return;
-  }
-
-  const paramsObj = parseParams(telemetry.params);
-  const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || telemetry.event === 'ignition_on';
-
-  // Format date: Colun expects "YYYY-MM-DD HH:mm:ss"
-  let formattedTime = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString().replace('T', ' ').substring(0, 19);
-
-  const payload = {
-    pv: deviceConfig.plate,
-    fh: formattedTime,
-    lt: parseFloat(telemetry.lat),
-    ln: parseFloat(telemetry.lng),
-    vg: Math.round(parseFloat(telemetry.speed || 0)),
-    c: Math.round(parseFloat(telemetry.angle || 0)),
-    tv: {
-      me: isEngineOn ? 1 : 0
+    if (result.success) {
+      console.log(`[Colun] Success Response:`, result.data);
+    } else {
+      console.error(`[Colun] Forwarding failed:`, result.error);
     }
-  };
-
-  // Add odometer if present in telemetry
-  if (telemetry.odometer !== undefined && telemetry.odometer !== '') {
-    payload.tv.od = Math.round(parseFloat(telemetry.odometer));
-  }
-
-  console.log(`[Colun] Dispatching telemetry for ${deviceConfig.plate} to ${url}...`);
-
-  try {
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/json'
-      },
-      timeout: 10000
-    });
-    console.log(`[Colun] Success Response:`, response.data);
-  } catch (error) {
-    console.error(`[Colun] Forwarding failed:`, error.response ? error.response.data : error.message);
   }
 }
 
-module.exports = {
-  sendToColun
-};
+module.exports = ColunStrategy;

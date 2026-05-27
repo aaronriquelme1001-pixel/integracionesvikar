@@ -1,55 +1,33 @@
-const axios = require('axios');
+const BaseStrategy = require('./BaseStrategy');
 
-/**
- * Converts "YYYY-MM-DD HH:mm:ss" to "YYYY-MM-DDTHH:mm:ss" ISO format
- */
-function formatUnigisDate(dtStr) {
-  if (!dtStr) return new Date().toISOString().substring(0, 19);
-  return dtStr.replace(' ', 'T');
-}
+class MelonStrategy extends BaseStrategy {
+  /**
+   * Executes the Melon/UNIGIS integration.
+   * 
+   * @param {Object} telemetry - Raw telemetry from GPS Server.
+   * @param {Object} deviceConfig - Vehicle metadata from devices.json.
+   * @param {Object} integrationConfig - Melon specific config overrides from devices.json.
+   */
+  async execute(telemetry, deviceConfig, integrationConfig) {
+    const url = integrationConfig.endpoint || process.env.UNIGIS_API_URL || 'https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx';
+    const user = integrationConfig.user || process.env.UNIGIS_SYSTEM_USER || 'VIKARGPS';
+    const pass = integrationConfig.password || process.env.UNIGIS_PASSWORD || 'VIKARGPS2024';
 
-function parseParams(paramsStr) {
-  const result = {};
-  if (!paramsStr) return result;
-  const parts = paramsStr.split('|');
-  for (const part of parts) {
-    if (part) {
-      const kv = part.split('=');
-      if (kv.length === 2) {
-        result[kv[0]] = kv[1];
-      }
-    }
-  }
-  return result;
-}
+    const paramsObj = this.parseParams(telemetry.params);
+    const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || telemetry.event === 'ignition_on';
 
-/**
- * Sends telemetry data to Cementos Melón (UNIGIS).
- * 
- * @param {Object} telemetry - Raw telemetry from GPS Server.
- * @param {Object} deviceConfig - Vehicle metadata from devices.json.
- */
-async function sendToMelon(telemetry, deviceConfig) {
-  const url = process.env.UNIGIS_API_URL || 'https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx';
-  const user = process.env.UNIGIS_SYSTEM_USER || 'VIKARGPS';
-  const pass = process.env.UNIGIS_PASSWORD || 'VIKARGPS2024';
+    // Format date times as ISO XML dates
+    const eventTime = this.formatDate(telemetry.dt_tracker, 'ISO_T');
+    const receptionTime = this.formatDate(telemetry.dt_server || telemetry.dt_tracker, 'ISO_T');
 
-  const paramsObj = parseParams(telemetry.params);
-  const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || telemetry.event === 'ignition_on';
+    const eventCode = isEngineOn ? 'ignition_on' : 'ignition_off';
 
-  // Format date times
-  const eventTime = formatUnigisDate(telemetry.dt_tracker);
-  const receptionTime = formatUnigisDate(telemetry.dt_server || telemetry.dt_tracker);
+    const latVal = parseFloat(telemetry.lat || 0).toFixed(6);
+    const lngVal = parseFloat(telemetry.lng || 0).toFixed(6);
+    const speedVal = Math.round(parseFloat(telemetry.speed || 0));
 
-  // Determine Event Code based on ignition
-  const eventCode = isEngineOn ? 'ignition_on' : 'ignition_off';
-
-  const latVal = parseFloat(telemetry.lat || 0).toFixed(6);
-  const lngVal = parseFloat(telemetry.lng || 0).toFixed(6);
-  const speedVal = Math.round(parseFloat(telemetry.speed || 0));
-
-  // Build SOAP 1.1 Envelope calling LoginYInsertarEvento2
-  const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
+    // Build SOAP 1.1 Envelope
+    const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <LoginYInsertarEvento2 xmlns="http://unisolutions.com.ar/">
@@ -79,22 +57,15 @@ async function sendToMelon(telemetry, deviceConfig) {
   </soap:Body>
 </soap:Envelope>`;
 
-  console.log(`[UNIGIS] Dispatching SOAP request for ${deviceConfig.plate} to ${url}...`);
+    console.log(`[UNIGIS] Dispatching SOAP request for ${deviceConfig.plate} to ${url}...`);
+    const result = await this.sendSOAPRequest(url, 'http://unisolutions.com.ar/LoginYInsertarEvento2', soapEnvelope);
 
-  try {
-    const response = await axios.post(url, soapEnvelope, {
-      headers: {
-        'Content-Type': 'text/xml; charset=utf-8',
-        'SOAPAction': 'http://unisolutions.com.ar/LoginYInsertarEvento2'
-      },
-      timeout: 10000
-    });
-    console.log(`[UNIGIS] Success Response:`, response.data.substring(0, 300));
-  } catch (error) {
-    console.error(`[UNIGIS] Forwarding failed:`, error.response ? error.response.data : error.message);
+    if (result.success) {
+      console.log(`[UNIGIS] Success Response:`, result.data.substring(0, 300));
+    } else {
+      console.error(`[UNIGIS] Forwarding failed:`, result.error);
+    }
   }
 }
 
-module.exports = {
-  sendToMelon
-};
+module.exports = MelonStrategy;

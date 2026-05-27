@@ -4,11 +4,20 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 
-// Import B2B integrations
-const { sendToColun } = require('./integrations/colun');
-const { sendToArauco } = require('./integrations/arauco');
-const { sendToMelon } = require('./integrations/melon');
-const { sendToFalabella } = require('./integrations/falabella');
+// Import Strategy Classes
+const ColunStrategy = require('./integrations/colun');
+const AraucoStrategy = require('./integrations/arauco');
+const MelonStrategy = require('./integrations/melon');
+const FalabellaStrategy = require('./integrations/falabella');
+
+// Initialize strategy mapping
+const strategies = {
+  colun: new ColunStrategy(),
+  arauco: new AraucoStrategy(),
+  melon: new MelonStrategy(),
+  unigis: new MelonStrategy(), // Alias for melon
+  falabella: new FalabellaStrategy()
+};
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -23,8 +32,7 @@ app.use((req, res, next) => {
 });
 
 /**
- * Loads device configuration dynamically on each request to allow
- * changes to config/devices.json without restarting the server.
+ * Loads device configuration dynamically.
  */
 function getDeviceConfig(imei) {
   try {
@@ -45,7 +53,7 @@ function getDeviceConfig(imei) {
  * Health check endpoint
  */
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'integraciones-vikar', time: new Date().toISOString() });
+  res.json({ status: 'OK', service: 'integraciones-vikar', pattern: 'Strategy', time: new Date().toISOString() });
 });
 
 /**
@@ -58,7 +66,7 @@ async function handleGpsServerWebhook(req, res) {
   const imei = telemetry.imei;
   if (!imei) {
     console.log('Received connection ping or request without IMEI.');
-    return res.status(200).send('ok'); // GPS Server expects a simple 'ok' response
+    return res.status(200).send('ok');
   }
 
   console.log(`\n======================================================`);
@@ -67,37 +75,43 @@ async function handleGpsServerWebhook(req, res) {
 
   // Check if device has B2B integrations configured
   const deviceConfig = getDeviceConfig(imei);
-  if (!deviceConfig || !deviceConfig.targets || deviceConfig.targets.length === 0) {
+  if (!deviceConfig || !deviceConfig.integrations) {
     console.log(`[Router] No B2B integrations mapped for IMEI: ${imei}. Skipping.`);
     console.log(`======================================================`);
     return res.status(200).send('ok');
   }
 
-  console.log(`[Router] Mapped targets for ${deviceConfig.plate}:`, deviceConfig.targets);
+  const targets = Object.keys(deviceConfig.integrations);
+  console.log(`[Router] Found integrations for ${deviceConfig.plate}:`, targets);
 
-  // Execute integrations in parallel but isolated from each other
-  const promises = deviceConfig.targets.map(async (target) => {
+  // Execute integrations concurrently using their Strategy classes
+  const promises = targets.map(async (target) => {
+    const integrationConfig = deviceConfig.integrations[target];
+    
+    // Check if integration is explicitly enabled
+    if (!integrationConfig || integrationConfig.enabled !== true) {
+      console.log(`[Router] Integration '${target}' is disabled for device ${imei}.`);
+      return;
+    }
+
+    const strategy = strategies[target];
+    if (!strategy) {
+      console.warn(`[Router] Warning: No strategy implemented for target '${target}'`);
+      return;
+    }
+
     try {
-      if (target === 'colun') {
-        await sendToColun(telemetry, deviceConfig);
-      } else if (target === 'arauco') {
-        await sendToArauco(telemetry, deviceConfig);
-      } else if (target === 'melon' || target === 'unigis') {
-        await sendToMelon(telemetry, deviceConfig);
-      } else if (target === 'falabella') {
-        await sendToFalabella(telemetry, deviceConfig);
-      } else {
-        console.warn(`[Router] Warning: Unknown B2B target '${target}'`);
-      }
+      console.log(`[Router] Executing strategy for B2B target: '${target}'`);
+      await strategy.execute(telemetry, deviceConfig, integrationConfig);
     } catch (err) {
-      console.error(`[Router] Error dispatching to target '${target}':`, err.message);
+      console.error(`[Router] Error executing strategy '${target}':`, err.message);
     }
   });
 
   // Await dispatching to all platforms
   await Promise.all(promises);
 
-  console.log(`[Router] Telemetry routing complete.`);
+  console.log(`[Router] Telemetry B2B routing complete.`);
   console.log(`======================================================`);
 
   res.send('ok'); // Always respond 'ok' to GPS Server
