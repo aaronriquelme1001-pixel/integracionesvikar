@@ -9,6 +9,14 @@ const ColunStrategy = require('./integrations/colun');
 const AraucoStrategy = require('./integrations/arauco');
 const MelonStrategy = require('./integrations/melon');
 const FalabellaStrategy = require('./integrations/falabella');
+const CencosudStrategy = require('./integrations/cencosud');
+const WalmartStrategy = require('./integrations/walmart');
+const MercadoLibreStrategy = require('./integrations/mercadolibre');
+const SmuStrategy = require('./integrations/smu');
+const AgrosuperStrategy = require('./integrations/agrosuper');
+const CcuStrategy = require('./integrations/ccu');
+const AmazonStrategy = require('./integrations/amazon');
+const DhlStrategy = require('./integrations/dhl');
 
 // Initialize strategy mapping
 const strategies = {
@@ -16,7 +24,16 @@ const strategies = {
   arauco: new AraucoStrategy(),
   melon: new MelonStrategy(),
   unigis: new MelonStrategy(), // Alias for melon
-  falabella: new FalabellaStrategy()
+  falabella: new FalabellaStrategy(),
+  cencosud: new CencosudStrategy(),
+  walmart: new WalmartStrategy(),
+  mercadolibre: new MercadoLibreStrategy(),
+  meli: new MercadoLibreStrategy(), // Alias for mercadolibre
+  smu: new SmuStrategy(),
+  agrosuper: new AgrosuperStrategy(),
+  ccu: new CcuStrategy(),
+  amazon: new AmazonStrategy(),
+  dhl: new DhlStrategy()
 };
 
 const app = express();
@@ -79,9 +96,35 @@ function getDynamicIntegrationConfig(target, client) {
     config.endpoint = process.env[`FALABELLA_API_URL${suffix}`] || process.env.FALABELLA_API_URL;
     config.user = process.env[`FALABELLA_USER${suffix}`] || process.env.FALABELLA_USER;
     config.password = process.env[`FALABELLA_PASSWORD${suffix}`] || process.env.FALABELLA_PASSWORD;
+  } else if (target === 'cencosud') {
+    config.endpoint = process.env[`CENCOSUD_API_URL${suffix}`] || process.env.CENCOSUD_API_URL;
+    config.api_key = process.env[`CENCOSUD_API_KEY${suffix}`] || process.env.CENCOSUD_API_KEY;
+  } else if (target === 'mercadolibre' || target === 'meli') {
+    config.endpoint = process.env[`MERCADOLIBRE_API_URL${suffix}`] || process.env.MERCADOLIBRE_API_URL;
+    config.token = process.env[`MERCADOLIBRE_BEARER_TOKEN${suffix}`] || process.env.MERCADOLIBRE_BEARER_TOKEN;
+  } else if (target === 'walmart') {
+    config.endpoint = process.env[`WALMART_API_URL${suffix}`] || process.env.WALMART_API_URL;
+    config.client_id = process.env[`WALMART_CLIENT_ID${suffix}`] || process.env.WALMART_CLIENT_ID;
+    config.client_secret = process.env[`WALMART_CLIENT_SECRET${suffix}`] || process.env.WALMART_CLIENT_SECRET;
+  } else if (target === 'smu') {
+    config.endpoint = process.env[`SMU_API_URL${suffix}`] || process.env.SMU_API_URL;
+    config.token = process.env[`SMU_API_TOKEN${suffix}`] || process.env.SMU_API_TOKEN;
+  } else if (target === 'agrosuper') {
+    config.endpoint = process.env[`AGROSUPER_API_URL${suffix}`] || process.env.AGROSUPER_API_URL;
+    config.api_key = process.env[`AGROSUPER_API_KEY${suffix}`] || process.env.AGROSUPER_API_KEY;
+  } else if (target === 'ccu') {
+    config.endpoint = process.env[`CCU_API_URL${suffix}`] || process.env.CCU_API_URL;
+    config.token = process.env[`CCU_BEARER_TOKEN${suffix}`] || process.env.CCU_BEARER_TOKEN;
+  } else if (target === 'amazon') {
+    config.endpoint = process.env[`AMAZON_API_URL${suffix}`] || process.env.AMAZON_API_URL;
+    config.token = process.env[`AMAZON_ACCESS_TOKEN${suffix}`] || process.env.AMAZON_ACCESS_TOKEN;
+  } else if (target === 'dhl') {
+    config.endpoint = process.env[`DHL_API_URL${suffix}`] || process.env.DHL_API_URL;
+    config.api_key = process.env[`DHL_API_KEY${suffix}`] || process.env.DHL_API_KEY;
   }
   return config;
 }
+
 
 /**
  * Unified endpoint for GPS Server webhook (GET and POST support)
