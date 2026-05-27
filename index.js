@@ -42,6 +42,9 @@ const PORT = process.env.PORT || 3001;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// Serve static dashboard files from the public folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Log incoming requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
