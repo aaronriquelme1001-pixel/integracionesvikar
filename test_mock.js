@@ -69,6 +69,10 @@ process.env.UNIGIS_API_URL = 'http://localhost:4003/hub_TEST/mapi/soap/gps/servi
 process.env.FALABELLA_API_URL = 'http://localhost:4004/gps_test/service.asmx';
 process.env.COLUN_BEARER_TOKEN = 'Bearer test_jwt_token';
 
+// Setup dynamic client environment variables for testing
+process.env.UNIGIS_SYSTEM_USER_KLETT = 'KLETT_USER_MOCK';
+process.env.UNIGIS_PASSWORD_KLETT = 'KLETT_PASS_MOCK';
+
 // Start all mock servers
 const servers = [
   colunApp.listen(4001, () => console.log('[Mocks] Colun mock active on port 4001')),
@@ -76,6 +80,10 @@ const servers = [
   unigisApp.listen(4003, () => console.log('[Mocks] UNIGIS mock active on port 4003')),
   falabellaApp.listen(4004, () => console.log('[Mocks] Falabella mock active on port 4004'))
 ];
+
+// Boot middleware server in the same process using mock env variables
+console.log('[Test Suite] Booting middleware server in-process...');
+require('./index.js');
 
 setTimeout(runTest, 1500);
 
@@ -107,6 +115,9 @@ async function runTest() {
   };
 
   try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 1: Static Webhook Routing (Fallback to devices.json)');
+    console.log('================================================================');
     console.log('[Test Suite] Dispatching simulated GET request to /webhook/gps-server...');
     const getRes = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/webhook/gps-server`, {
       params: gpsServerPayload
@@ -115,6 +126,32 @@ async function runTest() {
     console.log('[Test Suite] Middleware Response Body:', getRes.data);
   } catch (err) {
     console.error('[Test Suite] Error running GET webhook test:', err.message);
+  }
+
+  try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 2: Dynamic Webhook Routing (?target=melon&client=klett)');
+    console.log('================================================================');
+    
+    // Modify payload to represent a dynamic truck not configured in devices.json
+    const dynamicPayload = {
+      ...gpsServerPayload,
+      imei: '111222333444555',
+      plate_number: 'DYNAMIC99'
+    };
+
+    console.log('[Test Suite] Dispatching dynamic routing request to /webhook/gps-server?target=melon&client=klett...');
+    const dynamicRes = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/webhook/gps-server`, {
+      params: {
+        ...dynamicPayload,
+        target: 'melon',
+        client: 'klett'
+      }
+    });
+    console.log('[Test Suite] Middleware Response Status:', dynamicRes.status);
+    console.log('[Test Suite] Middleware Response Body:', dynamicRes.data);
+  } catch (err) {
+    console.error('[Test Suite] Error running dynamic webhook test:', err.message);
   }
 
   // Shut down mocks

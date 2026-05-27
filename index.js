@@ -57,6 +57,33 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * Resolves credentials and configuration dynamically based on the target integration and client query params.
+ */
+function getDynamicIntegrationConfig(target, client) {
+  const config = { enabled: true };
+  const suffix = client ? `_${client.toUpperCase()}` : '';
+
+  if (target === 'colun') {
+    config.endpoint = process.env[`COLUN_API_URL${suffix}`] || process.env.COLUN_API_URL;
+    config.token = process.env[`COLUN_BEARER_TOKEN${suffix}`] || process.env.COLUN_BEARER_TOKEN;
+  } else if (target === 'arauco') {
+    config.endpoint = process.env[`ARAUCO_API_URL${suffix}`] || process.env.ARAUCO_API_URL;
+    config.provider = process.env[`ARAUCO_PROVIDER_NAME${suffix}`] || process.env.ARAUCO_PROVIDER_NAME;
+    config.nom_flota = process.env[`ARAUCO_NOM_FLOTA${suffix}`] || process.env.ARAUCO_NOM_FLOTA;
+    config.cod_flota = process.env[`ARAUCO_COD_FLOTA${suffix}`] || process.env.ARAUCO_COD_FLOTA;
+  } else if (target === 'melon' || target === 'unigis') {
+    config.endpoint = process.env[`UNIGIS_API_URL${suffix}`] || process.env[`MELON_API_URL${suffix}`] || process.env.UNIGIS_API_URL;
+    config.user = process.env[`UNIGIS_SYSTEM_USER${suffix}`] || process.env[`MELON_USER${suffix}`] || process.env.UNIGIS_SYSTEM_USER;
+    config.password = process.env[`UNIGIS_PASSWORD${suffix}`] || process.env[`MELON_PASSWORD${suffix}`] || process.env.UNIGIS_PASSWORD;
+  } else if (target === 'falabella') {
+    config.endpoint = process.env[`FALABELLA_API_URL${suffix}`] || process.env.FALABELLA_API_URL;
+    config.user = process.env[`FALABELLA_USER${suffix}`] || process.env.FALABELLA_USER;
+    config.password = process.env[`FALABELLA_PASSWORD${suffix}`] || process.env.FALABELLA_PASSWORD;
+  }
+  return config;
+}
+
+/**
  * Unified endpoint for GPS Server webhook (GET and POST support)
  */
 async function handleGpsServerWebhook(req, res) {
@@ -73,20 +100,45 @@ async function handleGpsServerWebhook(req, res) {
   console.log(`[Webhook] New telemetry update for IMEI: ${imei}`);
   console.log('Telemetry details:', telemetry);
 
-  // Check if device has B2B integrations configured
-  const deviceConfig = getDeviceConfig(imei);
-  if (!deviceConfig || !deviceConfig.integrations) {
-    console.log(`[Router] No B2B integrations mapped for IMEI: ${imei}. Skipping.`);
-    console.log(`======================================================`);
-    return res.status(200).send('ok');
+  // Check query parameters for explicit target routing first (Dynamic Zero-Code Administration)
+  const targetParam = req.query.target;
+  const clientParam = req.query.client;
+
+  let targets = [];
+  let deviceConfig = null;
+  let dynamicConfigs = {};
+
+  if (targetParam) {
+    const target = targetParam.toLowerCase();
+    if (strategies[target]) {
+      console.log(`[Router] Dynamic webhook routing triggered. Target: ${target}, Client: ${clientParam || 'default'}`);
+      targets = [target];
+      deviceConfig = {
+        plate: telemetry.plate_number || telemetry.plate || 'SIN_PATENTE',
+        carrier: telemetry.carrier || 'VIKARGPS'
+      };
+      dynamicConfigs[target] = getDynamicIntegrationConfig(target, clientParam);
+    } else {
+      console.warn(`[Router] Dynamic routing requested unknown target: ${targetParam}`);
+    }
   }
 
-  const targets = Object.keys(deviceConfig.integrations);
-  console.log(`[Router] Found integrations for ${deviceConfig.plate}:`, targets);
+  // Fallback to config/devices.json if no target was resolved dynamically
+  if (targets.length === 0) {
+    const staticConfig = getDeviceConfig(imei);
+    if (!staticConfig || !staticConfig.integrations) {
+      console.log(`[Router] No B2B integrations mapped for IMEI: ${imei}. Skipping.`);
+      console.log(`======================================================`);
+      return res.status(200).send('ok');
+    }
+    deviceConfig = staticConfig;
+    targets = Object.keys(staticConfig.integrations);
+    console.log(`[Router] Found static integrations for ${deviceConfig.plate}:`, targets);
+  }
 
   // Execute integrations concurrently using their Strategy classes
   const promises = targets.map(async (target) => {
-    const integrationConfig = deviceConfig.integrations[target];
+    const integrationConfig = dynamicConfigs[target] || (deviceConfig.integrations && deviceConfig.integrations[target]);
     
     // Check if integration is explicitly enabled
     if (!integrationConfig || integrationConfig.enabled !== true) {
