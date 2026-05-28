@@ -270,7 +270,7 @@ app.get('/api/test', async (req, res) => {
       // Test connection to the central GPS Server
       const targetUrl = process.env.GPS_SERVER_URL || 'http://gsh7.net/id39/api/api_loc.php';
       const gpsParams = {
-        imei: '862798052972060',
+        imei: '999999999999999', // Dummy IMEI to prevent telemetry pollution of real vehicles
         plate: 'PING_TEST',
         lat: '-33.456789',
         lng: '-70.654321',
@@ -302,7 +302,7 @@ app.get('/api/test', async (req, res) => {
 
     // Standard mock telemetry payload for pings
     const telemetry = {
-      imei: '862798052972060',
+      imei: '999999999999999', // Dummy IMEI to prevent telemetry pollution of real vehicles
       plate_number: 'TEST99',
       lat: '-33.456789',
       lng: '-70.654321',
