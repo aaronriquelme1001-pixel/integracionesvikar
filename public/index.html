@@ -6,24 +6,25 @@
   <title>Vikar GPS - B2B Telemetry Integrations Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0b0f19;
-      --panel-bg: rgba(15, 22, 42, 0.65);
-      --border-color: rgba(255, 255, 255, 0.07);
-      --primary: #4f46e5;
-      --primary-glow: rgba(79, 70, 229, 0.4);
-      --accent: #06b6d4;
-      --accent-glow: rgba(6, 182, 212, 0.4);
+      --bg-dark: #06080e;
+      --bg-secondary: #0c0e17;
+      --panel-bg: rgba(12, 14, 23, 0.85);
+      --border-color: rgba(168, 85, 247, 0.15);
+      --border-focus: #a855f7;
+      --primary: #a855f7;
+      --primary-glow: rgba(168, 85, 247, 0.35);
+      --accent: #d946ef;
+      --accent-glow: rgba(217, 70, 239, 0.35);
       --success: #10b981;
-      --success-glow: rgba(16, 185, 129, 0.3);
+      --success-glow: rgba(16, 185, 129, 0.35);
       --warning: #f59e0b;
-      --warning-glow: rgba(245, 158, 11, 0.3);
       --danger: #ef4444;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #475569;
     }
 
     * {
@@ -35,29 +36,52 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
-      background-attachment: fixed;
+        linear-gradient(rgba(168, 85, 247, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168, 85, 247, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
       color: var(--text-main);
-      font-family: 'Outfit', sans-serif;
+      font-family: 'JetBrains Mono', monospace;
       min-height: 100vh;
+      line-height: 1.6;
+      position: relative;
       overflow-x: hidden;
-      line-height: 1.5;
     }
 
-    /* Container */
+    /* Ambient Glow Backgrounds */
+    .ambient-glow {
+      position: absolute;
+      top: 15%;
+      left: 10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .ambient-glow-2 {
+      position: absolute;
+      bottom: 20%;
+      right: 5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(217, 70, 239, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
     .container {
-      max-width: 1400px;
+      max-width: 1440px;
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
 
-    /* Header */
+    /* Header in Render Style */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 1.5rem;
     }
@@ -65,72 +89,97 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 1rem;
     }
 
-    .brand-logo {
-      width: 45px;
-      height: 45px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 20px var(--primary-glow);
-      font-weight: 800;
-      font-size: 1.5rem;
-      color: white;
+    .brand-logo-svg {
+      width: 32px;
+      height: 32px;
+      color: var(--primary);
+      filter: drop-shadow(0 0 8px var(--primary-glow));
     }
 
     .brand-text h1 {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 700;
-      letter-spacing: -0.025em;
-      background: linear-gradient(to right, #ffffff, #d1d5db);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .brand-text p {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
+      margin-top: 0.1rem;
     }
 
     .status-badge {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.2);
+      gap: 0.6rem;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.25);
       padding: 0.5rem 1rem;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
       color: var(--success);
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.05);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.05);
     }
 
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       background-color: var(--success);
       border-radius: 50%;
-      box-shadow: 0 0 10px var(--success);
-      animation: pulse 1.8s infinite;
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+
+    /* Tabs Bar (Render Style Dashboard) */
+    .tabs-bar {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 2rem;
+      padding-bottom: 1px;
+    }
+
+    .tab-item {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-item:hover {
+      color: #ffffff;
+    }
+
+    .tab-item.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
     }
 
     /* Grid Layout */
     .grid {
       display: grid;
-      grid-template-columns: 1fr 1.2fr;
+      grid-template-columns: 1fr 1.3fr;
       gap: 2rem;
-      margin-bottom: 3rem;
+      margin-bottom: 3.5rem;
     }
 
     @media (max-width: 1024px) {
@@ -139,86 +188,92 @@
       }
     }
 
-    /* Glassmorphism Card */
+    /* Render styled Cards */
     .card {
       background: var(--panel-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      padding: 1.75rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       position: relative;
-      overflow: hidden;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-      opacity: 0.6;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .card:hover {
-      border-color: rgba(255, 255, 255, 0.12);
+      border-color: rgba(168, 85, 247, 0.3);
+      box-shadow: 0 8px 32px rgba(168, 85, 247, 0.03);
+    }
+
+    .card-header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
     }
 
     .card-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
     }
 
     .card-title svg {
-      width: 24px;
-      height: 24px;
-      color: var(--accent);
+      width: 18px;
+      height: 18px;
+      color: var(--primary);
     }
 
-    /* Webhook Generator Form */
+    /* Forms */
     .form-group {
       margin-bottom: 1.25rem;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       margin-bottom: 0.5rem;
-      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
     }
 
     .form-control {
       width: 100%;
-      background: rgba(15, 23, 42, 0.8);
+      background: #030408;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 4px;
       padding: 0.75rem 1rem;
       color: var(--text-main);
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .form-control:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 10px var(--primary-glow);
+      border-color: var(--border-focus);
+      box-shadow: 0 0 8px var(--primary-glow);
     }
 
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.25rem;
+      padding-right: 2.5rem;
+    }
+
+    /* Webhook result box */
     .url-output-container {
-      margin-top: 1.75rem;
-      background: rgba(9, 13, 26, 0.9);
-      border: 1px solid rgba(79, 70, 229, 0.25);
-      border-radius: 12px;
+      margin-top: 1.5rem;
+      background: #030408;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
       padding: 1rem;
       display: flex;
       align-items: center;
@@ -228,8 +283,7 @@
     }
 
     .url-output {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--accent);
       white-space: nowrap;
       overflow-x: auto;
@@ -238,51 +292,48 @@
     }
 
     .url-output::-webkit-scrollbar {
-      height: 4px;
+      height: 3px;
     }
 
     .url-output::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
+      background: rgba(168, 85, 247, 0.2);
     }
 
     .btn-copy {
-      background: var(--primary);
-      border: none;
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: var(--primary);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      transition: background 0.2s, transform 0.1s;
+      gap: 0.4rem;
+      transition: all 0.2s;
       flex-shrink: 0;
     }
 
     .btn-copy:hover {
-      background: #4338ca;
-    }
-
-    .btn-copy:active {
-      transform: scale(0.97);
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 0 10px var(--primary-glow);
     }
 
     .tooltip-success {
       position: absolute;
-      top: -35px;
-      right: 15px;
+      top: -30px;
+      right: 10px;
       background: var(--success);
       color: white;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
       pointer-events: none;
       opacity: 0;
-      transform: translateY(5px);
+      transform: translateY(4px);
       transition: opacity 0.2s, transform 0.2s;
     }
 
@@ -291,53 +342,53 @@
       transform: translateY(0);
     }
 
-    /* Console Logger */
+    /* Terminal Console Style */
     .console-wrapper {
       display: flex;
       flex-direction: column;
       height: 100%;
-      min-height: 380px;
+      min-height: 420px;
     }
 
     .console-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(10, 15, 30, 0.85);
-      border-top-left-radius: 14px;
-      border-top-right-radius: 14px;
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.75rem 1.25rem;
+      background: #090a0f;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      padding: 0.6rem 1rem;
     }
 
-    .console-buttons {
+    .console-title {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       display: flex;
+      align-items: center;
       gap: 0.4rem;
     }
 
-    .console-btn {
-      width: 12px;
-      height: 12px;
+    .console-status-dot {
+      width: 5px;
+      height: 5px;
+      background-color: var(--primary);
       border-radius: 50%;
-    }
-
-    .console-btn.red { background-color: var(--danger); }
-    .console-btn.yellow { background-color: var(--warning); }
-    .console-btn.green { background-color: var(--success); }
-
-    .console-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-dim);
+      box-shadow: 0 0 5px var(--primary);
+      animation: pulse 1.5s infinite;
     }
 
     .btn-simulate {
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(6, 182, 212, 0.2);
+      background: rgba(217, 70, 239, 0.1);
+      border: 1px solid rgba(217, 70, 239, 0.3);
       color: var(--accent);
       padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
@@ -348,181 +399,220 @@
 
     .btn-simulate:hover {
       background: var(--accent);
-      color: white;
+      color: #ffffff;
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
     .console-body {
-      background: #05070f;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
+      background: #030408;
+      border: 1px solid var(--border-color);
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
       padding: 1.25rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      line-height: 1.45;
+      font-size: 0.75rem;
+      line-height: 1.5;
       overflow-y: auto;
       flex-grow: 1;
-      height: 310px;
-      color: #94a3b8;
+      height: 340px;
+      color: #cbd5e1;
+    }
+
+    .ascii-logo {
+      color: var(--primary);
+      font-size: 0.55rem;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      opacity: 0.85;
+      white-space: pre-wrap;
+      font-weight: bold;
     }
 
     .log-entry {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       word-break: break-all;
+      border-left: 2px solid transparent;
+      padding-left: 0.5rem;
+    }
+
+    .log-entry.active {
+      border-left-color: var(--primary);
+      background: rgba(168, 85, 247, 0.03);
     }
 
     .log-time { color: var(--text-dim); }
-    .log-method { color: var(--accent); font-weight: 600; }
+    .log-method { color: var(--accent); font-weight: bold; }
     .log-success { color: var(--success); }
-    .log-warning { color: var(--warning); }
     .log-router { color: #818cf8; }
 
-    /* B2B Target Grid */
+    /* Render styled grid visualizer */
     .section-title {
-      font-size: 1.5rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(to right, #ffffff, #9ca3af);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .targets-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .target-card {
-      background: var(--panel-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .target-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .target-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
       margin-bottom: 1.25rem;
-    }
-
-    .target-info {
+      color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-    }
-
-    .target-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: var(--accent);
-      font-size: 1.25rem;
-    }
-
-    .target-name {
-      font-weight: 600;
-      font-size: 1.05rem;
-    }
-
-    .target-slug {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .net-badge {
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
+      gap: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
-    .net-badge.public {
-      background: rgba(16, 185, 129, 0.1);
+    .section-title svg {
+      width: 18px;
+      height: 18px;
+      color: var(--primary);
+    }
+
+    /* List of Web Services */
+    .services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .service-row {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .service-row:hover {
+      border-color: rgba(168, 85, 247, 0.25);
+      background: rgba(12, 14, 23, 0.95);
+    }
+
+    .service-info-col {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-grow: 1;
+    }
+
+    .service-status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+
+    .service-name-wrapper {
+      min-width: 180px;
+    }
+
+    .service-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .service-type-badge {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .service-route-slug {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-family: inherit;
+    }
+
+    .service-env-badge {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.65rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      color: var(--text-muted);
+    }
+
+    /* Render instance graphical grid representation */
+    .service-visualizer {
+      width: 70px;
+      height: 38px;
+      background: #030408;
+      border: 1px solid rgba(168, 85, 247, 0.15);
+      border-radius: 3px;
+      padding: 3px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .vis-cell {
+      background: rgba(168, 85, 247, 0.08);
+      border-radius: 1px;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .vis-bar {
+      width: 100%;
+      height: 20%;
+      border-radius: 1px;
+      background: var(--primary);
+      animation: vis-pulse 1.8s infinite ease-in-out;
+    }
+
+    /* Differentiate animations for visualizer cells */
+    .vis-cell:nth-child(1) .vis-bar { background: var(--primary); animation-delay: 0.1s; }
+    .vis-cell:nth-child(2) .vis-bar { background: var(--accent); animation-delay: 0.5s; }
+    .vis-cell:nth-child(3) .vis-bar { background: #ffffff; animation-delay: 0.9s; }
+    .vis-cell:nth-child(4) .vis-bar { background: var(--primary); animation-delay: 0.3s; }
+
+    @keyframes vis-pulse {
+      0%, 100% { height: 10%; opacity: 0.3; }
+      50% { height: 85%; opacity: 1; }
+    }
+
+    .net-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.2rem 0.4rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .net-tag.public {
+      background: rgba(16, 185, 129, 0.06);
       border: 1px solid rgba(16, 185, 129, 0.2);
       color: var(--success);
     }
 
-    .net-badge.private {
-      background: rgba(245, 158, 11, 0.1);
+    .net-tag.private {
+      background: rgba(245, 158, 11, 0.06);
       border: 1px solid rgba(245, 158, 11, 0.2);
       color: var(--warning);
-    }
-
-    .target-variables {
-      background: rgba(9, 13, 26, 0.5);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 0.75rem;
-      margin-top: auto;
-    }
-
-    .target-variables-title {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--text-dim);
-      margin-bottom: 0.4rem;
-      letter-spacing: 0.05em;
-    }
-
-    .var-list {
-      list-style: none;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .var-list li {
-      margin-bottom: 0.2rem;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .var-name {
-      color: #cbd5e1;
     }
 
     /* Footer */
     footer {
       border-top: 1px solid var(--border-color);
-      padding-top: 2rem;
-      margin-top: 5rem;
+      padding: 2rem 0;
+      margin-top: 4rem;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
     }
 
     footer p {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
 
     footer a {
-      color: var(--accent);
+      color: var(--primary);
       text-decoration: none;
     }
 
@@ -532,34 +622,50 @@
   </style>
 </head>
 <body>
+  <div class="ambient-glow"></div>
+  <div class="ambient-glow-2"></div>
+
   <div class="container">
     <!-- Header -->
     <header>
       <div class="brand">
-        <div class="brand-logo">V</div>
+        <svg class="brand-logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
         <div class="brand-text">
-          <h1>Integraciones Vikar</h1>
-          <p>B2B Telemetry Routing Middleware</p>
+          <h1>VIKAR GPS - B2B TELEMETRY GATEWAY</h1>
+          <p>Render Cloud Web Service - Production Dashboard</p>
         </div>
       </div>
       <div class="status-badge">
         <div class="status-dot"></div>
-        <span>Servidor Activo (Production)</span>
+        <span>Instance: Active (srv-vikar-middleware)</span>
       </div>
     </header>
 
-    <!-- Top Grid: Form and Terminal -->
+    <!-- Console Tabs (Render Aesthetic) -->
+    <div class="tabs-bar">
+      <button class="tab-item active">Dashboard</button>
+      <button class="tab-item">Logs</button>
+      <button class="tab-item">Environment</button>
+      <button class="tab-item">Metrics</button>
+      <button class="tab-item">Settings</button>
+    </div>
+
+    <!-- Main Grid: Webhook Generator & Console Logger -->
     <div class="grid">
-      <!-- Webhook Generator -->
+      <!-- Webhook Generator Card -->
       <div class="card">
-        <div class="card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-          </svg>
-          Generador de Webhooks (Zero-Code)
+        <div class="card-header-container">
+          <div class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+            </svg>
+            Zero-Code Router Hook Builder
+          </div>
         </div>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-          Construye la URL del Webhook para pegarla directamente en la cuenta de tu cliente dentro de GPS Server.
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Construye la URL de enrutamiento dinámico para integraciones B2B externas. Pega el webhook generado dentro del panel de GPS Server para iniciar la retransmisión.
         </p>
 
         <div class="form-group">
@@ -584,320 +690,327 @@
         <div class="form-group">
           <label for="input-client">2. Identificador / Slug del Cliente (Client)</label>
           <input type="text" id="input-client" class="form-control" placeholder="ej. transklett" value="transklett">
-          <span style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem; display: block;">
-            Usa el mismo nombre de usuario que tiene en tu GPS Server.
+          <span style="font-size: 0.7rem; color: var(--text-dim); margin-top: 0.25rem; display: block;">
+            Usará los parámetros del entorno de Render con el prefijo asignado.
           </span>
         </div>
 
         <div class="url-output-container">
           <div class="tooltip-success" id="copy-tooltip">¡Copiado al portapapeles!</div>
-          <div class="url-output" id="url-result">Generando URL...</div>
+          <div class="url-output" id="url-result">Generando webhook...</div>
           <button class="btn-copy" id="btn-copy">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px;height:16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:13px;height:13px;">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.4m1.95 2.1h2.25m-.75 11.25V18a2.25 2.25 0 0 1 2.25-2.25h9a2.25 2.25 0 0 1 2.25 2.25v-9a2.25 2.25 0 0 1-2.25-2.25h-9a2.25 2.25 0 0 1-2.25 2.25v.85" />
             </svg>
-            Copiar
+            COPY
           </button>
         </div>
       </div>
 
-      <!-- Live Terminal Logger Mockup -->
-      <div class="card" style="padding: 0; display: flex; flex-direction: column;">
+      <!-- Live Terminal Logger (Render CLI Mockup) -->
+      <div class="card" style="padding: 0;">
         <div class="console-wrapper">
           <div class="console-header">
-            <div class="console-buttons">
-              <div class="console-btn red"></div>
-              <div class="console-btn yellow"></div>
-              <div class="console-btn green"></div>
+            <div class="console-title">
+              <div class="console-status-dot"></div>
+              service-live-logs.log
             </div>
-            <div class="console-title">middleware-logs.sh</div>
             <button class="btn-simulate" id="btn-simulate">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:14px;height:14px;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:12px;height:12px;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
               </svg>
-              Simular Tráfico
+              SIMULAR REPORTES
             </button>
           </div>
           <div class="console-body" id="console-body">
+            <pre class="ascii-logo">
+██╗   ██╗██╗██╗  ██╗ █████╗ ██████╗ 
+██║   ██║██║██║ ██╔╝██╔══██╗██╔══██╗
+██║   ██║██║█████╔╝ ███████║██████╔╝
+╚██╗ ██╔╝██║██╔═██╗ ██╔══██║██╔══██╗
+ ╚████╔╝ ██║██║  ██╗██║  ██║██║  ██║
+  ╚═══╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝</pre>
             <div class="log-entry">
-              <span class="log-time">[2026-05-27T18:31:02.000Z]</span>
-              <span class="log-router">VIKAR B2B Integrations Middleware iniciado en el puerto 3001</span>
+              <span class="log-time">[2026-05-28 12:30:00.010]</span>
+              <span class="log-router">SYSTEM: Inicializando ruteador de telemetria B2B en puerto 3001.</span>
             </div>
             <div class="log-entry">
-              <span class="log-time">[2026-05-27T18:31:02.012Z]</span>
-              <span class="log-router">Modo dinámico activado. Esperando conexiones de gsh7.net...</span>
+              <span class="log-time">[2026-05-28 12:30:00.015]</span>
+              <span class="log-router">SYSTEM: Cargar variables de entorno completado.</span>
             </div>
             <div class="log-entry">
-              <span class="log-time">[Haga clic en "Simular Tráfico" para ver la transmisión en vivo]</span>
+              <span class="log-time">[2026-05-28 12:30:00.020]</span>
+              <span class="log-router">SYSTEM: Webhook de Recepcion de Terceros '/webhook/incoming-gps' habilitado.</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[Haga clic en "SIMULAR REPORTES" para inyectar tramas de prueba en tiempo real]</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Integration Specs section -->
+    <!-- Active B2B Connectors Grid Section -->
     <div class="section-title">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px;height:24px;color:var(--accent);">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M21 20.25V3.75a1.125 1.125 0 0 0-1.125-1.125H4.125A1.125 1.125 0 0 0 3 3.75v16.5M21 3.75V20.25M3 3.75V20.25M3 18.75h18M3 20.25h18" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+        <line x1="6" y1="6" x2="6.01" y2="6"/>
+        <line x1="6" y1="18" x2="6.01" y2="18"/>
       </svg>
-      Plataformas de Destino B2B y Variables en Render
+      Servicios de Red y Conectores de Salida B2B
     </div>
 
-    <div class="targets-grid">
+    <div class="services-list">
       <!-- Melón -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">M</div>
-            <div>
-              <div class="target-name">Cementos Melón</div>
-              <div class="target-slug">target=melon</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-unigis-melon-connector</div>
+            <div class="service-type-badge">Web Service (SOAP Envelope)</div>
           </div>
-          <span class="net-badge public">Público (WSDL)</span>
+          <div class="service-route-slug">target=melon</div>
+          <span class="service-env-badge">UNIGIS_API_URL</span>
+          <span class="service-env-badge">UNIGIS_SYSTEM_USER</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">UNIGIS_API_URL</span></li>
-            <li><span class="var-name">UNIGIS_SYSTEM_USER</span></li>
-            <li><span class="var-name">UNIGIS_PASSWORD</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Colun -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">C</div>
-            <div>
-              <div class="target-name">Colun</div>
-              <div class="target-slug">target=colun</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-colun-wing-forwarder</div>
+            <div class="service-type-badge">Background Worker (REST JSON)</div>
           </div>
-          <span class="net-badge public">Público (API)</span>
+          <div class="service-route-slug">target=colun</div>
+          <span class="service-env-badge">COLUN_API_URL</span>
+          <span class="service-env-badge">COLUN_BEARER_TOKEN</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">COLUN_API_URL</span></li>
-            <li><span class="var-name">COLUN_BEARER_TOKEN</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Arauco -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">A</div>
-            <div>
-              <div class="target-name">Arauco (SISCO)</div>
-              <div class="target-slug">target=arauco</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-arauco-sisco-tunnel</div>
+            <div class="service-type-badge">Private Connection (SOAP WS)</div>
           </div>
-          <span class="net-badge private">Red Privada / QA</span>
+          <div class="service-route-slug">target=arauco</div>
+          <span class="service-env-badge">ARAUCO_API_URL</span>
+          <span class="service-env-badge">ARAUCO_COD_FLOTA</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">ARAUCO_API_URL</span></li>
-            <li><span class="var-name">ARAUCO_PROVIDER_NAME</span></li>
-            <li><span class="var-name">ARAUCO_NOM_FLOTA</span></li>
-            <li><span class="var-name">ARAUCO_COD_FLOTA</span></li>
-          </ul>
+        <span class="net-tag private">Private IP</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Falabella -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">F</div>
-            <div>
-              <div class="target-name">Falabella Group</div>
-              <div class="target-slug">target=falabella</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-qanalytics-falabella</div>
+            <div class="service-type-badge">Web Service (SOAP Envelope)</div>
           </div>
-          <span class="net-badge public">Público (WSDL)</span>
+          <div class="service-route-slug">target=falabella</div>
+          <span class="service-env-badge">FALABELLA_API_URL</span>
+          <span class="service-env-badge">FALABELLA_USER</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">FALABELLA_API_URL</span></li>
-            <li><span class="var-name">FALABELLA_USER</span></li>
-            <li><span class="var-name">FALABELLA_PASSWORD</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Cencosud -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">K</div>
-            <div>
-              <div class="target-name">Cencosud</div>
-              <div class="target-slug">target=cencosud</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-cencosud-rest-api</div>
+            <div class="service-type-badge">Background Worker (REST JSON)</div>
           </div>
-          <span class="net-badge private">API Privada</span>
+          <div class="service-route-slug">target=cencosud</div>
+          <span class="service-env-badge">CENCOSUD_API_URL</span>
+          <span class="service-env-badge">CENCOSUD_API_KEY</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">CENCOSUD_API_URL</span></li>
-            <li><span class="var-name">CENCOSUD_API_KEY</span></li>
-          </ul>
+        <span class="net-tag private">Private API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Walmart -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">W</div>
-            <div>
-              <div class="target-name">Walmart Chile</div>
-              <div class="target-slug">target=walmart</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-walmart-retaillink-api</div>
+            <div class="service-type-badge">Background Worker (REST JSON)</div>
           </div>
-          <span class="net-badge private">API Privada</span>
+          <div class="service-route-slug">target=walmart</div>
+          <span class="service-env-badge">WALMART_API_URL</span>
+          <span class="service-env-badge">WALMART_CLIENT_ID</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">WALMART_API_URL</span></li>
-            <li><span class="var-name">WALMART_CLIENT_ID</span></li>
-            <li><span class="var-name">WALMART_CLIENT_SECRET</span></li>
-          </ul>
+        <span class="net-tag private">Private API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Mercado Libre -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">L</div>
-            <div>
-              <div class="target-name">Mercado Libre</div>
-              <div class="target-slug">target=mercadolibre</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-mercadolibre-meli-hub</div>
+            <div class="service-type-badge">Web Service (REST Webhook)</div>
           </div>
-          <span class="net-badge public">API Pública</span>
+          <div class="service-route-slug">target=mercadolibre</div>
+          <span class="service-env-badge">MERCADOLIBRE_API_URL</span>
+          <span class="service-env-badge">MERCADOLIBRE_BEARER_TOKEN</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">MERCADOLIBRE_API_URL</span></li>
-            <li><span class="var-name">MERCADOLIBRE_BEARER_TOKEN</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- SMU -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">S</div>
-            <div>
-              <div class="target-name">SMU (Unimarc)</div>
-              <div class="target-slug">target=smu</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-smu-unimarc-integration</div>
+            <div class="service-type-badge">Background Worker (REST API)</div>
           </div>
-          <span class="net-badge private">API Privada</span>
+          <div class="service-route-slug">target=smu</div>
+          <span class="service-env-badge">SMU_API_URL</span>
+          <span class="service-env-badge">SMU_API_TOKEN</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">SMU_API_URL</span></li>
-            <li><span class="var-name">SMU_API_TOKEN</span></li>
-          </ul>
+        <span class="net-tag private">Private API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Agrosuper -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">G</div>
-            <div>
-              <div class="target-name">Agrosuper</div>
-              <div class="target-slug">target=agrosuper</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-agrosuper-coldchain-api</div>
+            <div class="service-type-badge">Background Worker (REST JSON)</div>
           </div>
-          <span class="net-badge private">API Privada</span>
+          <div class="service-route-slug">target=agrosuper</div>
+          <span class="service-env-badge">AGROSUPER_API_URL</span>
+          <span class="service-env-badge">AGROSUPER_API_KEY</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">AGROSUPER_API_URL</span></li>
-            <li><span class="var-name">AGROSUPER_API_KEY</span></li>
-          </ul>
+        <span class="net-tag private">Private API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- CCU -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">U</div>
-            <div>
-              <div class="target-name">CCU Chile</div>
-              <div class="target-slug">target=ccu</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-ccu-delivery-telemetry</div>
+            <div class="service-type-badge">Background Worker (REST JSON)</div>
           </div>
-          <span class="net-badge public">API Pública</span>
+          <div class="service-route-slug">target=ccu</div>
+          <span class="service-env-badge">CCU_API_URL</span>
+          <span class="service-env-badge">CCU_BEARER_TOKEN</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">CCU_API_URL</span></li>
-            <li><span class="var-name">CCU_BEARER_TOKEN</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- Amazon -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">Z</div>
-            <div>
-              <div class="target-name">Amazon SP-API</div>
-              <div class="target-slug">target=amazon</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-amazon-sellingpartner-api</div>
+            <div class="service-type-badge">Cron Job (OAuth REST API)</div>
           </div>
-          <span class="net-badge public">API Pública</span>
+          <div class="service-route-slug">target=amazon</div>
+          <span class="service-env-badge">AMAZON_API_URL</span>
+          <span class="service-env-badge">AMAZON_ACCESS_TOKEN</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">AMAZON_API_URL</span></li>
-            <li><span class="var-name">AMAZON_ACCESS_TOKEN</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
 
       <!-- DHL -->
-      <div class="target-card">
-        <div class="target-header">
-          <div class="target-info">
-            <div class="target-icon">D</div>
-            <div>
-              <div class="target-name">DHL Logística</div>
-              <div class="target-slug">target=dhl</div>
-            </div>
+      <div class="service-row">
+        <div class="service-info-col">
+          <div class="service-status-indicator"></div>
+          <div class="service-name-wrapper">
+            <div class="service-name">srv-dhl-3pl-integration</div>
+            <div class="service-type-badge">Background Worker (REST JSON)</div>
           </div>
-          <span class="net-badge public">API Pública</span>
+          <div class="service-route-slug">target=dhl</div>
+          <span class="service-env-badge">DHL_API_URL</span>
+          <span class="service-env-badge">DHL_API_KEY</span>
         </div>
-        <div class="target-variables">
-          <div class="target-variables-title">Variables en Render:</div>
-          <ul class="var-list">
-            <li><span class="var-name">DHL_API_URL</span></li>
-            <li><span class="var-name">DHL_API_KEY</span></li>
-          </ul>
+        <span class="net-tag public">Public API</span>
+        <div class="service-visualizer">
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
+          <div class="vis-cell"><div class="vis-bar"></div></div>
         </div>
       </div>
     </div>
@@ -905,7 +1018,7 @@
     <!-- Footer -->
     <footer>
       <p>&copy; 2026 Vikar GPS S.A. Todos los derechos reservados.</p>
-      <p>Desarrollado para la gestión de flotas y ruteo telemático B2B. Contacto: <a href="mailto:contacto@vikargps.cl">contacto@vikargps.cl</a></p>
+      <p>Desarrollado para la gestión de flotas y enrutamiento telemático B2B. Contacto: <a href="mailto:contacto@vikargps.cl">contacto@vikargps.cl</a></p>
     </footer>
   </div>
 
@@ -970,7 +1083,7 @@
       const randomTarget = selectPlatform.value;
       const targetLabel = selectPlatform.options[selectPlatform.selectedIndex].text.split(' (')[0];
       
-      const now = new Date().toISOString();
+      const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
       const lat = (-30 - Math.random() * 10).toFixed(6);
       const lng = (-70 - Math.random() * 5).toFixed(6);
       const speed = Math.floor(40 + Math.random() * 60);
@@ -984,9 +1097,10 @@
         `<span class="log-time">[${now}]</span> [Router] Envío completado con éxito.`
       ];
 
-      logs.forEach(log => {
+      // Insert log entries with highlight class for the first log of the batch
+      logs.forEach((log, index) => {
         const div = document.createElement('div');
-        div.className = 'log-entry';
+        div.className = 'log-entry' + (index === 0 ? ' active' : '');
         div.innerHTML = log;
         consoleBody.appendChild(div);
       });
