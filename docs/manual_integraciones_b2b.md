@@ -44,15 +44,11 @@
    * 6.2. Generador Automático de URLs de Webhook
    * 6.3. Monitor en Tiempo Real y Diagnóstico de Tráfico
    * 6.4. Simulador de Envío y Herramienta de Pruebas de Ping
-7. **Recepción de Telemetría Externa (Entrada a Vikar)**
-   * 7.1. Propósito del Endpoint Receptáculo
-   * 7.2. Especificaciones de la API de Entrada (JSON POST)
-   * 7.3. Autenticación y Llave de Seguridad (API Key)
-8. **Resolución de Problemas Frecuentes (Troubleshooting)**
-   * 8.1. El vehículo reporta en gsh7.net pero no llega al Mandante
-   * 8.2. Errores de Conexión Comunes (Timeout, Credenciales, Red Privada)
-   * 8.3. Cómo revisar los logs del servidor en Render.com
-9. **Anexo: Ficha de Validación e Inicio de Transmisión (Imprimible)**
+7. **Resolución de Problemas Frecuentes (Troubleshooting)**
+   * 7.1. El vehículo reporta en gsh7.net pero no llega al Mandante
+   * 7.2. Errores de Conexión Comunes (Timeout, Credenciales, Red Privada)
+   * 7.3. Cómo revisar los logs del servidor en Render.com
+8. **Anexo: Ficha de Validación e Inicio de Transmisión (Imprimible)**
 
 ---
 
@@ -371,59 +367,9 @@ El panel permite realizar una simulación técnica para verificar que los servid
 
 ---
 
-## 7. RECEPCIÓN DE TELEMETRÍA EXTERNA (Entrada a Vikar)
+## 7. RESOLUCIÓN DE PROBLEMAS FRECUENTES (Troubleshooting)
 
-El middleware también puede actuar como un **Receptor Universal** para que empresas externas, transportistas subcontratados o proveedores de GPS terceros envíen sus datos a nuestra plataforma para visualizarlos de manera centralizada en tu panel **gsh7.net (ID 39)**.
-
-### 7.1. Propósito del Endpoint Receptáculo
-En lugar de que cada tercero intente conectarse de forma nativa a la base de datos de nuestro servidor GPS, ellos envían un simple y estándar paquete de datos en formato **JSON** al middleware de Render. El middleware se encarga de recibirlo, validar su firma de seguridad y reenviarlo en milisegundos a la API de localización de `gsh7.net`.
-
-### 7.2. Especificaciones de la API de Entrada (JSON POST)
-La dirección URL a la cual la empresa externa debe apuntar su integración es:
-`https://integraciones-vikar.onrender.com/webhook/incoming-gps`
-
-El método de envío debe ser **HTTP POST** con un payload JSON estructurado bajo la siguiente definición de campos:
-
-#### JSON de Ejemplo a enviar:
-```json
-{
-  "imei": "999888777666555",
-  "plate": "PARTNER88",
-  "lat": -33.456789,
-  "lng": -70.654321,
-  "speed": 70,
-  "angle": 90,
-  "dt": "2026-05-28 12:00:00",
-  "ignition": true,
-  "params": "temp1=2.5|"
-}
-```
-
-*   **`imei`** (Obligatorio - Texto): El IMEI o identificador único del camión en el sistema GPS.
-*   **`lat`** (Obligatorio - Decimal): Latitud geográfica.
-*   **`lng`** (Obligatorio - Decimal): Longitud geográfica.
-*   **`plate`** (Opcional - Texto): Patente del vehículo.
-*   **`speed`** (Opcional - Entero): Velocidad en km/h.
-*   **`angle`** (Opcional - Entero): Rumbo en grados (0 a 359).
-*   **`dt`** (Opcional - Texto): Fecha y hora en formato `AAAA-MM-DD HH:MM:SS` (se recomienda usar hora UTC). Si no se envía, el servidor tomará la hora actual.
-*   **`ignition`** (Opcional - Booleano o Texto): Estado del motor. Acepta `true`/`false`, `1`/`0`, o `"ON"`/`"OFF"`.
-*   **`params`** (Opcional - Texto): Parámetros adicionales estructurados (ej. sensores de temperatura: `temp1=2.5|door=0|`).
-
-### 7.3. Autenticación y Llave de Seguridad (API Key)
-Para proteger nuestro servidor GPS de envíos maliciosos, cada petición externa debe incluir una cabecera HTTP de autenticación obligatoria:
-
-*   **Nombre de Cabecera:** `X-API-Key`
-*   **Llave Autorizada:** El valor por defecto es `vikar_incoming_secure_key_2026` (se puede cambiar o configurar en la variable de entorno `INCOMING_API_KEY` en Render).
-
-> [!IMPORTANT]
-> **Pauta de Configuración:**
-> Antes de que el proveedor externo comience a transmitir a esta URL, asegúrese de haber creado la patente del vehículo y su IMEI correspondiente dentro de la plataforma **gsh7.net** para que los datos puedan mapearse y visualizarse correctamente en los mapas.
-
----
-
-## 8. RESOLUCIÓN DE PROBLEMAS FRECUENTES (Troubleshooting)
-
-### 8.1. El vehículo reporta en gsh7.net pero no llega al Mandante
+### 7.1. El vehículo reporta en gsh7.net pero no llega al Mandante
 *   **Causa 1: Patente mal formateada en GPS Server.**
     *   *Solución:* Revise que la patente en el servidor GPS esté en mayúsculas y no contenga guiones (ej. debe ser `ABCD12` y no `abcd-12`).
 *   **Causa 2: La patente no está registrada en el sistema del Mandante.**
@@ -431,7 +377,7 @@ Para proteger nuestro servidor GPS de envíos maliciosos, cada petición externa
 *   **Causa 3: Webhook mal configurado.**
     *   *Solución:* Verifique que la URL copiada en gsh7.net tenga exactamente las palabras clave correctas sin espacios (ej: `target=melon&client=transklett`).
 
-### 8.2. Errores de Conexión Comunes (Timeout, Credenciales, Red Privada)
+### 7.2. Errores de Conexión Comunes (Timeout, Credenciales, Red Privada)
 *   **Error: `ETIMEDOUT` / `ENOTFOUND`**
     *   *Significado:* El servidor del mandante no responde o no está disponible públicamente.
     *   *Solución:* Compruebe si el mandante requiere Red Privada (ej. Arauco). Si es así, asegúrese de haber solicitado a su TI que agregue la IP de salida de nuestro servidor de Render a su lista blanca.
@@ -439,7 +385,7 @@ Para proteger nuestro servidor GPS de envíos maliciosos, cada petición externa
     *   *Significado:* El token o las credenciales configuradas en Render no son válidas o han expirado.
     *   *Solución:* Revise en Render que el nombre de las variables de entorno para el cliente esté bien escrito (ej: `UNIGIS_PASSWORD_CLIENTE`) y que el valor copiado no tenga espacios adicionales al inicio o al final.
 
-### 8.3. Cómo revisar los logs del servidor en Render.com
+### 7.3. Cómo revisar los logs del servidor en Render.com
 Si la falla persiste y necesita apoyo de desarrollo:
 1. Inicie sesión en **Render.com** y haga clic en **`integraciones-vikar`**.
 2. Seleccione la pestaña **Logs** en el panel superior.
@@ -453,7 +399,7 @@ Si la falla persiste y necesita apoyo de desarrollo:
 
 \newpage
 
-## 9. ANEXO: FICHA DE VALIDACIÓN E INICIO DE TRANSMISIÓN (Imprimible)
+## 8. ANEXO: FICHA DE VALIDACIÓN E INICIO DE TRANSMISIÓN (Imprimible)
 
 *Esta ficha debe ser impresa y completada por el operador de Vikar GPS encargado para registrar cada proceso de integración de manera formal.*
 

@@ -174,19 +174,31 @@ def draw_table(pdf, rows):
     if not rows:
         return
     
-    # Detectar ancho de columnas según el contenido. 
-    # Para tabla de mandante (especificaciones datos standard): [Nombre, Tipo, Formato, Descripcion]
-    # Ancho total: 170 mm
-    widths = [38, 22, 45, 65]
-    
-    # Determinar si la primera fila es de cabecera
     clean_rows = []
     for r in rows:
         # Saltar las filas de separador de Markdown
         if re.match(r'^\s*\|\s*[:\-|\s]+$', r):
             continue
-        cols = [c.strip() for c in r.split('|')[1:-1]]
+        # Reemplazar tuberías escapadas con un marcador temporal antes de separar
+        r_temp = r.replace('\\|', '___PIPE_PLACEHOLDER___')
+        cols = [c.strip().replace('___PIPE_PLACEHOLDER___', '|') for c in r_temp.split('|')[1:-1]]
         clean_rows.append(cols)
+        
+    if not clean_rows:
+        return
+        
+    num_cols = len(clean_rows[0])
+    
+    # Determinar anchos de columna según el número de columnas
+    if num_cols == 4:
+        # Tabla de Mandantes / Integraciones
+        widths = [38, 30, 78, 24]
+    elif num_cols == 5:
+        # Tabla de Vehículos Autorizados / Interna
+        widths = [12, 32, 45, 32, 49]
+    else:
+        # Distribución uniforme
+        widths = [170.0 / num_cols] * num_cols
 
     # Renderizar cada fila
     for row_idx, cols in enumerate(clean_rows):
@@ -246,9 +258,19 @@ def draw_table(pdf, rows):
 
 def parse_markdown_to_pdf(markdown_path, output_pdf_path):
     filename = os.path.basename(markdown_path).lower()
+    
+    is_internal_reception = "interno_recepcion" in filename
+    is_external_provider = "proveedor_recepcion" in filename
     is_client_guide = "cliente" in filename or "mandante" in filename
     
-    title_header = "VIKAR GPS  |  Guía de Integración para Mandantes" if is_client_guide else "VIKAR GPS  |  Manual de Operación de Integraciones B2B"
+    if is_internal_reception:
+        title_header = "VIKAR GPS  |  Manual Interno de Recepción GPS"
+    elif is_external_provider:
+        title_header = "VIKAR GPS  |  Guía de Integración para Proveedores"
+    elif is_client_guide:
+        title_header = "VIKAR GPS  |  Guía de Integración para Mandantes"
+    else:
+        title_header = "VIKAR GPS  |  Manual de Operación de Integraciones B2B"
 
     with open(markdown_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -268,7 +290,19 @@ def parse_markdown_to_pdf(markdown_path, output_pdf_path):
     pdf.set_text_color(27, 54, 93)
     pdf.set_font("Arial", "B", 18)
     
-    if is_client_guide:
+    if is_internal_reception:
+        pdf.multi_cell(170, 8, "MANUAL INTERNO DE CONFIGURACIÓN:\nRECEPCIÓN DE TELEMETRÍA EXTERNA", align="L")
+        pdf.ln(5)
+        pdf.set_text_color(100, 110, 120)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Procedimiento de Alta y Parametrización de Terceros")
+    elif is_external_provider:
+        pdf.multi_cell(170, 8, "GUÍA DE INTEGRACIÓN DE TELEMETRÍA\nPARA PROVEEDORES GPS", align="L")
+        pdf.ln(5)
+        pdf.set_text_color(100, 110, 120)
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 8, "Especificaciones de Entrada y Formato de Datos JSON")
+    elif is_client_guide:
         pdf.multi_cell(170, 8, "GUÍA DE INTEGRACIÓN TELEMÁTICA\nPARA EMPRESAS MANDANTES", align="L")
         pdf.ln(5)
         pdf.set_text_color(100, 110, 120)
@@ -299,7 +333,25 @@ def parse_markdown_to_pdf(markdown_path, output_pdf_path):
     pdf.set_xy(25, metadata_y + 4)
     pdf.set_text_color(40, 40, 40)
     
-    if is_client_guide:
+    if is_internal_reception:
+        metadata = [
+            ("Version del Manual:", "1.0 (Edicion Corporativa de Oficina)"),
+            ("Fecha de Edicion:", "Mayo 2026"),
+            ("Disenado Para:", "Operadores y Soporte Tecnico de Vikar GPS"),
+            ("Servicio Servidor:", "Render Web Service (integraciones-vikar)"),
+            ("Endpoint de Entrada:", "/webhook/incoming-gps"),
+            ("Clave API por Defecto:", "vikar_incoming_secure_key_2026"),
+        ]
+    elif is_external_provider:
+        metadata = [
+            ("Documento Ref.:", "GI-PROV-01 (Guia de Integracion Externa)"),
+            ("Emisor Oficial:", "Area de Integraciones y TI - Vikar GPS"),
+            ("Contacto Tecnico:", "contacto@vikargps.cl"),
+            ("Metodo y Formato:", "HTTP POST (application/json)"),
+            ("Endpoint de Destino:", "https://integraciones-vikar.onrender.com/webhook/incoming-gps"),
+            ("Estado del Endpoint:", "Activo en Produccion (Protegido por API Key)"),
+        ]
+    elif is_client_guide:
         metadata = [
             ("Documento Ref.:", "GI-MAND-01 (Guía de Transmisión Externa)"),
             ("Emisor Oficial:", "Area de Integraciones y TI - Vikar GPS"),
@@ -328,7 +380,7 @@ def parse_markdown_to_pdf(markdown_path, output_pdf_path):
         
     # Mensaje de impresión en la parte inferior
     pdf.set_xy(20, 220)
-    if is_client_guide:
+    if is_client_guide or is_external_provider:
         pdf.set_fill_color(240, 248, 255) # Celeste
         pdf.set_draw_color(190, 218, 255)
         pdf.rect(20, 220, 170, 20, style="FD")
@@ -339,7 +391,10 @@ def parse_markdown_to_pdf(markdown_path, output_pdf_path):
         pdf.ln(5)
         pdf.set_x(25)
         pdf.set_font("Arial", "", 8.5)
-        pdf.cell(0, 5, "Por favor remita este documento a su departamento de TI o de Soporte de Integraciones.")
+        if is_external_provider:
+            pdf.cell(0, 5, "Por favor remita este documento al area de Ingenieria o Desarrollo de su proveedor GPS.")
+        else:
+            pdf.cell(0, 5, "Por favor remita este documento a su departamento de TI o de Soporte de Integraciones.")
     else:
         pdf.set_fill_color(255, 241, 240) # Rojo
         pdf.set_draw_color(255, 204, 199)
