@@ -73,12 +73,24 @@ process.env.COLUN_BEARER_TOKEN = 'Bearer test_jwt_token';
 process.env.UNIGIS_SYSTEM_USER_KLETT = 'KLETT_USER_MOCK';
 process.env.UNIGIS_PASSWORD_KLETT = 'KLETT_PASS_MOCK';
 
+// Setup mock incoming GPS environment variables
+process.env.GPS_SERVER_URL = 'http://localhost:4005/api/api_loc.php';
+process.env.INCOMING_API_KEY = 'test_incoming_key_123';
+
+const gpsServerApp = express();
+gpsServerApp.get('/api/api_loc.php', (req, res) => {
+  console.log('\n[Mock GPS Server] Received forwarded request from incoming-gps endpoint:');
+  console.log('Query:', req.query);
+  res.send('ok');
+});
+
 // Start all mock servers
 const servers = [
   colunApp.listen(4001, () => console.log('[Mocks] Colun mock active on port 4001')),
   araucoApp.listen(4002, () => console.log('[Mocks] Arauco mock active on port 4002')),
   unigisApp.listen(4003, () => console.log('[Mocks] UNIGIS mock active on port 4003')),
-  falabellaApp.listen(4004, () => console.log('[Mocks] Falabella mock active on port 4004'))
+  falabellaApp.listen(4004, () => console.log('[Mocks] Falabella mock active on port 4004')),
+  gpsServerApp.listen(4005, () => console.log('[Mocks] GPS Server mock active on port 4005'))
 ];
 
 // Boot middleware server in the same process using mock env variables
@@ -152,6 +164,35 @@ async function runTest() {
     console.log('[Test Suite] Middleware Response Body:', dynamicRes.data);
   } catch (err) {
     console.error('[Test Suite] Error running dynamic webhook test:', err.message);
+  }
+
+  try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 3: Incoming GPS Telemetry from Third Party');
+    console.log('================================================================');
+    console.log('[Test Suite] Dispatching simulated JSON POST to /webhook/incoming-gps...');
+    
+    const incomingPayload = {
+      imei: '999888777666555',
+      plate: 'PARTNER88',
+      lat: -33.456789,
+      lng: -70.654321,
+      speed: 70,
+      angle: 90,
+      dt: '2026-05-28 12:00:00',
+      ignition: true,
+      params: 'temp1=2.5|'
+    };
+
+    const res = await axios.post(`http://localhost:${MIDDLEWARE_PORT}/webhook/incoming-gps`, incomingPayload, {
+      headers: {
+        'X-API-Key': 'test_incoming_key_123'
+      }
+    });
+    console.log('[Test Suite] Middleware Response Status:', res.status);
+    console.log('[Test Suite] Middleware Response Body:', res.data);
+  } catch (err) {
+    console.error('[Test Suite] Error running Scenario 3:', err.response ? err.response.data : err.message);
   }
 
   // Shut down mocks

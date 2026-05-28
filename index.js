@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 // Import Strategy Classes
 const ColunStrategy = require('./integrations/colun');
@@ -251,6 +252,73 @@ async function handleGpsServerWebhook(req, res) {
 
 app.get('/webhook/gps-server', handleGpsServerWebhook);
 app.post('/webhook/gps-server', handleGpsServerWebhook);
+
+/**
+ * Standard incoming endpoint for third-party GPS providers.
+ * Translates and forwards external telemetry JSON to GPS Server (gsh7.net).
+ */
+app.post('/webhook/incoming-gps', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-api-key'] || req.query.api_key;
+    const expectedKey = process.env.INCOMING_API_KEY || 'vikar_incoming_secure_key_2026';
+
+    if (apiKey !== expectedKey) {
+      console.warn(`[Incoming GPS] Unauthorized access attempt with API Key: ${apiKey}`);
+      return res.status(401).json({ success: false, error: 'Unauthorized. Invalid API Key.' });
+    }
+
+    const { imei, plate, lat, lng, speed, angle, dt, ignition, params } = req.body;
+
+    if (!imei || lat === undefined || lng === undefined) {
+      return res.status(400).json({ success: false, error: 'Missing required fields: imei, lat, lng' });
+    }
+
+    // Determine ignition value (ACC)
+    let accVal = 0;
+    if (ignition === true || ignition === 1 || String(ignition).toUpperCase() === 'ON' || String(ignition).toUpperCase() === '1') {
+      accVal = 1;
+    }
+
+    // Build params string
+    let paramsStr = `acc=${accVal}|`;
+    if (params) {
+      paramsStr += params;
+    }
+
+    // Prepare parameters for gsh7.net
+    const gpsParams = {
+      imei: imei,
+      plate: plate || '',
+      lat: Number(lat).toFixed(6),
+      lng: Number(lng).toFixed(6),
+      speed: Number(speed || 0),
+      angle: Number(angle || 0),
+      dt: dt || new Date().toISOString().replace('T', ' ').substring(0, 19),
+      loc_valid: 1,
+      altitude: 0,
+      params: paramsStr
+    };
+
+    const targetUrl = process.env.GPS_SERVER_URL || 'http://gsh7.net/id39/api/api_loc.php';
+    console.log(`[Incoming GPS] Forwarding telemetry for ${plate || imei} to GPS Server: ${targetUrl}`);
+    
+    const response = await axios.get(targetUrl, { 
+      params: gpsParams,
+      timeout: 8000
+    });
+
+    console.log(`[Incoming GPS] GPS Server Response:`, response.data);
+
+    res.json({ 
+      success: true, 
+      message: 'Telemetry received and forwarded successfully', 
+      serverResponse: response.data 
+    });
+  } catch (error) {
+    console.error('[Incoming GPS] Error forwarding telemetry:', error.message);
+    res.status(500).json({ success: false, error: 'Internal server error: ' + error.message });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`===========================================================`);
