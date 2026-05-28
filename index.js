@@ -42,6 +42,40 @@ const PORT = process.env.PORT || 3001;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+/**
+ * Simple Basic Authentication middleware to protect the dashboard
+ */
+function basicAuth(req, res, next) {
+  // Allow public access to webhooks and health checks
+  if (req.path.startsWith('/webhook/') || req.path === '/health') {
+    return next();
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Vikar B2B Dashboard"');
+    return res.status(401).send('Authentication required.');
+  }
+
+  try {
+    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+    const user = auth[0];
+    const pass = auth[1];
+
+    if (user === 'admin' && pass === 'vikar1247') {
+      return next();
+    }
+  } catch (err) {
+    console.error('Error parsing auth header:', err.message);
+  }
+
+  res.setHeader('WWW-Authenticate', 'Basic realm="Vikar B2B Dashboard"');
+  return res.status(401).send('Invalid credentials.');
+}
+
+// Protect the dashboard using basic authentication
+app.use(basicAuth);
+
 // Serve static dashboard files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
