@@ -191,10 +191,10 @@ def draw_table(pdf, rows):
     
     # Determinar anchos de columna según el número de columnas
     if num_cols == 4:
-        # Tabla de Mandantes / Integraciones
-        widths = [38, 30, 78, 24]
+        # Tabla de Mandantes / Integraciones (Nombre Campo, Tipo, Formato, Descripcion)
+        widths = [30, 22, 38, 80]
     elif num_cols == 5:
-        # Tabla de Vehículos Autorizados / Interna
+        # Tabla de Vehículos Autorizados / Interna (N°, Patente, IMEI, Creado, Observaciones)
         widths = [12, 32, 45, 32, 49]
     else:
         # Distribución uniforme
@@ -205,20 +205,21 @@ def draw_table(pdf, rows):
         is_header = (row_idx == 0)
         
         # Calcular altura requerida para la fila basado en el contenido más largo
+        # Descontamos 3mm (1.5mm padding de cada lado) del ancho de columna para calcular el espacio real del texto
         max_lines = 1
         lines_list = []
         for i, text in enumerate(cols):
             clean_text = text.replace("**", "").replace("`", "").replace("<br>", "\n").replace("<br/>", "\n")
             clean_text = clean_special_chars(clean_text)
             pdf.set_font("Arial", "B" if is_header else "", 8.5)
-            # Obtener número de líneas virtuales que tomaría la celda
-            virtual_lines = pdf.multi_cell(widths[i], 5, clean_text, dry_run=True, output="LINES")
+            avail_w = max(5.0, widths[i] - 3.0)
+            virtual_lines = pdf.multi_cell(avail_w, 4.2, clean_text, dry_run=True, output="LINES")
             max_lines = max(max_lines, len(virtual_lines))
-            lines_list.append(clean_text)
+            lines_list.append((clean_text, virtual_lines))
             
-        row_h = max_lines * 4.8 + 3.5
+        row_h = max_lines * 4.2 + 4.5
 
-        # Control de salto de página
+        # Control de salto de página per-fila
         if pdf.y + row_h > 260:
             pdf.add_page()
             # Si saltamos página, volvemos a dibujar las cabeceras si no estamos en la cabecera misma
@@ -229,32 +230,51 @@ def draw_table(pdf, rows):
         x_start = pdf.x
         y_start = pdf.y
         
-        for i, text in enumerate(lines_list):
-            pdf.set_xy(x_start + sum(widths[:i]), y_start)
+        # 1. Dibujar el fondo y bordes de todas las celdas de la fila primero para que queden alineadas
+        for i in range(len(lines_list)):
+            cell_x = x_start + sum(widths[:i])
             if is_header:
                 pdf.set_fill_color(27, 54, 93)   # Azul Vikar oscuro
-                pdf.set_text_color(255, 255, 255)
-                pdf.set_font("Arial", "B", 8.5)
-                align = "C"
+                pdf.set_draw_color(200, 205, 210)
+                style = "FD"
             else:
                 if row_idx % 2 == 0:
                     pdf.set_fill_color(245, 247, 250)
                 else:
                     pdf.set_fill_color(255, 255, 255)
-                pdf.set_text_color(40, 40, 40)
-                pdf.set_font("Arial", "", 8.5)
-                align = "C" if (i == 1 or i == 0) else "L"
-
-            pdf.set_draw_color(200, 205, 210)
+                pdf.set_draw_color(200, 205, 210)
+                style = "FD"
             pdf.set_line_width(0.25)
+            pdf.rect(cell_x, y_start, widths[i], row_h, style=style)
             
-            # Dibujar la celda
-            pdf.multi_cell(widths[i], row_h, text, border=1, align=align, fill=True)
+        # 2. Escribir el texto de cada celda centrado verticalmente
+        for i, (clean_text, virtual_lines) in enumerate(lines_list):
+            cell_x = x_start + sum(widths[:i])
+            text_h = len(virtual_lines) * 4.2
+            top_padding = (row_h - text_h) / 2.0
+            
+            pdf.set_xy(cell_x + 1.5, y_start + top_padding)
+            if is_header:
+                pdf.set_text_color(255, 255, 255)
+                align = "C"
+            else:
+                pdf.set_text_color(40, 40, 40)
+                if num_cols == 5:
+                    align = "C" if i in (0, 1, 2, 3) else "L"
+                elif num_cols == 4:
+                    align = "C" if i == 1 else "L"
+                else:
+                    align = "C" if (i == 1 or i == 0) else "L"
+                
+            pdf.set_font("Arial", "B" if is_header else "", 8.5)
+            avail_w = max(5.0, widths[i] - 3.0)
+            pdf.multi_cell(avail_w, 4.2, clean_text, border=0, align=align, fill=False)
             
         # Posicionarse al final de la fila
         pdf.set_xy(x_start, y_start + row_h)
     
     pdf.ln(4)
+
 
 def parse_markdown_to_pdf(markdown_path, output_pdf_path):
     filename = os.path.basename(markdown_path).lower()
