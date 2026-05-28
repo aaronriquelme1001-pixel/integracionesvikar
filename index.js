@@ -254,6 +254,88 @@ app.get('/webhook/gps-server', handleGpsServerWebhook);
 app.post('/webhook/gps-server', handleGpsServerWebhook);
 
 /**
+ * Real-time integration testing endpoint
+ */
+app.get('/api/test', async (req, res) => {
+  const { target, client } = req.query;
+  
+  if (!target) {
+    return res.status(400).json({ success: false, error: 'Falta el parámetro target' });
+  }
+
+  const cleanTarget = target.toLowerCase();
+
+  try {
+    if (cleanTarget === 'incoming-gps') {
+      // Test connection to the central GPS Server
+      const targetUrl = process.env.GPS_SERVER_URL || 'http://gsh7.net/id39/api/api_loc.php';
+      const gpsParams = {
+        imei: '862798052972060',
+        plate: 'PING_TEST',
+        lat: '-33.456789',
+        lng: '-70.654321',
+        speed: 0,
+        angle: 0,
+        dt: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        loc_valid: 1,
+        altitude: 0,
+        params: 'acc=0|'
+      };
+
+      console.log(`[Test API] Testing GPS Server connection: ${targetUrl}`);
+      const response = await axios.get(targetUrl, { 
+        params: gpsParams,
+        timeout: 4000
+      });
+      
+      return res.json({ 
+        success: true, 
+        message: 'Conexión con GPS Server (gsh7.net) exitosa',
+        response: response.data 
+      });
+    }
+
+    const strategy = strategies[cleanTarget];
+    if (!strategy) {
+      return res.status(400).json({ success: false, error: `No se encontró estrategia para ${target}` });
+    }
+
+    // Standard mock telemetry payload for pings
+    const telemetry = {
+      imei: '862798052972060',
+      plate_number: 'TEST99',
+      lat: '-33.456789',
+      lng: '-70.654321',
+      speed: '60',
+      angle: '90',
+      dt_tracker: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      params: 'acc=1|'
+    };
+
+    const deviceConfig = {
+      plate: 'TEST99',
+      carrier: 'VIKARGPS_TEST'
+    };
+
+    const config = getDynamicIntegrationConfig(cleanTarget, client);
+    console.log(`[Test API] Running live strategy test for: ${cleanTarget} (Client: ${client || 'default'})...`);
+    
+    await strategy.execute(telemetry, deviceConfig, config);
+
+    return res.json({ 
+      success: true, 
+      message: `Test de conexión con ${target.toUpperCase()} exitoso` 
+    });
+  } catch (err) {
+    console.error(`[Test API] Error testing target ${target}:`, err.message);
+    return res.json({ 
+      success: false, 
+      error: err.message 
+    });
+  }
+});
+
+/**
  * Standard incoming endpoint for third-party GPS providers.
  * Translates and forwards external telemetry JSON to GPS Server (gsh7.net).
  */
