@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const { computeSignature } = require('./utils/signature');
 
 const MIDDLEWARE_PORT = 3001;
 
@@ -77,11 +78,56 @@ process.env.UNIGIS_PASSWORD_KLETT = 'KLETT_PASS_MOCK';
 process.env.GPS_SERVER_URL = 'http://localhost:4005/api/api_loc.php';
 process.env.INCOMING_API_KEY = 'test_incoming_key_123';
 
+// Tracksolid Mock environment variables
+process.env.TRACKSOLID_API_URL = 'http://localhost:4006/route/rest';
+process.env.TRACKSOLID_USER_ID = 'test_user';
+process.env.TRACKSOLID_APP_KEY = 'test_key';
+process.env.TRACKSOLID_APP_SECRET = 'test_secret';
+process.env.TRACKSOLID_USER_PWD_MD5 = 'test_pwd_md5';
+process.env.TRACKSOLID_IMEIS = '862798052972060';
+process.env.TRACKSOLID_POLL_INTERVAL = '60000'; // high interval so it doesn't poll repeatedly in test background
+
 const gpsServerApp = express();
 gpsServerApp.get('/api/api_loc.php', (req, res) => {
-  console.log('\n[Mock GPS Server] Received forwarded request from incoming-gps endpoint:');
+  console.log('\n[Mock GPS Server] Received forwarded request:');
   console.log('Query:', req.query);
   res.send('ok');
+});
+
+const tracksolidApp = express();
+tracksolidApp.use(bodyParser.urlencoded({ extended: true }));
+tracksolidApp.use(bodyParser.json());
+tracksolidApp.post('/route/rest', (req, res) => {
+  const method = req.query.method || req.body.method;
+  console.log(`\n[Mock Tracksolid API] Received request for method: ${method}`);
+  
+  if (method === 'jimi.oauth.token.get') {
+    return res.json({
+      code: 0,
+      message: 'success',
+      result: {
+        accessToken: 'mock_access_token_123456789',
+        expiresIn: 7200
+      }
+    });
+  } else if (method === 'jimi.device.location.get') {
+    return res.json({
+      code: 0,
+      message: 'success',
+      result: [
+        {
+          imei: '862798052972060',
+          lat: -39.821962,
+          lng: -73.229566,
+          speed: 0,
+          direction: 134,
+          accStatus: '0',
+          gpsTime: '2026-05-29 16:15:01'
+        }
+      ]
+    });
+  }
+  res.json({ code: -1, message: 'Unknown method' });
 });
 
 // Start all mock servers
@@ -90,7 +136,8 @@ const servers = [
   araucoApp.listen(4002, () => console.log('[Mocks] Arauco mock active on port 4002')),
   unigisApp.listen(4003, () => console.log('[Mocks] UNIGIS mock active on port 4003')),
   falabellaApp.listen(4004, () => console.log('[Mocks] Falabella mock active on port 4004')),
-  gpsServerApp.listen(4005, () => console.log('[Mocks] GPS Server mock active on port 4005'))
+  gpsServerApp.listen(4005, () => console.log('[Mocks] GPS Server mock active on port 4005')),
+  tracksolidApp.listen(4006, () => console.log('[Mocks] Tracksolid API mock active on port 4006'))
 ];
 
 // Boot middleware server in the same process using mock env variables
@@ -195,7 +242,70 @@ async function runTest() {
     console.error('[Test Suite] Error running Scenario 3:', err.response ? err.response.data : err.message);
   }
 
+  try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 4: Tracksolid Push Webhook (POST /webhook/location)');
+    console.log('================================================================');
+    
+    const tracksolidPayload = {
+      msgType: 'jimi.open.instruction.raw.receive',
+      data: JSON.stringify({
+        imei: '862798052972060',
+        gpsTime: '2026-05-29 12:45:00',
+        lat: -39.821962,
+        lng: -73.229566,
+        speed: 10,
+        direction: 90,
+        accStatus: '1',
+        electQuantity: 95,
+        powerValue: '13.2'
+      })
+    };
+
+    const commonParams = {
+      method: 'jimi.open.instruction.raw.receive',
+      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      app_key: 'test_key',
+      v: '1.0',
+      format: 'json'
+    };
+
+    const signParams = { ...commonParams, ...tracksolidPayload };
+    const sign = computeSignature(signParams, 'test_secret');
+    commonParams.sign = sign;
+
+    const url = `http://localhost:${MIDDLEWARE_PORT}/webhook/location?` + new URLSearchParams(commonParams).toString();
+    
+    console.log('[Test Suite] Sending signed POST request to /webhook/location...');
+    const res = await axios.post(url, tracksolidPayload);
+    console.log('[Test Suite] Middleware Response Status:', res.status);
+    console.log('[Test Suite] Middleware Response Body:', res.data);
+  } catch (err) {
+    console.error('[Test Suite] Error running Scenario 4:', err.response ? err.response.data : err.message);
+  }
+
+  try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 5: Live API Test Connection (/api/test?target=tracksolid)');
+    console.log('================================================================');
+    
+    console.log('[Test Suite] Sending test request for target tracksolid...');
+    const res = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/api/test?target=tracksolid`, {
+      auth: {
+        username: 'admin',
+        password: 'vikar1247'
+      }
+    });
+    console.log('[Test Suite] Middleware Response Status:', res.status);
+    console.log('[Test Suite] Middleware Response Body:', res.data);
+  } catch (err) {
+    console.error('[Test Suite] Error running Scenario 5:', err.response ? err.response.data : err.message);
+  }
+
   // Shut down mocks
-  console.log('\n[Test Suite] Closing mock B2B servers...');
+  console.log('\n[Test Suite] Closing mock B2B servers and exiting...');
   servers.forEach(s => s.close());
+  setTimeout(() => {
+    process.exit(0);
+  }, 1000);
 }

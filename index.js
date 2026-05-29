@@ -4,6 +4,24 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const { verifySignature, computeSignature } = require('./utils/signature');
+
+// Tracksolid API configuration
+const TRACKSOLID_API_URL = process.env.TRACKSOLID_API_URL || 'https://us-open.tracksolidpro.com/route/rest';
+const TRACKSOLID_USER_ID = process.env.TRACKSOLID_USER_ID;
+const TRACKSOLID_USER_PWD_MD5 = process.env.TRACKSOLID_USER_PWD_MD5;
+const TRACKSOLID_APP_KEY = process.env.TRACKSOLID_APP_KEY;
+const TRACKSOLID_APP_SECRET = process.env.TRACKSOLID_APP_SECRET;
+const TRACKSOLID_IMEIS = process.env.TRACKSOLID_IMEIS;
+const TRACKSOLID_POLL_INTERVAL = parseInt(process.env.TRACKSOLID_POLL_INTERVAL || '10000', 10);
+const GPS_SERVER_URL = process.env.GPS_SERVER_URL || 'http://gsh7.net/id39/api/api_loc.php';
+
+// Tracksolid Poller Cache & Diagnostics State
+let cachedTracksolidToken = null;
+let tracksolidTokenExpiresAt = null;
+let lastTracksolidPollTime = null;
+let lastTracksolidPollStatus = 'No runs yet';
+let lastTracksolidForwardStatus = 'No runs yet';
 
 // Import Strategy Classes
 const ColunStrategy = require('./integrations/colun');
@@ -108,7 +126,19 @@ function getDeviceConfig(imei) {
  * Health check endpoint
  */
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'integraciones-vikar', pattern: 'Strategy', time: new Date().toISOString() });
+  res.json({
+    status: 'OK',
+    service: 'integraciones-vikar',
+    pattern: 'Strategy',
+    time: new Date().toISOString(),
+    tracksolidPoller: {
+      active: !!(TRACKSOLID_USER_ID && TRACKSOLID_APP_KEY && TRACKSOLID_APP_SECRET && TRACKSOLID_USER_PWD_MD5 && TRACKSOLID_IMEIS),
+      hasToken: !!cachedTracksolidToken,
+      lastPollTime: lastTracksolidPollTime,
+      lastPollStatus: lastTracksolidPollStatus,
+      lastForwardStatus: lastTracksolidForwardStatus
+    }
+  });
 });
 
 /**
@@ -266,6 +296,19 @@ app.get('/api/test', async (req, res) => {
   const cleanTarget = target.toLowerCase();
 
   try {
+    if (cleanTarget === 'tracksolid') {
+      if (!TRACKSOLID_USER_ID || !TRACKSOLID_APP_KEY || !TRACKSOLID_APP_SECRET || !TRACKSOLID_USER_PWD_MD5) {
+        return res.status(400).json({ success: false, error: 'Credenciales de Tracksolid incompletas en variables de entorno' });
+      }
+      console.log(`[Test API] Testing Tracksolid API connection...`);
+      const token = await getTracksolidToken();
+      return res.json({
+        success: true,
+        message: 'Conexión con Tracksolid API exitosa. Token obtenido correctamente.',
+        token: token ? `${token.substring(0, 10)}...` : 'null'
+      });
+    }
+
     if (cleanTarget === 'incoming-gps') {
       // Test connection to the central GPS Server
       const targetUrl = process.env.GPS_SERVER_URL || 'http://gsh7.net/id39/api/api_loc.php';
@@ -402,9 +445,307 @@ app.post('/webhook/incoming-gps', async (req, res) => {
   }
 });
 
+/**
+ * Helper to format date in yyyy-MM-dd HH:mm:ss format (UTC)
+ */
+function getUtcTimestamp() {
+  const now = new Date();
+  const yyyy = now.getUTCFullYear();
+  const MM = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  const hh = String(now.getUTCHours()).padStart(2, '0');
+  const mm = String(now.getUTCMinutes()).padStart(2, '0');
+  const ss = String(now.getUTCSeconds()).padStart(2, '0');
+  return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
+}
+
+/**
+ * Common formatting and forwarding logic to GPS Server
+ */
+async function forwardTelemetryToGpsServer(payload, msgType = null) {
+  let gpsParams = {
+    imei: payload.imei,
+    altitude: 0,
+    loc_valid: 1
+  };
+
+  // Case 1: Alarm Push Event (jimi.push.device.alarm)
+  if (msgType === 'jimi.push.device.alarm' || payload.alarmType !== undefined) {
+    const alarmTypeStr = String(payload.alarmType || '');
+    const isAccOff = alarmTypeStr === '1001' || String(payload.originalAlarmType).toUpperCase() === 'ACC_OFF';
+    const isAccOn = alarmTypeStr === '1002' || String(payload.originalAlarmType).toUpperCase() === 'ACC_ON';
+    
+    let mappedEvent = 'alert';
+    let accVal = 0;
+
+    if (isAccOff) {
+      mappedEvent = 'ignition_off';
+      accVal = 0;
+    } else if (isAccOn) {
+      mappedEvent = 'ignition_on';
+      accVal = 1;
+    } else if (alarmTypeStr === '1') {
+      mappedEvent = 'sos';
+    } else if (alarmTypeStr === '2') {
+      mappedEvent = 'pwrcut';
+    } else if (alarmTypeStr === '14') {
+      mappedEvent = 'lowdc';
+    } else if (alarmTypeStr === '15') {
+      mappedEvent = 'lowbat';
+    } else if (alarmTypeStr === '20') {
+      mappedEvent = 'door';
+    } else if (alarmTypeStr === '41') {
+      mappedEvent = 'haccel';
+    } else if (alarmTypeStr === '48') {
+      mappedEvent = 'hbrake';
+    }
+
+    gpsParams.dt = payload.alarmTime || new Date().toISOString().replace('T', ' ').substring(0, 19);
+    gpsParams.lat = Number(payload.lat || 0).toFixed(6);
+    gpsParams.lng = Number(payload.lng || 0).toFixed(6);
+    gpsParams.speed = Number(payload.speed || 0);
+    gpsParams.angle = Number(payload.direction || 0);
+    gpsParams.event = mappedEvent;
+    gpsParams.params = `acc=${accVal}|alarm_type=${alarmTypeStr}|alarm_name=${payload.alarmName || ''}|`;
+
+  // Case 2: Standard Location telemetry
+  } else {
+    const isAccOn = payload.accStatus === '1' || payload.accStatus === 1 || String(payload.ignition).toUpperCase() === 'ON';
+    const accVal = isAccOn ? 1 : 0;
+    const batpVal = (payload.electQuantity !== undefined && payload.electQuantity !== null && payload.electQuantity !== '') ? payload.electQuantity : null;
+    const powerVal = (payload.powerValue !== undefined && payload.powerValue !== null && payload.powerValue !== '') ? payload.powerValue : null;
+
+    let paramsStr = `acc=${accVal}|`;
+    if (batpVal !== null) {
+      paramsStr += `batp=${batpVal}|`;
+    }
+    if (powerVal !== null) {
+      paramsStr += `voltage=${powerVal}|`;
+    }
+
+    gpsParams.dt = payload.gpsTime || payload.hbTime || new Date().toISOString().replace('T', ' ').substring(0, 19);
+    gpsParams.lat = Number(payload.lat || 0).toFixed(6);
+    gpsParams.lng = Number(payload.lng || 0).toFixed(6);
+    gpsParams.speed = Number(payload.speed || 0);
+    gpsParams.angle = Number(payload.direction || 0);
+    gpsParams.event = null;
+    gpsParams.params = paramsStr;
+  }
+
+  console.log(`Forwarding to GPS Server: ${GPS_SERVER_URL}`, gpsParams);
+  try {
+    const response = await axios.get(GPS_SERVER_URL, { params: gpsParams, timeout: 5000 });
+    console.log('GPS Server Response:', response.data);
+    const respStr = typeof response.data === 'object' ? JSON.stringify(response.data) : response.data;
+    lastTracksolidForwardStatus = `Success: GPS Server replied "${respStr}" at ${new Date().toISOString()}`;
+  } catch (err) {
+    console.error('GPS Server forward failed:', err.message);
+    lastTracksolidForwardStatus = `Failed: ${err.message} at ${new Date().toISOString()}`;
+    throw err;
+  }
+}
+
+/**
+ * Tracksolid Token Retriever (handles credentials & caches token)
+ */
+async function getTracksolidToken() {
+  const now = Date.now();
+  if (cachedTracksolidToken && tracksolidTokenExpiresAt && now < tracksolidTokenExpiresAt) {
+    return cachedTracksolidToken;
+  }
+
+  console.log('[Tracksolid API] Fetching new access token...');
+  const timestamp = getUtcTimestamp();
+  
+  const commonParams = {
+    method: 'jimi.oauth.token.get',
+    timestamp: timestamp,
+    app_key: TRACKSOLID_APP_KEY,
+    sign_method: 'md5',
+    v: '1.0',
+    format: 'json'
+  };
+
+  const privateParams = {
+    user_id: TRACKSOLID_USER_ID,
+    user_pwd_md5: TRACKSOLID_USER_PWD_MD5,
+    expires_in: 7200
+  };
+
+  const allParams = { ...commonParams, ...privateParams };
+  const sign = computeSignature(allParams, TRACKSOLID_APP_SECRET);
+  
+  const queryParams = { ...commonParams, sign };
+  const queryStr = new URLSearchParams(queryParams).toString();
+  const bodyStr = new URLSearchParams(privateParams).toString();
+
+  try {
+    const res = await axios.post(`${TRACKSOLID_API_URL}?${queryStr}`, bodyStr, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+
+    if (res.data && res.data.code === 0 && res.data.result) {
+      cachedTracksolidToken = res.data.result.accessToken;
+      const expiresInSec = parseInt(res.data.result.expiresIn || '7200', 10);
+      tracksolidTokenExpiresAt = Date.now() + (expiresInSec - 600) * 1000;
+      console.log(`[Tracksolid API] Token cached successfully. Expires in ${expiresInSec}s.`);
+      return cachedTracksolidToken;
+    } else {
+      const errorMsg = res.data ? res.data.message : 'Unknown error';
+      const errorCode = res.data ? res.data.code : -1;
+      throw new Error(`Failed to get token (Code: ${errorCode}, Msg: ${errorMsg})`);
+    }
+  } catch (err) {
+    console.error('[Tracksolid API] Error retrieving token:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * Poll location updates for configured IMEIs
+ */
+async function pollTracksolidLocations() {
+  lastTracksolidPollTime = new Date().toISOString();
+  try {
+    const token = await getTracksolidToken();
+    const imeisList = TRACKSOLID_IMEIS.split(',').map(s => s.trim());
+    
+    console.log(`[Tracksolid Poller] Fetching locations for ${imeisList.length} devices...`);
+
+    const timestamp = getUtcTimestamp();
+    const commonParams = {
+      method: 'jimi.device.location.get',
+      timestamp: timestamp,
+      app_key: TRACKSOLID_APP_KEY,
+      sign_method: 'md5',
+      v: '1.0',
+      format: 'json',
+      access_token: token
+    };
+
+    const privateParams = {
+      imeis: imeisList.join(',')
+    };
+
+    const allParams = { ...commonParams, ...privateParams };
+    const sign = computeSignature(allParams, TRACKSOLID_APP_SECRET);
+    
+    const queryParams = { ...commonParams, sign };
+    const queryStr = new URLSearchParams(queryParams).toString();
+    const bodyStr = new URLSearchParams(privateParams).toString();
+
+    const res = await axios.post(`${TRACKSOLID_API_URL}?${queryStr}`, bodyStr, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+
+    if (res.data && res.data.code === 0 && res.data.result) {
+      const devices = Array.isArray(res.data.result) ? res.data.result : [res.data.result];
+      console.log(`[Tracksolid Poller] Successfully retrieved ${devices.length} locations.`);
+      lastTracksolidPollStatus = `Success: retrieved ${devices.length} locations at ${new Date().toISOString()}`;
+
+      for (const device of devices) {
+        if (!device || !device.imei) continue;
+        console.log(`[Tracksolid Poller] Processing location for IMEI ${device.imei}`);
+        await forwardTelemetryToGpsServer(device);
+      }
+    } else {
+      const code = res.data ? res.data.code : -1;
+      const msg = res.data ? res.data.message : 'Unknown error';
+      console.warn(`[Tracksolid Poller] API warning (Code: ${code}, Msg: ${msg})`);
+      lastTracksolidPollStatus = `API Warning: Code ${code}, Msg: ${msg} at ${new Date().toISOString()}`;
+      
+      if (code === 1004 || String(msg).toLowerCase().includes('token')) {
+        console.log('[Tracksolid Poller] Token error detected. Invalidating cached token.');
+        cachedTracksolidToken = null;
+        tracksolidTokenExpiresAt = null;
+      }
+    }
+  } catch (err) {
+    console.error('[Tracksolid Poller] Polling cycle failed:', err.message);
+    lastTracksolidPollStatus = `Failed: ${err.message} at ${new Date().toISOString()}`;
+  }
+}
+
+/**
+ * Middleware to verify Tracksolid signature
+ */
+function requireTracksolidSignature(req, res, next) {
+  const hasParams = Object.keys(req.query).length > 0 || Object.keys(req.body).length > 0;
+  if (!hasParams) {
+    return res.status(200).json({ code: 0, message: 'success' });
+  }
+
+  const incomingSign = req.query.sign || req.body.sign || req.headers['x-sign'] || req.headers['sign'];
+  if (!incomingSign) {
+    console.log('[Signature Warning] Missing signature on push, proceeding anyway.');
+    return next();
+  }
+
+  if (!verifySignature(req, TRACKSOLID_APP_SECRET)) {
+    console.warn(`[Signature Failed] Unauthorized request to ${req.path}`);
+    return res.status(401).json({
+      code: 1004,
+      message: 'Illegal access, token exception! (Invalid signature)'
+    });
+  }
+  next();
+}
+
+/**
+ * Unified request handler for both Tracksolid Webhooks
+ */
+async function handleTracksolidPush(req, res) {
+  try {
+    const { msgType, data } = req.body;
+
+    if (!msgType || !data) {
+      console.log('Received empty payload/verification ping on POST.');
+      return res.status(200).json({ code: 0, message: 'success' });
+    }
+
+    const payload = typeof data === 'string' ? JSON.parse(data) : data;
+    console.log(`\n--- New Telemetry Push (Type: ${msgType}) ---`);
+    console.log('Payload:', payload);
+
+    await forwardTelemetryToGpsServer(payload, msgType);
+
+    res.json({ code: 0, message: 'Telemetry forwarded successfully' });
+  } catch (error) {
+    console.error('Error handling webhook push:', error.message);
+    res.status(500).json({ code: -1, message: 'Internal server error: ' + error.message });
+  }
+}
+
+// Tracksolid Push Routes
+app.get('/webhook/alarm', (req, res) => {
+  console.log('Received GET verification ping on /webhook/alarm');
+  res.status(200).json({ code: 0, message: 'success' });
+});
+
+app.get('/webhook/location', (req, res) => {
+  console.log('Received GET verification ping on /webhook/location');
+  res.status(200).json({ code: 0, message: 'success' });
+});
+
+app.post('/webhook/alarm', requireTracksolidSignature, handleTracksolidPush);
+app.post('/webhook/location', requireTracksolidSignature, handleTracksolidPush);
+
 app.listen(PORT, () => {
   console.log(`===========================================================`);
   console.log(`VIKAR B2B Integrations Middleware running on port ${PORT}`);
   console.log(`Active configuration mappings read from config/devices.json`);
+  
+  // Start Tracksolid Polling Engine if credentials are provided
+  if (TRACKSOLID_USER_ID && TRACKSOLID_APP_KEY && TRACKSOLID_APP_SECRET && TRACKSOLID_USER_PWD_MD5 && TRACKSOLID_IMEIS) {
+    console.log(`[Polling Engine] Starting background location polling loop.`);
+    console.log(`[Polling Engine] Interval: ${TRACKSOLID_POLL_INTERVAL}ms`);
+    console.log(`[Polling Engine] Target IMEIs: ${TRACKSOLID_IMEIS}`);
+    
+    // Run immediately on startup, then every interval
+    pollTracksolidLocations();
+    setInterval(pollTracksolidLocations, TRACKSOLID_POLL_INTERVAL);
+  } else {
+    console.log(`[Polling Engine] Disabled (missing one or more TRACKSOLID_* env variables).`);
+  }
   console.log(`===========================================================`);
 });
