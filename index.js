@@ -613,7 +613,14 @@ async function pollTracksolidLocations() {
   lastTracksolidPollTime = new Date().toISOString();
   try {
     const token = await getTracksolidToken();
-    const imeisList = TRACKSOLID_IMEIS.replace(/['"]/g, '').split(',').map(s => s.trim());
+    const matches = TRACKSOLID_IMEIS.match(/\d{14,16}/g);
+    const imeisList = matches ? matches : [];
+    
+    if (imeisList.length === 0) {
+      console.warn('[Tracksolid Poller] No valid IMEIs (14-16 digits) found in TRACKSOLID_IMEIS.');
+      lastTracksolidPollStatus = 'Warning: No valid IMEIs found in configuration at ' + new Date().toISOString();
+      return;
+    }
     
     console.log(`[Tracksolid Poller] Fetching locations for ${imeisList.length} devices...`);
 
