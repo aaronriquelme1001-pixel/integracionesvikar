@@ -791,6 +791,16 @@
           <div class="url-text" id="url-result">Generando webhook...</div>
           <button class="btn-copy-url" id="btn-copy">COPIAR URL</button>
         </div>
+
+        <!-- Dynamic Environment Configuration Help -->
+        <div class="env-help-box" id="env-help-container" style="margin-top: 1.5rem; display: none;">
+          <p class="panel-desc" style="font-weight: bold; color: #ffffff; margin-bottom: 0.5rem; font-size: 0.8rem;">
+            ⚠️ Configuración de Variables de Entorno Requerida en Render:
+          </p>
+          <div class="env-variables-list" id="env-help-list" style="background: rgba(255, 255, 255, 0.02); padding: 1rem; border-radius: 4px; border: 1px dashed var(--primary); font-size: 0.72rem; color: var(--text-muted); line-height: 1.6;">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
       </div>
 
       <!-- Compact Simulator Logs Console -->
@@ -883,15 +893,113 @@
       const platform = selectPlatform.value;
       const client = inputClient.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
       const origin = window.location.origin.includes('localhost') 
-        ? 'https://integraciones-vikar.onrender.com' 
+        ? 'https://integracionesvikarb2b.onrender.com' 
         : window.location.origin;
       
+      const envHelpContainer = document.getElementById('env-help-container');
+      const envHelpList = document.getElementById('env-help-list');
+
       if (!client) {
         urlResult.textContent = 'Ingrese un identificador del cliente...';
+        envHelpContainer.style.display = 'none';
         return;
       }
       
       urlResult.textContent = `${origin}/webhook/gps-server?target=${platform}&client=${client}`;
+
+      // Populate Render Env Help
+      const clientUpper = client.toUpperCase();
+      let envVarsHtml = '';
+      
+      switch (platform) {
+        case 'melon':
+        case 'unigis':
+          envVarsHtml = `
+            <div><strong>UNIGIS_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx</span> (o URL real)</div>
+            <div><strong>UNIGIS_SYSTEM_USER_${clientUpper}</strong> = <span style="color:#ffffff">usuario_del_cliente</span></div>
+            <div><strong>UNIGIS_PASSWORD_${clientUpper}</strong> = <span style="color:#ffffff">contraseña_del_cliente</span></div>
+          `;
+          break;
+        case 'colun':
+          envVarsHtml = `
+            <div><strong>COLUN_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://services.wing.cl/tracking/receiver/hub/v2</span> (o URL real)</div>
+            <div><strong>COLUN_BEARER_TOKEN_${clientUpper}</strong> = <span style="color:#ffffff">Bearer eyJhbGciOi... (Token JWT)</span></div>
+          `;
+          break;
+        case 'arauco':
+          envVarsHtml = `
+            <div><strong>ARAUCO_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">http://clsclwebqas09.arauco.cl/GPSChileWS/GPSChileWS.asmx</span> (o URL real)</div>
+            <div><strong>ARAUCO_PROVIDER_NAME_${clientUpper}</strong> = <span style="color:#ffffff">VIKARGPS</span></div>
+            <div><strong>ARAUCO_NOM_FLOTA_${clientUpper}</strong> = <span style="color:#ffffff">VIKARGPS</span></div>
+            <div><strong>ARAUCO_COD_FLOTA_${clientUpper}</strong> = <span style="color:#ffffff">1539</span></div>
+          `;
+          break;
+        case 'falabella':
+          envVarsHtml = `
+            <div><strong>FALABELLA_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">http://ww3.qanalytics.cl/gps_test/service.asmx</span> (o URL real)</div>
+            <div><strong>FALABELLA_USER_${clientUpper}</strong> = <span style="color:#ffffff">usuario_del_cliente</span></div>
+            <div><strong>FALABELLA_PASSWORD_${clientUpper}</strong> = <span style="color:#ffffff">contraseña_del_cliente</span></div>
+          `;
+          break;
+        case 'cencosud':
+          envVarsHtml = `
+            <div><strong>CENCOSUD_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.cencosud.cl/gps</span></div>
+            <div><strong>CENCOSUD_API_KEY_${clientUpper}</strong> = <span style="color:#ffffff">api_key_del_cliente</span></div>
+          `;
+          break;
+        case 'walmart':
+          envVarsHtml = `
+            <div><strong>WALMART_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.walmart.cl/gps</span></div>
+            <div><strong>WALMART_CLIENT_ID_${clientUpper}</strong> = <span style="color:#ffffff">client_id_del_cliente</span></div>
+            <div><strong>WALMART_CLIENT_SECRET_${clientUpper}</strong> = <span style="color:#ffffff">client_secret_del_cliente</span></div>
+          `;
+          break;
+        case 'mercadolibre':
+          envVarsHtml = `
+            <div><strong>MERCADOLIBRE_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.mercadolibre.com/gps</span></div>
+            <div><strong>MERCADOLIBRE_BEARER_TOKEN_${clientUpper}</strong> = <span style="color:#ffffff">token_del_cliente</span></div>
+          `;
+          break;
+        case 'smu':
+          envVarsHtml = `
+            <div><strong>SMU_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.unimarc.cl/gps</span></div>
+            <div><strong>SMU_API_TOKEN_${clientUpper}</strong> = <span style="color:#ffffff">token_del_cliente</span></div>
+          `;
+          break;
+        case 'agrosuper':
+          envVarsHtml = `
+            <div><strong>AGROSUPER_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.agrosuper.cl/gps</span></div>
+            <div><strong>AGROSUPER_API_KEY_${clientUpper}</strong> = <span style="color:#ffffff">api_key_del_cliente</span></div>
+          `;
+          break;
+        case 'ccu':
+          envVarsHtml = `
+            <div><strong>CCU_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.ccu.cl/gps</span></div>
+            <div><strong>CCU_BEARER_TOKEN_${clientUpper}</strong> = <span style="color:#ffffff">token_del_cliente</span></div>
+          `;
+          break;
+        case 'amazon':
+          envVarsHtml = `
+            <div><strong>AMAZON_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.amazon.com/gps</span></div>
+            <div><strong>AMAZON_ACCESS_TOKEN_${clientUpper}</strong> = <span style="color:#ffffff">token_del_cliente</span></div>
+          `;
+          break;
+        case 'dhl':
+          envVarsHtml = `
+            <div><strong>DHL_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.dhl.com/gps</span></div>
+            <div><strong>DHL_API_KEY_${clientUpper}</strong> = <span style="color:#ffffff">api_key_del_cliente</span></div>
+          `;
+          break;
+        default:
+          envVarsHtml = '';
+      }
+      
+      if (envVarsHtml) {
+        envHelpList.innerHTML = envVarsHtml;
+        envHelpContainer.style.display = 'block';
+      } else {
+        envHelpContainer.style.display = 'none';
+      }
     }
 
     selectPlatform.addEventListener('change', updateUrl);
