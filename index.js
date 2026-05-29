@@ -613,7 +613,7 @@ async function pollTracksolidLocations() {
   lastTracksolidPollTime = new Date().toISOString();
   try {
     const token = await getTracksolidToken();
-    const imeisList = TRACKSOLID_IMEIS.split(',').map(s => s.trim());
+    const imeisList = TRACKSOLID_IMEIS.replace(/['"]/g, '').split(',').map(s => s.trim());
     
     console.log(`[Tracksolid Poller] Fetching locations for ${imeisList.length} devices...`);
 
