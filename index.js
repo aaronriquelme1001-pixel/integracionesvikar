@@ -131,6 +131,11 @@ app.get('/health', (req, res) => {
     service: 'integraciones-vikar',
     pattern: 'Strategy',
     time: new Date().toISOString(),
+    config: {
+      gpsServerUrl: GPS_SERVER_URL,
+      targetImeis: TRACKSOLID_IMEIS,
+      pollIntervalMs: TRACKSOLID_POLL_INTERVAL
+    },
     tracksolidPoller: {
       active: !!(TRACKSOLID_USER_ID && TRACKSOLID_APP_KEY && TRACKSOLID_APP_SECRET && TRACKSOLID_USER_PWD_MD5 && TRACKSOLID_IMEIS),
       hasToken: !!cachedTracksolidToken,
