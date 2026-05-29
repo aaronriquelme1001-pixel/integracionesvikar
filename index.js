@@ -613,7 +613,7 @@ async function pollTracksolidLocations() {
   lastTracksolidPollTime = new Date().toISOString();
   try {
     const token = await getTracksolidToken();
-    const matches = TRACKSOLID_IMEIS.match(/\d{14,16}/g);
+    const matches = (TRACKSOLID_IMEIS || '').match(/\d{14,16}/g);
     const imeisList = matches ? matches : [];
     
     if (imeisList.length === 0) {
