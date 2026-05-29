@@ -763,21 +763,20 @@
         <div class="panel-desc">Construye la URL parametrizada para configurar el reenvío desde tu GPS Server hacia el middleware.</div>
         
         <div class="form-group">
-          <label for="select-platform">1. Plataforma B2B de Destino (Target)</label>
+          <label for="select-platform">1. Protocolo / Plataforma Técnica de Destino (Target)</label>
           <select id="select-platform" class="form-control">
-            <option value="melon">Cementos Melón (UNIGIS)</option>
-            <option value="unigis">Walmart / CCU / Cencosud (vía UNIGIS)</option>
-            <option value="colun">Colun (vía Wing.cl)</option>
-            <option value="arauco">Arauco (vía SISCO GPS)</option>
-            <option value="falabella">Falabella / Sodimac / Tottus (vía QAnalytics)</option>
-            <option value="cencosud">Cencosud (API REST Directa)</option>
-            <option value="walmart">Walmart (API REST Directa)</option>
-            <option value="mercadolibre">Mercado Libre Chile</option>
-            <option value="smu">SMU (Unimarc)</option>
-            <option value="agrosuper">Agrosuper (Cadena de Frío)</option>
-            <option value="ccu">CCU (API REST Directa)</option>
-            <option value="amazon">Amazon (Latam)</option>
-            <option value="dhl">DHL (Subcontratación)</option>
+            <option value="unigis">UNIGIS (SOAP XML - Usado por Melón, Walmart, CCU, Arauco, etc.)</option>
+            <option value="colun">Wing.cl (REST JSON - Usado por Colun, etc.)</option>
+            <option value="arauco">SISCO GPS (SOAP XML - Usado por Arauco, etc.)</option>
+            <option value="falabella">QAnalytics (SOAP XML - Usado por Falabella, Sodimac, Tottus, etc.)</option>
+            <option value="cencosud">Cencosud API (REST Directa)</option>
+            <option value="walmart">Walmart API (REST Directa)</option>
+            <option value="mercadolibre">Mercado Libre API</option>
+            <option value="smu">SMU API (Unimarc)</option>
+            <option value="agrosuper">Agrosuper API (Cadena de Frío)</option>
+            <option value="ccu">CCU API (REST Directa)</option>
+            <option value="amazon">Amazon API (Latam)</option>
+            <option value="dhl">DHL API (Subcontratación)</option>
           </select>
         </div>
 
