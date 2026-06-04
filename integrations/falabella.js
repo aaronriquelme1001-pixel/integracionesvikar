@@ -20,8 +20,8 @@ class FalabellaStrategy extends BaseStrategy {
 
     const speedVal = Math.round(parseFloat(telemetry.speed || 0));
     const angleVal = Math.round(parseFloat(telemetry.angle || 0));
-    const satVal = Math.round(parseFloat(telemetry.gps_satellites || 0));
-    const hdopVal = Math.round(parseFloat(telemetry.hdop || 0));
+    const satVal = Math.round(parseFloat(telemetry.gps_satellites || paramsObj.sat || paramsObj.satellites || 0));
+    const hdopVal = Math.round(parseFloat(telemetry.hdop || paramsObj.hdop || 0));
 
     // Build SOAP 1.1 Envelope
     const soapEnvelope = `<?xml version="1.0" encoding="utf-8"?>
