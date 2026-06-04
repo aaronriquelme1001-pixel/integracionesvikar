@@ -170,7 +170,7 @@ async function runTest() {
     driver_name: 'Juan Perez',
     odometer: '154320',
     eng_hours: '4321',
-    params: 'acc=1|batp=90|voltage=12.4|'
+    params: 'acc=1|batp=90|voltage=12.4|hdop=1.5|sat=12|'
   };
 
   try {
@@ -196,7 +196,9 @@ async function runTest() {
     const dynamicPayload = {
       ...gpsServerPayload,
       imei: '111222333444555',
-      plate_number: 'DYNAMIC99'
+      plate_number: 'DYNAMIC99',
+      gps_satellites: '10',
+      hdop: '1.8'
     };
 
     console.log('[Test Suite] Dispatching dynamic routing request to /webhook/gps-server?target=melon&client=klett...');
