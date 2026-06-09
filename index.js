@@ -131,6 +131,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     service: 'integraciones-vikar',
+    version: '1.0.2-query-fix',
     pattern: 'Strategy',
     time: new Date().toISOString(),
     config: {
