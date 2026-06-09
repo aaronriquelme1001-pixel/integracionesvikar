@@ -8,10 +8,26 @@ class BaseStrategy {
   /**
    * Helper to parse GPS Server parameters string into an object.
    */
-  parseParams(paramsStr) {
+  parseParams(params) {
+    if (!params) return {};
+
+    // 1. If it is already a parsed JSON object, return it
+    if (typeof params === 'object') {
+      return params;
+    }
+
+    // 2. If it is a JSON string, parse it
+    if (typeof params === 'string' && params.trim().startsWith('{')) {
+      try {
+        return JSON.parse(params);
+      } catch (err) {
+        // Fallback to standard pipe parsing on parse error
+      }
+    }
+
+    // 3. Fallback: Parse pipe-separated string
     const result = {};
-    if (!paramsStr) return result;
-    const parts = paramsStr.split('|');
+    const parts = String(params).split('|');
     for (const part of parts) {
       if (part) {
         const kv = part.split('=');

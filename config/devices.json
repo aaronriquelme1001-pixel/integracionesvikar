@@ -16,5 +16,55 @@
         "enabled": true
       }
     }
+  },
+  "869671072811878": {
+    "plate": "SHPC57",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "avlchile": {
+        "enabled": true,
+        "client": "luisherrera"
+      }
+    }
+  },
+  "869671072679432": {
+    "plate": "LZPH86",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "avlchile": {
+        "enabled": true,
+        "client": "luisherrera"
+      }
+    }
+  },
+  "865413053768429": {
+    "plate": "LTGY40",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "avlchile": {
+        "enabled": true,
+        "client": "luisherrera"
+      }
+    }
+  },
+  "863719062576112": {
+    "plate": "RTBB39",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "avlchile": {
+        "enabled": true,
+        "client": "luisherrera"
+      }
+    }
+  },
+  "865413054273106": {
+    "plate": "DWCB62",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "avlchile": {
+        "enabled": true,
+        "client": "alirorios"
+      }
+    }
   }
 }

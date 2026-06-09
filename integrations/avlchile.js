@@ -18,7 +18,10 @@ class AvlChileStrategy extends BaseStrategy {
     }
 
     const paramsObj = this.parseParams(telemetry.params);
-    const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || telemetry.event === 'ignition_on';
+    const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || 
+                       paramsObj.io239 === '1' || paramsObj.io239 === 1 || 
+                       telemetry.event === 'ignition_on' || 
+                       parseFloat(telemetry.speed || 0) > 0;
 
     // Parse date and convert to UNIX timestamp (seconds)
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();

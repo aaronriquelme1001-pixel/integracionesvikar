@@ -23,6 +23,15 @@ let lastTracksolidPollTime = null;
 let lastTracksolidPollStatus = 'No runs yet';
 let lastTracksolidForwardStatus = 'No runs yet';
 
+// GPS Server Polling Engine Settings
+const GPSSERVER_POLL_CLIENTS = process.env.GPSSERVER_POLL_CLIENTS;
+const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL || '60000', 10);
+const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
+
+// GPS Server Poller Diagnostics State
+let lastGpsServerPollTime = null;
+let lastGpsServerPollStatus = 'No runs yet';
+
 // Import Strategy Classes
 const ColunStrategy = require('./integrations/colun');
 const AraucoStrategy = require('./integrations/arauco');
@@ -145,6 +154,13 @@ app.get('/health', (req, res) => {
       lastPollTime: lastTracksolidPollTime,
       lastPollStatus: lastTracksolidPollStatus,
       lastForwardStatus: lastTracksolidForwardStatus
+    },
+    gpsServerPoller: {
+      active: !!(GPSSERVER_POLL_CLIENTS),
+      clients: GPSSERVER_POLL_CLIENTS,
+      intervalMs: GPSSERVER_POLL_INTERVAL,
+      lastPollTime: lastGpsServerPollTime,
+      lastPollStatus: lastGpsServerPollStatus
     }
   });
 });
@@ -693,6 +709,119 @@ async function pollTracksolidLocations() {
 }
 
 /**
+ * Poll location updates for configured GPS Server clients and forward them to B2B targets
+ */
+async function pollGpsServerLocations() {
+  lastGpsServerPollTime = new Date().toISOString();
+  if (!GPSSERVER_POLL_CLIENTS) {
+    lastGpsServerPollStatus = 'Disabled: GPSSERVER_POLL_CLIENTS is not configured';
+    return;
+  }
+
+  const clientsList = GPSSERVER_POLL_CLIENTS.split(',').map(c => c.trim()).filter(Boolean);
+  if (clientsList.length === 0) {
+    lastGpsServerPollStatus = 'Disabled: Empty client list';
+    return;
+  }
+
+  console.log(`[GPS Server Poller] Starting poll cycle for clients: ${clientsList.join(', ')}`);
+  let successCount = 0;
+  let totalDevicesProcessed = 0;
+
+  for (const client of clientsList) {
+    const apiKeyEnvName = `GPSSERVER_API_KEY_${client.toUpperCase()}`;
+    const apiKey = process.env[apiKeyEnvName];
+
+    if (!apiKey) {
+      console.warn(`[GPS Server Poller] Missing API Key environment variable: ${apiKeyEnvName}`);
+      continue;
+    }
+
+    try {
+      console.log(`[GPS Server Poller] Querying locations for client '${client}'...`);
+      const response = await axios.get(GPSSERVER_API_URL, {
+        params: {
+          api: 'user',
+          key: apiKey,
+          cmd: 'OBJECT_GET_LOCATIONS,*'
+        },
+        timeout: 15000
+      });
+
+      if (response.data && typeof response.data === 'object') {
+        const devices = response.data;
+        const imeis = Object.keys(devices);
+        console.log(`[GPS Server Poller] Client '${client}' returned ${imeis.length} devices.`);
+        
+        for (const imei of imeis) {
+          const device = devices[imei];
+          if (!device) continue;
+
+          totalDevicesProcessed++;
+          
+          // Get B2B config for this device from config/devices.json
+          const deviceConfig = getDeviceConfig(imei);
+          if (!deviceConfig || !deviceConfig.integrations) {
+            // Not configured for B2B forwarding, skip
+            continue;
+          }
+
+          // Format telemetry to match what strategies expect
+          const telemetry = {
+            imei: imei,
+            name: device.name,
+            lat: device.lat,
+            lng: device.lng,
+            altitude: device.altitude || 0,
+            angle: device.angle || 0,
+            speed: device.speed || 0,
+            dt_tracker: device.dt_tracker,
+            dt_server: device.dt_server,
+            loc_valid: device.loc_valid,
+            odometer: device.odometer,
+            engine_hours: device.engine_hours,
+            params: device.params // Can be JSON object directly since we upgraded parseParams
+          };
+
+          const targets = Object.keys(deviceConfig.integrations);
+          
+          // Process integrations
+          for (const target of targets) {
+            const integrationConfig = deviceConfig.integrations[target];
+            if (!integrationConfig || integrationConfig.enabled !== true) {
+              continue;
+            }
+
+            const strategy = strategies[target];
+            if (!strategy) {
+              console.warn(`[GPS Server Poller] No strategy implemented for target '${target}'`);
+              continue;
+            }
+
+            try {
+              // Resolve token and endpoint (checking for environment overrides for this client)
+              const resolvedConfig = getDynamicIntegrationConfig(target, integrationConfig.client || client);
+              
+              console.log(`[GPS Server Poller] Forwarding ${device.name || imei} (${deviceConfig.plate}) to target: '${target}' (Client config: ${integrationConfig.client || client})`);
+              await strategy.execute(telemetry, deviceConfig, resolvedConfig);
+            } catch (err) {
+              console.error(`[GPS Server Poller] Error forwarding device ${imei} to ${target}:`, err.message);
+            }
+          }
+        }
+        successCount++;
+      } else {
+        console.warn(`[GPS Server Poller] Invalid response format for client '${client}':`, response.data);
+      }
+    } catch (err) {
+      console.error(`[GPS Server Poller] Failed polling client '${client}':`, err.message);
+    }
+  }
+
+  lastGpsServerPollStatus = `Success: polled ${successCount}/${clientsList.length} clients, processed ${totalDevicesProcessed} total devices at ${new Date().toISOString()}`;
+}
+
+/**
  * Middleware to verify Tracksolid signature
  */
 function requireTracksolidSignature(req, res, next) {
@@ -772,6 +901,19 @@ app.listen(PORT, () => {
     setInterval(pollTracksolidLocations, TRACKSOLID_POLL_INTERVAL);
   } else {
     console.log(`[Polling Engine] Disabled (missing one or more TRACKSOLID_* env variables).`);
+  }
+
+  // Start GPS Server Polling Engine if clients are configured
+  if (GPSSERVER_POLL_CLIENTS) {
+    console.log(`[GPS Server Poller] Starting background location polling loop.`);
+    console.log(`[GPS Server Poller] Interval: ${GPSSERVER_POLL_INTERVAL}ms`);
+    console.log(`[GPS Server Poller] Active Clients: ${GPSSERVER_POLL_CLIENTS}`);
+    
+    // Run immediately on startup, then every interval
+    pollGpsServerLocations();
+    setInterval(pollGpsServerLocations, GPSSERVER_POLL_INTERVAL);
+  } else {
+    console.log(`[GPS Server Poller] Disabled (GPSSERVER_POLL_CLIENTS is not configured).`);
   }
   console.log(`===========================================================`);
 });
