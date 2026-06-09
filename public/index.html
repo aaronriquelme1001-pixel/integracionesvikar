@@ -510,12 +510,7 @@
 
     <!-- Dynamic Tab Content: Outgoing Services (Colun, Melon, etc.) -->
     <div id="tab-outgoing">
-      <!-- Table Controls -->
-      <div class="table-controls">
-        <label for="global-client-input">ID CLIENTE PARA PRUEBA (SUFFIX):</label>
-        <input type="text" id="global-client-input" value="transklett" placeholder="ej. transklett">
-        <span style="color: var(--text-dim); font-size: 0.7rem;">(Define qué credenciales de Render se verificarán al probar, ej: _TRANSKLETT)</span>
-      </div>
+
 
       <div class="table-wrapper">
         <table>
@@ -525,7 +520,7 @@
               <th>Protocolo</th>
               <th>Target Path</th>
               <th>Variables Entorno</th>
-              <th>Acción</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -538,12 +533,7 @@
                 <span class="env-variable">UNIGIS_API_URL</span>
                 <span class="env-variable">UNIGIS_SYSTEM_USER</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('melon', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Colun -->
             <tr>
@@ -554,12 +544,7 @@
                 <span class="env-variable">COLUN_API_URL</span>
                 <span class="env-variable">COLUN_BEARER_TOKEN</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('colun', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Arauco -->
             <tr>
@@ -570,12 +555,7 @@
                 <span class="env-variable">ARAUCO_API_URL</span>
                 <span class="env-variable">ARAUCO_COD_FLOTA</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('arauco', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Falabella -->
             <tr>
@@ -586,12 +566,7 @@
                 <span class="env-variable">FALABELLA_API_URL</span>
                 <span class="env-variable">FALABELLA_USER</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('falabella', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Cencosud -->
             <tr>
@@ -602,12 +577,7 @@
                 <span class="env-variable">CENCOSUD_API_URL</span>
                 <span class="env-variable">CENCOSUD_API_KEY</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('cencosud', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Walmart -->
             <tr>
@@ -618,12 +588,7 @@
                 <span class="env-variable">WALMART_API_URL</span>
                 <span class="env-variable">WALMART_CLIENT_ID</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('walmart', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Mercado Libre -->
             <tr>
@@ -634,12 +599,7 @@
                 <span class="env-variable">MERCADOLIBRE_API_URL</span>
                 <span class="env-variable">MERCADOLIBRE_BEARER_TOKEN</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('mercadolibre', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- SMU -->
             <tr>
@@ -650,12 +610,7 @@
                 <span class="env-variable">SMU_API_URL</span>
                 <span class="env-variable">SMU_API_TOKEN</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('smu', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Agrosuper -->
             <tr>
@@ -666,12 +621,7 @@
                 <span class="env-variable">AGROSUPER_API_URL</span>
                 <span class="env-variable">AGROSUPER_API_KEY</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('agrosuper', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- CCU -->
             <tr>
@@ -682,12 +632,7 @@
                 <span class="env-variable">CCU_API_URL</span>
                 <span class="env-variable">CCU_BEARER_TOKEN</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('ccu', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- Amazon -->
             <tr>
@@ -698,12 +643,7 @@
                 <span class="env-variable">AMAZON_API_URL</span>
                 <span class="env-variable">AMAZON_ACCESS_TOKEN</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('amazon', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- DHL -->
             <tr>
@@ -714,12 +654,7 @@
                 <span class="env-variable">DHL_API_URL</span>
                 <span class="env-variable">DHL_API_KEY</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('dhl', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <!-- AVL Chile -->
             <tr>
@@ -730,12 +665,7 @@
                 <span class="env-variable">AVLCHILE_API_URL</span>
                 <span class="env-variable">AVLCHILE_TOKEN</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('avlchile', this)">PROBAR</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
           </tbody>
         </table>
@@ -752,7 +682,7 @@
               <th>Dirección Endpoint</th>
               <th>Formato Entrada</th>
               <th>Variables Entorno</th>
-              <th>Acción</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -764,12 +694,7 @@
                 <span class="env-variable">INCOMING_API_KEY</span>
                 <span class="env-variable">GPS_SERVER_URL</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('incoming-gps', this)">PROBAR CONEXION GSH7</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
             <tr>
               <td class="service-name-cell">srv-tracksolid-poller</td>
@@ -784,12 +709,7 @@
                 <span class="env-variable">TRACKSOLID_POLL_INTERVAL</span>
                 <span class="env-variable">GPS_SERVER_URL</span>
               </td>
-              <td>
-                <div class="test-cell-container">
-                  <button class="btn-test" onclick="runIntegrationTest('tracksolid', this)">PROBAR TRACKSOLID</button>
-                  <span class="test-status pending">PENDIENTE</span>
-                </div>
-              </td>
+              
             </tr>
           </tbody>
         </table>
@@ -843,16 +763,7 @@
         </div>
       </div>
 
-      <!-- Compact Simulator Logs Console -->
-      <div class="traffic-console">
-        <div class="console-top">
-          <span class="console-title">Consola de Simulación de Tráfico</span>
-          <button class="btn-simulate" id="btn-simulate">INYECTAR TRAMA DE PRUEBA</button>
-        </div>
-        <div class="console-logs" id="console-body">
-          <div class="log-row">Esperando tramas de prueba simuladas...</div>
-        </div>
-      </div>
+
     </div>
 
     <!-- Footer -->
@@ -887,40 +798,7 @@
       }
     }
 
-    // Dynamic real-time integration tester logic
-    async function runIntegrationTest(target, buttonElement) {
-      const container = buttonElement.parentElement;
-      const statusElement = container.querySelector('.test-status');
-      const clientVal = document.getElementById('global-client-input').value.trim();
 
-      // Set UI state to testing
-      buttonElement.disabled = true;
-      statusElement.textContent = 'PROBANDO...';
-      statusElement.className = 'test-status testing';
-      statusElement.removeAttribute('title');
-
-      try {
-        const queryUrl = `/api/test?target=${target}` + (clientVal ? `&client=${clientVal}` : '');
-        const response = await fetch(queryUrl);
-        const data = await response.json();
-
-        if (data.success) {
-          statusElement.textContent = '✔️ OK';
-          statusElement.className = 'test-status ok';
-          statusElement.title = data.message || 'Prueba exitosa';
-        } else {
-          statusElement.textContent = '❌ ERROR';
-          statusElement.className = 'test-status error';
-          statusElement.title = `Detalle: ${data.error || 'Error desconocido'}`;
-        }
-      } catch (err) {
-        statusElement.textContent = '❌ FALLA';
-        statusElement.className = 'test-status error';
-        statusElement.title = `Error de Red: ${err.message}`;
-      } finally {
-        buttonElement.disabled = false;
-      }
-    }
 
     // Webhook Generator Logic
     const selectPlatform = document.getElementById('select-platform');
@@ -1069,47 +947,7 @@
       }
     });
 
-    // Console Live Simulator Logger Logic
-    const btnSimulate = document.getElementById('btn-simulate');
-    const consoleBody = document.getElementById('console-body');
 
-    const plates = ['GLXP79', 'ABCD12', 'XWZ789', 'FTGY45', 'PLOK89', 'DYNAMIC99'];
-    const imeis = ['862798052972060', '862798052972061', '111222333444555', '999888777666555'];
-    const clients = ['transklett', 'pacel', 'gscatalan', 'holzapfel', 'klett'];
-    const carriers = ['VIKARGPS', 'TRANSPACEL', 'GPSCATALAN'];
-
-    btnSimulate.addEventListener('click', () => {
-      const randomPlate = plates[Math.floor(Math.random() * plates.length)];
-      const randomImei = imeis[Math.floor(Math.random() * imeis.length)];
-      const randomClient = clients[Math.floor(Math.random() * clients.length)];
-      const randomCarrier = carriers[Math.floor(Math.random() * carriers.length)];
-      const randomTarget = selectPlatform.value;
-      const targetLabel = selectPlatform.options[selectPlatform.selectedIndex].text.split(' (')[0];
-      
-      const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-      const lat = (-30 - Math.random() * 10).toFixed(6);
-      const lng = (-70 - Math.random() * 5).toFixed(6);
-      const speed = Math.floor(40 + Math.random() * 60);
-
-      const logs = [
-        `\n<span class="log-time">[${now}]</span> <span class="log-method">GET</span> /webhook/gps-server?target=${randomTarget}&client=${randomClient}`,
-        `<span class="log-time">[${now}]</span> [Webhook] Nueva telemetría. IMEI: ${randomImei}, Patente: ${randomPlate}, Velocidad: ${speed} km/h`,
-        `<span class="log-time">[${now}]</span> [Router] Ruteo Dinámico. Destino: ${randomTarget}, Cliente: ${randomClient}`,
-        `<span class="log-time">[${now}]</span> [Router] Despachando a '${randomTarget}' (Patente: ${randomPlate})...`,
-        `<span class="log-time">[${now}]</span> <span class="log-success">[${targetLabel}] Petición despachada exitosamente. Código 200/201 OK.</span>`
-      ];
-
-      // Insert log entries
-      logs.forEach((log) => {
-        const div = document.createElement('div');
-        div.className = 'log-row';
-        div.innerHTML = log;
-        consoleBody.appendChild(div);
-      });
-
-      // Auto scroll to bottom
-      consoleBody.scrollTop = consoleBody.scrollHeight;
-    });
   </script>
 </body>
 </html>

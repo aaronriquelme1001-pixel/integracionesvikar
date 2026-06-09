@@ -309,23 +309,7 @@ async function runTest() {
     console.error('[Test Suite] Error running Scenario 4:', err.response ? err.response.data : err.message);
   }
 
-  try {
-    console.log('\n================================================================');
-    console.log('[Test Suite] SCENARIO 5: Live API Test Connection (/api/test?target=tracksolid)');
-    console.log('================================================================');
-    
-    console.log('[Test Suite] Sending test request for target tracksolid...');
-    const res = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/api/test?target=tracksolid`, {
-      auth: {
-        username: 'admin',
-        password: 'vikar1247'
-      }
-    });
-    console.log('[Test Suite] Middleware Response Status:', res.status);
-    console.log('[Test Suite] Middleware Response Body:', res.data);
-  } catch (err) {
-    console.error('[Test Suite] Error running Scenario 5:', err.response ? err.response.data : err.message);
-  }
+
 
   try {
     console.log('\n================================================================');
