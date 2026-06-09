@@ -83,7 +83,7 @@ class AvlChileStrategy extends BaseStrategy {
     const result = await this.sendJSONRequest(url, headers, payload);
 
     if (result.success) {
-      console.log(`[AVL Chile] Success Response:`, result.data);
+      console.log(`[AVL Chile] Success Response:`, JSON.stringify(result.data));
     } else {
       console.error(`[AVL Chile] Forwarding failed:`, result.error);
     }
