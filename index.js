@@ -378,10 +378,14 @@ app.get('/api/test', async (req, res) => {
       return res.status(400).json({ success: false, error: `No se encontró estrategia para ${target}` });
     }
 
+    // Generate a unique plate for the test to prevent AVL Chile's 5-second rate limiting per plate
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const testPlate = `TST${randomSuffix}`;
+
     // Standard mock telemetry payload for pings
     const telemetry = {
       imei: '999999999999999', // Dummy IMEI to prevent telemetry pollution of real vehicles
-      plate_number: 'TEST99',
+      plate_number: testPlate,
       lat: '-33.456789',
       lng: '-70.654321',
       speed: '60',
@@ -391,7 +395,7 @@ app.get('/api/test', async (req, res) => {
     };
 
     const deviceConfig = {
-      plate: 'TEST99',
+      plate: testPlate,
       carrier: 'VIKARGPS_TEST'
     };
 
