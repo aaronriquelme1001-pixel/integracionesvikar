@@ -87,6 +87,11 @@ process.env.TRACKSOLID_USER_PWD_MD5 = 'test_pwd_md5';
 process.env.TRACKSOLID_IMEIS = '862798052972060';
 process.env.TRACKSOLID_POLL_INTERVAL = '60000'; // high interval so it doesn't poll repeatedly in test background
 
+// AVL Chile Mock environment variables
+process.env.AVLCHILE_API_URL = 'http://localhost:4007/api/v2/';
+process.env.AVLCHILE_TOKEN_ALIRORIOS = 'mock_alirorios_token_123';
+process.env.AVLCHILE_TOKEN_LUISHERRERA = 'mock_luisherrera_token_456';
+
 const gpsServerApp = express();
 gpsServerApp.get('/api/api_loc.php', (req, res) => {
   console.log('\n[Mock GPS Server] Received forwarded request:');
@@ -130,6 +135,23 @@ tracksolidApp.post('/route/rest', (req, res) => {
   res.json({ code: -1, message: 'Unknown method' });
 });
 
+const avlchileApp = express();
+avlchileApp.use(bodyParser.json());
+avlchileApp.post('/api/v2/', (req, res) => {
+  console.log('\n[Mock AVL Chile API] Received telemetry:');
+  console.log('Headers:', { authorization: req.headers.authorization });
+  console.log('Body:', JSON.stringify(req.body, null, 2));
+  res.json({
+    status: {
+      result: true,
+      total_count: req.body.length,
+      valid_count: req.body.length,
+      error_count: 0,
+      error: []
+    }
+  });
+});
+
 // Start all mock servers
 const servers = [
   colunApp.listen(4001, () => console.log('[Mocks] Colun mock active on port 4001')),
@@ -137,7 +159,8 @@ const servers = [
   unigisApp.listen(4003, () => console.log('[Mocks] UNIGIS mock active on port 4003')),
   falabellaApp.listen(4004, () => console.log('[Mocks] Falabella mock active on port 4004')),
   gpsServerApp.listen(4005, () => console.log('[Mocks] GPS Server mock active on port 4005')),
-  tracksolidApp.listen(4006, () => console.log('[Mocks] Tracksolid API mock active on port 4006'))
+  tracksolidApp.listen(4006, () => console.log('[Mocks] Tracksolid API mock active on port 4006')),
+  avlchileApp.listen(4007, () => console.log('[Mocks] AVL Chile mock active on port 4007'))
 ];
 
 // Boot middleware server in the same process using mock env variables
@@ -302,6 +325,24 @@ async function runTest() {
     console.log('[Test Suite] Middleware Response Body:', res.data);
   } catch (err) {
     console.error('[Test Suite] Error running Scenario 5:', err.response ? err.response.data : err.message);
+  }
+
+  try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 6: Dynamic Webhook Routing to AVL Chile (?target=avlchile&client=alirorios)');
+    console.log('================================================================');
+    console.log('[Test Suite] Dispatching dynamic routing request to /webhook/gps-server?target=avlchile&client=alirorios...');
+    const res = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/webhook/gps-server`, {
+      params: {
+        ...gpsServerPayload,
+        target: 'avlchile',
+        client: 'alirorios'
+      }
+    });
+    console.log('[Test Suite] Middleware Response Status:', res.status);
+    console.log('[Test Suite] Middleware Response Body:', res.data);
+  } catch (err) {
+    console.error('[Test Suite] Error running Scenario 6:', err.response ? err.response.data : err.message);
   }
 
   // Shut down mocks

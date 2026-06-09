@@ -36,6 +36,7 @@ const AgrosuperStrategy = require('./integrations/agrosuper');
 const CcuStrategy = require('./integrations/ccu');
 const AmazonStrategy = require('./integrations/amazon');
 const DhlStrategy = require('./integrations/dhl');
+const AvlChileStrategy = require('./integrations/avlchile');
 
 // Initialize strategy mapping
 const strategies = {
@@ -52,7 +53,8 @@ const strategies = {
   agrosuper: new AgrosuperStrategy(),
   ccu: new CcuStrategy(),
   amazon: new AmazonStrategy(),
-  dhl: new DhlStrategy()
+  dhl: new DhlStrategy(),
+  avlchile: new AvlChileStrategy()
 };
 
 const app = express();
@@ -194,6 +196,9 @@ function getDynamicIntegrationConfig(target, client) {
   } else if (target === 'dhl') {
     config.endpoint = process.env[`DHL_API_URL${suffix}`] || process.env.DHL_API_URL;
     config.api_key = process.env[`DHL_API_KEY${suffix}`] || process.env.DHL_API_KEY;
+  } else if (target === 'avlchile') {
+    config.endpoint = process.env[`AVLCHILE_API_URL${suffix}`] || process.env.AVLCHILE_API_URL;
+    config.token = process.env[`AVLCHILE_TOKEN${suffix}`] || process.env.AVLCHILE_TOKEN;
   }
   return config;
 }

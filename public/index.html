@@ -721,6 +721,22 @@
                 </div>
               </td>
             </tr>
+            <!-- AVL Chile -->
+            <tr>
+              <td class="service-name-cell">srv-avlchile-connector</td>
+              <td>REST (JSON)</td>
+              <td><code>target=avlchile</code></td>
+              <td>
+                <span class="env-variable">AVLCHILE_API_URL</span>
+                <span class="env-variable">AVLCHILE_TOKEN</span>
+              </td>
+              <td>
+                <div class="test-cell-container">
+                  <button class="btn-test" onclick="runIntegrationTest('avlchile', this)">PROBAR</button>
+                  <span class="test-status pending">PENDIENTE</span>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -801,6 +817,7 @@
             <option value="ccu">CCU API (REST Directa)</option>
             <option value="amazon">Amazon API (Latam)</option>
             <option value="dhl">DHL API (Subcontratación)</option>
+            <option value="avlchile">AVL Chile API (REST JSON)</option>
           </select>
         </div>
 
@@ -1011,6 +1028,12 @@
           envVarsHtml = `
             <div><strong>DHL_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://api.dhl.com/gps</span></div>
             <div><strong>DHL_API_KEY_${clientUpper}</strong> = <span style="color:#ffffff">api_key_del_cliente</span></div>
+          `;
+          break;
+        case 'avlchile':
+          envVarsHtml = `
+            <div><strong>AVLCHILE_API_URL_${clientUpper}</strong> = <span style="color:#ffffff">https://webapp.avlchile.cl/api/v2/</span></div>
+            <div><strong>AVLCHILE_TOKEN_${clientUpper}</strong> = <span style="color:#ffffff">token_del_cliente</span></div>
           `;
           break;
         default:

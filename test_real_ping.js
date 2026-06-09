@@ -10,6 +10,7 @@ const AgrosuperStrategy = require('./integrations/agrosuper');
 const CcuStrategy = require('./integrations/ccu');
 const AmazonStrategy = require('./integrations/amazon');
 const DhlStrategy = require('./integrations/dhl');
+const AvlChileStrategy = require('./integrations/avlchile');
 
 const telemetry = {
   imei: '862798052972060',
@@ -85,6 +86,11 @@ async function pingAll() {
       name: 'DHL',
       strategy: new DhlStrategy(),
       config: { enabled: true, api_key: 'dummy_key' }
+    },
+    {
+      name: 'AVL Chile',
+      strategy: new AvlChileStrategy(),
+      config: { enabled: true, token: 'UkjYmu0rayhCqnSa1unMYEcpvZzeULAD0J03BrZkH6wydBLQt3M7nLkKzWuN2JYd' }
     }
   ];
 
