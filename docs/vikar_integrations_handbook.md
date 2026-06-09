@@ -1,268 +1,148 @@
-# Vikar Telemetry & B2B Integrations Handbook
+# Manual de Integraciones B2B y Telemática - Vikar GPS
 
-This handbook serves as the ultimate documentation and reference guide for the telematic telemetry routing system developed for **Vikar**. It explains how the architecture works, how to configure and maintain the systems, and how to scale the services or add new integrations.
+Este manual sirve como documentación central y guía de referencia técnica para el ecosistema de ruteo de telemetría telemática desarrollado para **Vikar GPS**. Explica el diseño de la arquitectura, cómo configurar y mantener los servicios, y cómo agregar nuevos camiones o clientes B2B de forma rápida y expedita.
 
 ---
 
-## 1. High-Level Architecture
+## 1. Arquitectura de Alto Nivel (Flujo Híbrido)
 
-The system is split into two independent Node.js middleware services hosted on Render:
+El sistema opera bajo un esquema híbrido de **Webhooks (Eventos en Tiempo Real)** y **Polling Engine (Consulta Periódica de Respaldo)** para asegurar que los camiones transmitan de manera continua, incluso cuando están estacionados por horas:
 
 ```mermaid
 flowchart TD
-    subgraph Tracksolid to GPS Server (nifty-hertz)
-        Tracksolid[Tracksolid Pro API] -->|1. Polling Cycle (Every 30s)| PollingEngine[API Polling Engine]
-        PollingEngine -->|2. HTTP GET| GPSServer[GPS Server gsh7.net]
+    subgraph Recepción de Telemetría (Entrada)
+        Tracksolid[API Tracksolid Pro] -->|1. Poller Tracksolid cada 10s| MidTracksolid[Poller Interno]
+        MidTracksolid -->|2. Relé HTTP GET| GPSServer[GPS Server gsh7.net]
     end
 
-    subgraph B2B Integrations Router (integraciones-vikar)
-        GPSServer -->|3. Outgoing Webhook POST| B2BRouter[B2B Router Webhook]
-        B2BRouter -->|4. Checks Query Params or config/devices.json| Config{Routing Resolved?}
+    subgraph Ruteo B2B Integrador (integraciones-vikar)
+        GPSServer -->|3. Webhook en Tiempo Real cuando se mueve| B2BRouter[Middleware Webhook]
+        GPSServer -.->|3. Backup Poller GPS Server cada 20 min| B2BRouter
         
-        Config -->|Yes| StrategyPattern[Strategy Manager]
-        StrategyPattern -->|JSON REST| Colun[Colun Web Service]
-        StrategyPattern -->|XML SOAP| Arauco[Arauco Web Service]
-        StrategyPattern -->|XML SOAP| Melon[Cementos Melón / UNIGIS]
-        StrategyPattern -->|XML SOAP| Falabella[Falabella / QAnalytics]
-        StrategyPattern -->|JSON REST| Cencosud[Cencosud API]
-        StrategyPattern -->|JSON REST| Walmart[Walmart REST API]
-        StrategyPattern -->|JSON REST| MercadoLibre[Mercado Libre API]
-        StrategyPattern -->|JSON REST| SMU[SMU API]
-        StrategyPattern -->|JSON REST| Agrosuper[Agrosuper API]
-        StrategyPattern -->|JSON REST| CCU[CCU API]
-        StrategyPattern -->|JSON REST| Amazon[Amazon SP-API]
-        StrategyPattern -->|JSON REST| DHL[DHL API]
+        B2BRouter -->|4. Filtro Deduplicador de 10s| RateLimit{¿Envío Reciente < 10s?}
+        RateLimit -->|Sí - Evita Bloqueos| Skip[Ignorar trama duplicada]
+        RateLimit -->|No - Procesa| StrategyPattern[Strategy Manager]
+        
+        StrategyPattern -->|Colun / Wing| Colun[API Colun]
+        StrategyPattern -->|Arauco / SISCO| Arauco[API Arauco SOAP]
+        StrategyPattern -->|Melón / UNIGIS| Melon[API UNIGIS SOAP]
+        StrategyPattern -->|Falabella / QAnalytics| Falabella[API Falabella SOAP]
+        StrategyPattern -->|AVL Chile REST| AVL[API AVL Chile]
+        StrategyPattern -->|Otros: Cencosud, Walmart, CCU, DHL, etc.| Others[APIs B2B Outgoing]
     end
 ```
 
-### Flow Explanation:
-1. **Telemetry Retrieval:** The JC400 camera tracker reports to Tracksolid Pro. Since Tracksolid webhooks only push alert/ignition events, a **Polling Engine** running in `tracksolid-to-gps-server` polls Tracksolid Pro every 10 seconds to fetch real-time route locations.
-2. **GPS Server Update:** The Polling Engine forwards these points to your custom GPS Server (`http://gsh7.net/id39/api/api_loc.php`).
-3. **B2B Webhook Dispatch:** The GPS Server triggers an outgoing webhook to `integraciones-vikar` whenever it receives new position updates.
-4. **B2B Client Forwarding:** The `integraciones-vikar` router reads `config/devices.json`. If the IMEI has integrations enabled, it formats the telemetry according to each logistics platform's protocol (REST or SOAP) and dispatches it.
+### Explicación del Flujo Híbrido:
+1. **Webhooks (En movimiento):** Cuando los camiones están en ruta y cambian de estado, GPS Server (`gsh7.net`) gatilla inmediatamente un webhook hacia `integraciones-vikar` con la coordenada en tiempo real.
+2. **Poller de Respaldo (Estacionados):** Como los webhooks de GPS Server son estrictamente por eventos (cambio de estado de falso a verdadero), si un camión se estaciona por horas no gatillará webhooks. El **GPS Server Poller** consulta cada 20 minutos (`GPSSERVER_POLL_INTERVAL`) las últimas coordenadas conocidas de las flotas y las retransmite para mantener los vehículos "online" en las plataformas corporativas.
+3. **Deduplicador de 10s:** Si el poller de respaldo coincide con un webhook en tiempo real en un lapso menor a 10 segundos para una misma patente, el middleware **descarta el envío duplicado** localmente para cumplir con las tasas de refresco de las APIs corporativas (como AVL Chile, que bloquea envíos si ocurren en menos de 5 segundos).
 
 ---
 
-## 2. Repositories and Deployment Details
+## 2. Repositorios y Despliegues en Render
 
-### 2.1 Repository 1: `tracksolid-to-gps-server`
-*   **Local Directory:** `C:\Users\aaron\Documents\antigravity\nifty-hertz`
-*   **Git Remote:** `https://github.com/aaronriquelme1001-pixel/tracksolid-to-gps-server.git`
-*   **Render Web Service:** `https://tracksolid-forwarder.onrender.com`
-*   **Verification Command:** `npm run test:mock` (runs a local webhook test with mock signatures)
-
-#### Render Environment Variables:
-```env
-TRACKSOLID_USER_ID=contacto@vikargps.cl
-TRACKSOLID_USER_PWD_MD5=c5e3817d8fee89920b29741823cff106
-TRACKSOLID_APP_KEY=8FB345B8693CCD006BD16DA4A532B248339A22A4105B6558
-TRACKSOLID_APP_SECRET=cb1ea27673f44ac7936a2ecdc8d35154
-TRACKSOLID_IMEIS=862798052972060
-TRACKSOLID_POLL_INTERVAL=10000
-GPS_SERVER_URL=http://gsh7.net/id39/api/api_loc.php
-```
-
----
-
-### 2.2 Repository 2: `integraciones-vikar`
-*   **Local Directory:** `C:\Users\aaron\Documents\antigravity\integraciones-vikar`
+### 2.1 Repositorio: `integraciones-vikar`
+*   **Directorio Local:** `C:\Users\aaron\Documents\antigravity\integraciones-vikar`
 *   **Git Remote:** `https://github.com/aaronriquelme1001-pixel/integracionesvikar.git`
-*   **Render Web Service:** `https://integraciones-vikar.onrender.com` *(adjust to actual Render URL)*
-*   **Verification Command:** `npm run test:mock` (simulates a GPS Server webhook and tests Colun, Arauco, UNIGIS, and Falabella mocks)
-
-#### Render Environment Variables:
-```env
-PORT=3001
-
-# --- 1. COLUN ---
-COLUN_API_URL=https://services.wing.cl/tracking/receiver/hub/v2
-COLUN_BEARER_TOKEN=Bearer <Token>
-
-# --- 2. ARAUCO ---
-ARAUCO_API_URL=http://clsclwebqas09.arauco.cl/GPSChileWS/GPSChileWS.asmx
-ARAUCO_PROVIDER_NAME=VIKARGPS
-ARAUCO_NOM_FLOTA=VIKARGPS
-ARAUCO_COD_FLOTA=1539
-
-# --- 3. CEMENTOS MELON / UNIGIS ---
-UNIGIS_API_URL=https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx
-UNIGIS_SYSTEM_USER=VIKARGPS
-UNIGIS_PASSWORD=VIKARGPS2024
-
-# --- 4. FALABELLA / SODIMAC / TOTTUS ---
-FALABELLA_API_URL=http://ww3.qanalytics.cl/gps_test/service.asmx
-FALABELLA_USER=WS_test
-FALABELLA_PASSWORD=$$WS17
-
-# --- 5. CENCOSUD ---
-CENCOSUD_API_URL=https://api.cencosud.com/logistics/v1/telemetry
-CENCOSUD_API_KEY=<ApiKey>
-
-# --- 6. MERCADO LIBRE ---
-MERCADOLIBRE_API_URL=https://api.mercadolibre.com/logistics/carriers/telemetry
-MERCADOLIBRE_BEARER_TOKEN=<BearerToken>
-
-# --- 7. WALMART (REST CUSTOM API) ---
-WALMART_API_URL=https://api.walmart.com/logistics/v1/carrier/gps
-WALMART_CLIENT_ID=<ClientId>
-WALMART_CLIENT_SECRET=<ClientSecret>
-
-# --- 8. SMU (UNIMARC) ---
-SMU_API_URL=https://api.smu.cl/tracking/gps
-SMU_API_TOKEN=<Token>
-
-# --- 9. AGROSUPER ---
-AGROSUPER_API_URL=https://api.agrosuper.cl/logistica/telemetria/gps
-AGROSUPER_API_KEY=<ApiKey>
-
-# --- 10. CCU ---
-CCU_API_URL=https://api.ccu.cl/distribucion/gps
-CCU_BEARER_TOKEN=<BearerToken>
-
-# --- 11. AMAZON ---
-AMAZON_API_URL=https://sellingpartnerapi-na.amazon.com/shipping/v2/carrier/telemetry
-AMAZON_ACCESS_TOKEN=<AccessToken>
-
-# --- 12. DHL ---
-DHL_API_URL=https://api.dhl.com/transport/v1/telemetry
-DHL_API_KEY=<ApiKey>
-```
+*   **URL Producción:** `https://integracionesvikarb2b.onrender.com`
+*   **Comando de Test Local:** `npm run test:mock` (Levanta servidores mock locales en puertos 400x y prueba todo el flujo de ruteo sin tocar los servidores reales).
 
 ---
 
-## 3. Operational Guidelines (Runbook)
+## 3. Variables de Entorno en Render.com
 
-### 3.1 Adding a New Vehicle / Client (Dynamic Zero-Code Method - RECOMMENDED)
-To onboard a client and their vehicles without editing code or redeploying:
-1.  **GPS Server Setup:** 
-    *   Create the client account or sub-account (e.g., `transklett`) in GPS Server.
-    *   Create the trucks/devices under that account, assigning their IMEIs and Plates.
-    *   Add a Webhook for this client pointing to the middleware's URL:
-        `https://integraciones-vikar.onrender.com/webhook/gps-server?target=<b2b_platform>&client=<client_identifier>`
-        *Example for transklett sending to Melon:*
-        `https://integraciones-vikar.onrender.com/webhook/gps-server?target=melon&client=transklett`
-        *Supported Target Platforms:*
-        *   `melon` (aliases: `unigis` - for Cementos Melón, Walmart, Cencosud, SMU, CCU, etc. if using their UNIGIS platform)
-        *   `colun` (Wing.cl)
-        *   `arauco` (SISCO GPS)
-        *   `falabella` (QAnalytics - also supports Tottus and Sodimac division requests)
-        *   `cencosud` (Custom Cencosud REST API)
-        *   `walmart` (Custom Walmart REST API)
-        *   `mercadolibre` (alias: `meli`)
-        *   `smu` (Custom SMU REST API)
-        *   `agrosuper` (Cold chain temperature-enabled REST API)
-        *   `ccu` (Custom CCU REST API)
-        *   `amazon` (Amazon SP-API compatible format)
-        *   `dhl` (DHL logistics tracking API)
-2.  **Render Credentials Setup:**
-    If the client uses custom API endpoints or credentials different from the defaults, add them to Render's environment variables using the `_<CLIENT>` suffix (all uppercase). Refer to Section 2.2 for all available keys.
-    *(If no client-specific variables are defined, the router automatically falls back to the default credentials configured in Render).*
-3.  **Deactivation:** To stop sharing data or revoke a client, simply disable their webhook or user account in GPS Server.
+Para administrar las integraciones, se configuran las siguientes variables de entorno en el panel de Render para `integraciones-vikar`:
+
+### 3.1 Variables Globales y de Recepción
+*   `PORT` = `10000` (Puerto de escucha)
+*   `GPS_SERVER_URL` = `http://gsh7.net/id39/api/api_loc.php` (Servidor central de GPS)
+*   `INCOMING_API_KEY` = Llave de seguridad para recibir telemetría externa.
+*   `GPSSERVER_POLL_CLIENTS` = `luisherrera,alirorios` (Lista de usuarios de GPS Server separados por coma que el Poller consultará periódicamente).
+*   `GPSSERVER_POLL_INTERVAL` = `1200000` (Intervalo de polling de respaldo en milisegundos, recomendado 20 minutos = 1,200,000 ms).
+*   `GPSSERVER_API_KEY_[CLIENTE]` = API Key del usuario en GPS Server para el poller (ej: `GPSSERVER_API_KEY_LUISHERRERA` y `GPSSERVER_API_KEY_ALIRORIOS`).
+
+### 3.2 Variables de Clientes B2B (Estructura Dinámica)
+El router resuelve credenciales dinámicamente usando el sufijo del cliente en mayúsculas (ej: `_LUISHERRERA`). Si no existen variables con sufijo de cliente, se usan las variables globales por defecto:
+
+*   **Integración AVL Chile (`target=avlchile`):**
+    *   `AVLCHILE_API_URL` = `https://webapp.avlchile.cl/api/v2/` (Endpoint base de AVL Chile)
+    *   `AVLCHILE_TOKEN_LUISHERRERA` = Token del cliente Luis Herrera en AVL Chile (ej: `E052E03119509CD3EA64159E4D34F819`).
+    *   `AVLCHILE_TOKEN_ALIRORIOS` = Token del cliente Aliro Ríos en AVL Chile (ej: `28BD2274962FD15472D8ABB789582D1B`).
+*   **Integración Melón / UNIGIS (`target=melon`):**
+    *   `UNIGIS_API_URL_[CLIENTE]` (ej: `UNIGIS_API_URL_TRANSKLETT`)
+    *   `UNIGIS_SYSTEM_USER_[CLIENTE]`
+    *   `UNIGIS_PASSWORD_[CLIENTE]`
+*   **Integración Colun (`target=colun`):**
+    *   `COLUN_API_URL_[CLIENTE]`
+    *   `COLUN_BEARER_TOKEN_[CLIENTE]`
 
 ---
 
-### 3.2 Adding a New Vehicle (Static Fallback Method)
-If you do not want to use query parameters in the webhook and prefer to map vehicles statically:
-1.  Open `config/devices.json` in the `integraciones-vikar` repository.
-2.  Add a new entry with the device's IMEI as the key. Specify its plate number, carrier, and enable the desired target integrations.
-    *Example:*
-    ```json
-    "862798052972061": {
-      "plate": "ABCD12",
-      "carrier": "VIKARGPS",
-      "integrations": {
-        "colun": { "enabled": true },
-        "melon": { "enabled": true }
-      }
-    }
-    ```
-3.  Commit and push the changes to GitHub. Render will automatically redeploy:
-    ```bash
-    git add config/devices.json
-    git commit -m "Add vehicle ABCD12 to integrations"
-    git push origin main
-    ```
+## 4. Guía de Operaciones (Paso a Paso)
+
+Cuando des de alta a una **nueva empresa** o **nuevos camiones**, sigue este protocolo para que el proceso sea rápido y expedito:
+
+### 4.1 Método Dinámico (Sin modificar código ni reiniciar el servidor)
+Este es el método recomendado. Permite añadir clientes y camiones directamente desde GPS Server:
+
+#### Paso 1: Configurar Webhooks en GPS Server (gsh7.net)
+1. Entra a tu panel de administración en `gsh7.net`.
+2. Haz login como el usuario del cliente (ej: `luisherrera`).
+3. Ve a **Configuración** -> **Webhooks** (o Eventos -> Webhooks).
+4. Crea un webhook que apunte al middleware indicando la plataforma destino (`target`) y el slug del cliente (`client`):
+   `https://integracionesvikarb2b.onrender.com/webhook/gps-server?target=avlchile&client=luisherrera`
+   *Nota: Si se configuran reglas de eventos en GPS Server, asegúrate de activar una regla que cubra todos los estados del vehículo (ej: `speed > -1`) para forzar un flujo continuo de telemetría.*
+
+#### Paso 2: Habilitar el Poller de Respaldo en Render
+1. Si el cliente es nuevo, ve al panel de Render de `integraciones-vikar`.
+2. En la pestaña **Environment**, añade su nombre al listado separado por comas en `GPSSERVER_POLL_CLIENTS`.
+3. Crea la variable `GPSSERVER_API_KEY_[CLIENTE]` con la API Key obtenida de la cuenta del cliente en `gsh7.net` (ej: en Configuración -> Cuenta de GPS Server).
+4. Configura el token del cliente B2B correspondiente (ej: `AVLCHILE_TOKEN_LUISHERRERA`).
+5. Guarda los cambios. Render aplicará los cambios sin downtime.
+
+#### Paso 3: Mapear Camiones en `config/devices.json` (Solo si no usas Webhooks dinámicos)
+Si no usas URLs dinámicas en los webhooks de GPS Server y deseas que el ruteo se resuelva de manera estática a través del IMEI:
+1. Abre el archivo [devices.json](file:///C:/Users/aaron/Documents/antigravity/integraciones-vikar/config/devices.json).
+2. Añade la entrada del IMEI del camión mapeando su patente y la configuración del B2B:
+   ```json
+   "863719062576112": {
+     "plate": "RTBB39",
+     "carrier": "VIKARGPS",
+     "integrations": {
+       "avlchile": {
+         "enabled": true,
+         "client": "luisherrera"
+       }
+     }
+   }
+   ```
+3. Realiza commit y push del archivo. Render se desplegará solo en segundos.
 
 ---
 
-### 3.3 Modifying endpoints or tokens (e.g. going live with Arauco)
-When moving from QA to production for a corporate client:
-1.  Locate their API URL in the Render Environment panel for `integraciones-vikar` (e.g. `ARAUCO_API_URL` or `ARAUCO_API_URL_CLIENT`).
-2.  Update the URL to the production server link provided by the client's IT team and save the environment variables.
+## 5. Diagnóstico y Lectura de Logs en Producción
+
+Para revisar el estado de transmisiones y diagnosticar errores directamente desde la consola de Render:
+
+1. **Ingresar a los Logs de Render:** Selecciona el servicio `integraciones-vikar` y ve a la pestaña **Logs**.
+2. **Monitorear Webhooks y Poller:**
+   * Cuando se despacha un camión con éxito, verás:
+     `[AVL Chile] Success Response: {"status":{"result":true,"total_count":1,"valid_count":1,"error_count":0,"error":[]}}`
+   * Si un camión no está autorizado por el cliente corporativo (ej: AVL Chile no ha dado de alta la patente en sus servidores), la respuesta del API de destino se imprimirá detalladamente gracias al sistema de JSON stringified:
+     `[AVL Chile] Success Response: {"status":{"result":false,"total_count":1,"valid_count":0,"error_count":1,"error":[{"avl.id":1,"avl.ident":"SHPC57","result":false,"message":"Vehículo no autorizado"}]}}`
+     *Esto te indicará con precisión exacta qué camiones no están habilitados en la plataforma del mandante.*
+3. **Evitar filtros antiguos:** Asegúrate de no tener filtros fijos aplicados en la barra de búsqueda de Render (como cápsulas azules de `instance: [ID]`), ya que esto evitará que veas los registros de los contenedores más recientes tras cada despliegue.
 
 ---
 
-### 3.4 Manual de Administración Webhook Dinámico (Español)
-Para dar de alta integraciones B2B de forma dinámica sin modificar el código:
+## 6. Patrones de Diseño del Código
 
-#### Paso 1: Construir la URL del Webhook
-Tú mismo creas la URL agregando los parámetros al final. La estructura es:
-`https://integraciones-vikar.onrender.com/webhook/gps-server?target=PLATAFORMA&client=SLUG_CLIENTE`
-
-*   **`target`**: La plataforma de destino en minúsculas (`melon`, `unigis`, `colun`, `arauco`, `falabella`, `cencosud`, `walmart`, `meli`, `smu`, `agrosuper`, `ccu`, `amazon`, `dhl`).
-*   **`client`**: El identificador o "slug" del cliente (ej. `transklett`, `pacel`, `holzapfel`). Se recomienda usar el mismo nombre de usuario que tiene en GPS Server para mantener el orden.
-
-*Ejemplo para enviar Transklett a Cementos Melón:*
-`https://integraciones-vikar.onrender.com/webhook/gps-server?target=melon&client=transklett`
-
-#### Paso 2: Configurar la URL en GPS Server (gsh7.net)
-1.  Inicia sesión en el Control Panel de Administrador de GPS Server.
-2.  Ubica al usuario correspondiente (ej. `transklett`) y haz clic en **"Login as user"** (Ingresar como usuario).
-3.  Una vez dentro de la cuenta del cliente, ve a **Configuración** (icono de engranaje/llave).
-4.  Busca la sección **Webhooks** o **Eventos -> Webhooks**.
-5.  Pega la URL completa construida en el Paso 1 y haz clic en **Guardar**.
-
-#### Paso 3: Configurar las Credenciales en Render
-Si el cliente tiene credenciales específicas entregadas por la empresa B2B:
-1.  Ve al dashboard de Render para el servicio `integraciones-vikar`.
-2.  Ve a la pestaña **Environment** y añade las variables con el sufijo `_SLUG_CLIENTE` (en mayúsculas):
-    *   Ejemplo: `UNIGIS_SYSTEM_USER_TRANSKLETT` = `usuario_de_transklett`
-    *   Ejemplo: `UNIGIS_PASSWORD_TRANSKLETT` = `clave_de_transklett`
-3.  Si no agregas variables para el cliente, el sistema usará las credenciales por defecto de esa plataforma B2B.
-
-#### Paso 4: Seguridad y Acceso al Dashboard
-Para evitar el acceso público no deseado al panel de control, la raíz de la web (`/`) está protegida por Autenticación Básica (Basic Auth).
-*   **Usuario:** `admin`
-*   **Contraseña:** `vikar1247`
-
-*Nota: Los endpoints de Webhook (`/webhook/gps-server`) y Health Check (`/health`) están completamente exentos de esta restricción y no requieren autenticación, lo que garantiza el correcto funcionamiento de las transmisiones y monitoreos externos.*
+*   **Strategy Pattern (`BaseStrategy.js` y subclases):** Permite al router seleccionar y ejecutar dinámicamente las reglas de mapeo de datos y protocolos HTTP/SOAP para cada B2B sin llenar el archivo principal de condicionales.
+*   **Deduplicador Temporal:** La clase `AvlChileStrategy` implementa un caché volátil en memoria. Almacena las marcas de tiempo por patente y descarta de forma proactiva envíos repetidos dentro de un margen de 10 segundos, previniendo bloqueos de token o spam al Web Service externo.
+*   **Seguridad:** Acceso protegido a la visualización del Dashboard mediante Basic Auth (`admin` / `vikar1247`), permitiendo libre tránsito público únicamente a los Webhooks `/webhook/*` y al chequeo de salud `/health`.
 
 ---
 
-### 3.3 Adding a New B2B Integration Target
-To add a new corporate client integration:
-1.  **Create Strategy Class:** Inside `integraciones-vikar/integrations/`, create a new file (e.g. `newclient.js`) extending `BaseStrategy`:
-    ```javascript
-    const BaseStrategy = require('./BaseStrategy');
-    class NewClientStrategy extends BaseStrategy {
-      async execute(telemetry, deviceConfig, integrationConfig) {
-        const url = integrationConfig.endpoint || process.env.NEWCLIENT_API_URL;
-        // 1. Build Payload
-        // 2. Dispatch using this.sendJSONRequest or this.sendSOAPRequest
-      }
-    }
-    module.exports = NewClientStrategy;
-    ```
-2.  **Register Strategy:** In `integraciones-vikar/index.js`, import and register the new class:
-    ```javascript
-    const NewClientStrategy = require('./integrations/newclient');
-    const strategies = {
-      // ...,
-      newclient: new NewClientStrategy()
-    };
-    ```
-3.  **Map Devices:** Add `"newclient": { "enabled": true }` to target vehicles in `config/devices.json`.
-
----
-
-## 4. Code Design Patterns
-
-*   **Strategy Pattern:** Used in `integraciones-vikar`. Allows the router to dynamically select and execute the correct integration logic based on the targets listed in `devices.json` without massive `if/else` statements.
-*   **BaseStrategy Helper (`BaseStrategy.js`):** Encapsulates repetitive formatting tasks (date string mapping to ISO/Chile formats, URL parameter extraction, SOAP envelope generation, and HTTP POST triggers).
-*   **Built-in Resilience:** The polling loop caches tokens locally, checking validity timestamps before making requests. If a request returns an authentication error (code 1004), the token cache is cleared to prevent repeated failures.
-
----
-
-## 5. Contact Information
-*   **Owner:** Aaron Riquelme (Vikar GPS)
-*   **Email:** `contacto@vikargps.cl`
+## 7. Contacto Técnico y Soporte
+*   **Encargado:** Aaron Riquelme (Vikar GPS)
+*   **Correo Electrónico:** `contacto@vikargps.cl`
