@@ -222,8 +222,16 @@ async function handleGpsServerWebhook(req, res) {
   console.log('Telemetry details:', telemetry);
 
   // Check query parameters for explicit target routing first (Dynamic Zero-Code Administration)
-  const targetParam = req.query.target;
-  const clientParam = req.query.client;
+  let targetParam = req.query.target;
+  let clientParam = req.query.client;
+
+  // Clean up any incorrectly appended query string parameters from GPS Server (e.g. client=luisherrera?username=trans.herrera)
+  if (targetParam && targetParam.includes('?')) {
+    targetParam = targetParam.split('?')[0];
+  }
+  if (clientParam && clientParam.includes('?')) {
+    clientParam = clientParam.split('?')[0];
+  }
 
   let targets = [];
   let deviceConfig = null;
