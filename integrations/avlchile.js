@@ -1,5 +1,8 @@
 const BaseStrategy = require('./BaseStrategy');
 
+// Memory cache to prevent duplicate transmissions within the 5-second rate-limit window
+const lastSentCache = {};
+
 class AvlChileStrategy extends BaseStrategy {
   /**
    * Executes the AVL Chile integration.
@@ -16,6 +19,19 @@ class AvlChileStrategy extends BaseStrategy {
       console.error('[AVL Chile] Error: Token is not configured.');
       return;
     }
+
+    const plate = deviceConfig.plate || telemetry.plate_number || telemetry.imei;
+
+    // Enforce 10-second deduplication window to comply with AVL Chile's rate limit
+    const now = Date.now();
+    const lastSent = lastSentCache[plate];
+    if (lastSent && (now - lastSent) < 10000) {
+      console.log(`[AVL Chile] Skipping telemetry dispatch for ${plate} to prevent rate limit (last sent ${((now - lastSent) / 1000).toFixed(1)}s ago).`);
+      return;
+    }
+
+    // Save timestamp before sending (optimistic cache lock)
+    lastSentCache[plate] = now;
 
     const paramsObj = this.parseParams(telemetry.params);
     const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || 
