@@ -11,7 +11,8 @@ class TraccarStrategy extends BaseStrategy {
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
     const url = integrationConfig.endpoint || process.env.TRACCAR_API_URL || 'http://demo3.traccar.org:5055/';
-    const id = deviceConfig.plate || telemetry.plate_number || telemetry.imei;
+    const idType = integrationConfig.idType || process.env.TRACCAR_ID_TYPE || 'plate';
+    const id = idType === 'imei' ? telemetry.imei : (deviceConfig.plate || telemetry.plate_number || telemetry.imei);
 
     // Parse date and convert to UNIX timestamp (seconds)
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();

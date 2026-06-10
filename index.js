@@ -236,6 +236,7 @@ function getDynamicIntegrationConfig(target, client) {
     config.username = process.env[`TRACCAR_USER${suffix}`] || process.env.TRACCAR_USER;
     config.password = process.env[`TRACCAR_PASSWORD${suffix}`] || process.env.TRACCAR_PASSWORD;
     config.webUrl = process.env[`TRACCAR_WEB_URL${suffix}`] || process.env.TRACCAR_WEB_URL;
+    config.idType = process.env[`TRACCAR_ID_TYPE${suffix}`] || process.env.TRACCAR_ID_TYPE;
   }
   return config;
 }
