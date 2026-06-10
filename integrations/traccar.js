@@ -53,52 +53,6 @@ class TraccarStrategy extends BaseStrategy {
       const response = await axios.get(url, { params, timeout: 8000 });
       console.log(`[Traccar] Success Response for ${id}: Status ${response.status}`);
     } catch (err) {
-      if (err.response && (err.response.status === 404 || err.response.status === 400)) {
-        console.warn(`[Traccar] Device ${id} rejected (${err.response.status}) by Traccar server. Attempting auto-registration...`);
-        
-        const username = integrationConfig.username || process.env.TRACCAR_USER;
-        const password = integrationConfig.password || process.env.TRACCAR_PASSWORD;
-        let webUrl = integrationConfig.webUrl || process.env.TRACCAR_WEB_URL;
-        
-        if (!webUrl && url) {
-          try {
-            const parsedUrl = new URL(url);
-            parsedUrl.port = ''; // Use default port (80/443)
-            webUrl = parsedUrl.toString();
-          } catch (e) {
-            // ignore URL parse errors
-          }
-        }
-
-        if (username && password && webUrl) {
-          try {
-            const registerUrl = `${webUrl.replace(/\/$/, '')}/api/devices`;
-            const authHeader = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
-            
-            console.log(`[Traccar] Creating device ${id} via REST API: ${registerUrl}...`);
-            await axios.post(registerUrl, 
-              { name: id, uniqueId: id },
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json',
-                  'Authorization': authHeader
-                },
-                timeout: 10000
-              }
-            );
-            
-            console.log(`[Traccar] Device ${id} registered successfully. Retrying telemetry push...`);
-            const retryResponse = await axios.get(url, { params, timeout: 8000 });
-            console.log(`[Traccar] Success Response for ${id} (after retry): Status ${retryResponse.status}`);
-            return;
-          } catch (regErr) {
-            console.error(`[Traccar] Auto-registration failed for ${id}:`, regErr.response ? JSON.stringify(regErr.response.data) : regErr.message);
-          }
-        } else {
-          console.warn(`[Traccar] Missing credentials/web URL for auto-registration of ${id}. Please configure TRACCAR_USER, TRACCAR_PASSWORD, and TRACCAR_WEB_URL.`);
-        }
-      }
       console.error(`[Traccar] Forwarding failed for ${id}:`, err.message);
     }
   }
