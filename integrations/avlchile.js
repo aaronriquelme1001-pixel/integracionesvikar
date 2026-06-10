@@ -8,8 +8,8 @@ const lastSentTelemetryTimestamp = {};
 const batchQueues = {}; 
 const targetUrls = {};
 
-// Background worker that flushes batches every 15 seconds
-// This perfectly satisfies the AVL Chile rule: "Recomendamos 10 a 15 segundos entre cada envío y en ese envío pueden enviar todo el paquete de posiciones"
+// Background worker that flushes batches every 10 seconds
+// This perfectly satisfies the AVL Chile rule while allowing the user's desired 10-second ultra-low latency
 setInterval(async () => {
   const tokens = Object.keys(batchQueues);
   if (tokens.length === 0) return;
@@ -32,11 +32,10 @@ setInterval(async () => {
       console.error(`[AVL Chile] Batch Forwarding failed:`, err.message);
     }
 
-    // If there are multiple tokens (e.g. luisherrera and alirorios), 
-    // wait 6 seconds between their requests to prevent any global API IP limits
-    await new Promise(resolve => setTimeout(resolve, 6000));
+    // Since rate limits are usually per-account, we just leave a tiny 1-second gap between different tokens
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
-}, 15000);
+}, 10000);
 
 class AvlChileStrategy extends BaseStrategy {
   async execute(telemetry, deviceConfig, integrationConfig) {
