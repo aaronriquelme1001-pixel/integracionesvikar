@@ -359,22 +359,27 @@ async function dispatchToB2B(telemetry) {
   // Look up device configuration from devices.json
   const deviceConfig = getDeviceConfig(imei);
   if (!deviceConfig || !deviceConfig.integrations) {
-    console.log(`[B2B Dispatch] No B2B integrations configured for IMEI: ${imei}. Skipping.`);
+    // Only log if it's NOT the tracksolid periodic poll to avoid spam, or just don't log at all
     return;
   }
 
-  const targets = Object.keys(deviceConfig.integrations);
-  console.log(`[B2B Dispatch] Device: ${deviceConfig.plate || imei} — Targets: ${targets.join(', ')}`);
+  // Get only enabled targets
+  const enabledTargets = Object.keys(deviceConfig.integrations).filter(
+    target => deviceConfig.integrations[target] && deviceConfig.integrations[target].enabled === true
+  );
+
+  if (enabledTargets.length === 0) {
+    // Silently skip if all integrations are disabled to avoid log spam
+    return;
+  }
+
+  console.log(`[B2B Dispatch] Device: ${deviceConfig.plate || imei} — Routing to: ${enabledTargets.join(', ')}`);
 
   // Dispatch all integrations concurrently
-  const promises = targets.map(async (target) => {
+  const promises = enabledTargets.map(async (target) => {
     const integrationConfig = deviceConfig.integrations[target];
-    if (!integrationConfig || integrationConfig.enabled !== true) {
-      console.log(`[B2B Dispatch] Integration '${target}' is disabled for device ${imei}.`);
-      return;
-    }
-
     const strategy = strategies[target];
+    
     if (!strategy) {
       console.warn(`[B2B Dispatch] No strategy implemented for target '${target}'`);
       return;
@@ -386,7 +391,6 @@ async function dispatchToB2B(telemetry) {
     };
 
     try {
-      console.log(`[B2B Dispatch] Executing strategy for target: '${target}'`);
       await strategy.execute(telemetry, deviceConfig, resolvedConfig);
     } catch (err) {
       console.error(`[B2B Dispatch] Error executing strategy '${target}':`, err.message);
