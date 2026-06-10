@@ -91,25 +91,30 @@ class AvlChileStrategy extends BaseStrategy {
       avlRequestQueue = avlRequestQueue
         .then(async () => {
           const timeSinceLast = Date.now() - lastRequestTime;
-          const minDelay = 5100; // 5.1 seconds to be safe
+          const minDelay = 5500; // 5.5 seconds safety margin from completion of previous request
           if (timeSinceLast < minDelay) {
             const waitTime = minDelay - timeSinceLast;
             console.log(`[AVL Chile] Throttling request for ${plate}: waiting ${waitTime}ms to comply with 5-second rate limit...`);
             await delay(waitTime);
           }
 
-          // Update last request timestamp
-          lastRequestTime = Date.now();
-
           console.log(`[AVL Chile] Dispatching telemetry for ${deviceConfig.plate || telemetry.plate_number} to ${url}...`);
           const headers = {
             'Authorization': `AVLToken ${token}`
           };
-          const res = await this.sendJSONRequest(url, headers, payload);
+          
+          let res;
+          try {
+            res = await this.sendJSONRequest(url, headers, payload);
+          } finally {
+            // Update last request timestamp AFTER completion (success or failure) to account for connection latency
+            lastRequestTime = Date.now();
+          }
           resolve(res);
         })
         .catch((err) => {
           console.error(`[AVL Chile] Error in request queue:`, err.message);
+          lastRequestTime = Date.now();
           resolve({ success: false, error: err.message });
         });
     });
