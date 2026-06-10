@@ -92,6 +92,10 @@ process.env.AVLCHILE_API_URL = 'http://localhost:4007/api/v2/';
 process.env.AVLCHILE_TOKEN_ALIRORIOS = 'mock_alirorios_token_123';
 process.env.AVLCHILE_TOKEN_LUISHERRERA = 'mock_luisherrera_token_456';
 
+// Traccar Mock environment variables
+process.env.TRACCAR_API_URL = 'http://localhost:4009/';
+
+
 const gpsServerApp = express();
 gpsServerApp.get('/api/api_loc.php', (req, res) => {
   console.log('\n[Mock GPS Server] Received forwarded request:');
@@ -152,6 +156,13 @@ avlchileApp.post('/api/v2/', (req, res) => {
   });
 });
 
+const traccarApp = express();
+traccarApp.get('/', (req, res) => {
+  console.log('\n[Mock Traccar API] Received telemetry via GET:');
+  console.log('Query parameters:', req.query);
+  res.sendStatus(200);
+});
+
 // Start all mock servers
 const servers = [
   colunApp.listen(4001, () => console.log('[Mocks] Colun mock active on port 4001')),
@@ -160,7 +171,8 @@ const servers = [
   falabellaApp.listen(4004, () => console.log('[Mocks] Falabella mock active on port 4004')),
   gpsServerApp.listen(4005, () => console.log('[Mocks] GPS Server mock active on port 4005')),
   tracksolidApp.listen(4006, () => console.log('[Mocks] Tracksolid API mock active on port 4006')),
-  avlchileApp.listen(4007, () => console.log('[Mocks] AVL Chile mock active on port 4007'))
+  avlchileApp.listen(4007, () => console.log('[Mocks] AVL Chile mock active on port 4007')),
+  traccarApp.listen(4009, () => console.log('[Mocks] Traccar mock active on port 4009'))
 ];
 
 // Boot middleware server in the same process using mock env variables
@@ -327,6 +339,24 @@ async function runTest() {
     console.log('[Test Suite] Middleware Response Body:', res.data);
   } catch (err) {
     console.error('[Test Suite] Error running Scenario 6:', err.response ? err.response.data : err.message);
+  }
+
+  try {
+    console.log('\n================================================================');
+    console.log('[Test Suite] SCENARIO 7: Dynamic Webhook Routing to Traccar (?target=traccar&client=luisherrera)');
+    console.log('================================================================');
+    console.log('[Test Suite] Dispatching dynamic routing request to /webhook/gps-server?target=traccar&client=luisherrera...');
+    const res = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/webhook/gps-server`, {
+      params: {
+        ...gpsServerPayload,
+        target: 'traccar',
+        client: 'luisherrera'
+      }
+    });
+    console.log('[Test Suite] Middleware Response Status:', res.status);
+    console.log('[Test Suite] Middleware Response Body:', res.data);
+  } catch (err) {
+    console.error('[Test Suite] Error running Scenario 7:', err.response ? err.response.data : err.message);
   }
 
   // Shut down mocks

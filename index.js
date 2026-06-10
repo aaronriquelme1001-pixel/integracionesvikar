@@ -46,6 +46,7 @@ const CcuStrategy = require('./integrations/ccu');
 const AmazonStrategy = require('./integrations/amazon');
 const DhlStrategy = require('./integrations/dhl');
 const AvlChileStrategy = require('./integrations/avlchile');
+const TraccarStrategy = require('./integrations/traccar');
 
 // Initialize strategy mapping
 const strategies = {
@@ -63,7 +64,8 @@ const strategies = {
   ccu: new CcuStrategy(),
   amazon: new AmazonStrategy(),
   dhl: new DhlStrategy(),
-  avlchile: new AvlChileStrategy()
+  avlchile: new AvlChileStrategy(),
+  traccar: new TraccarStrategy()
 };
 
 const app = express();
@@ -228,6 +230,8 @@ function getDynamicIntegrationConfig(target, client) {
   } else if (target === 'avlchile') {
     config.endpoint = process.env[`AVLCHILE_API_URL${suffix}`] || process.env.AVLCHILE_API_URL;
     config.token = process.env[`AVLCHILE_TOKEN${suffix}`] || process.env.AVLCHILE_TOKEN;
+  } else if (target === 'traccar') {
+    config.endpoint = process.env[`TRACCAR_API_URL${suffix}`] || process.env.TRACCAR_API_URL;
   }
   return config;
 }
