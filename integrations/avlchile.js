@@ -1,23 +1,44 @@
 const BaseStrategy = require('./BaseStrategy');
+const axios = require('axios');
 
-// Memory cache to prevent duplicate transmissions within the 10-second rate-limit window per plate
-const lastSentCache = {};
 // Memory cache to prevent duplicate transmissions of the exact same coordinate timestamp
 const lastSentTelemetryTimestamp = {};
 
-// Queue variables to ensure consecutive requests to AVL Chile are paced at least 5 seconds apart
-let avlRequestQueue = Promise.resolve();
-let lastRequestTime = 0;
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+// Batch queues grouped by token: { 'tokenXYZ': [record1, record2] }
+const batchQueues = {}; 
+const targetUrls = {};
+
+// Background worker that flushes batches every 15 seconds
+// This perfectly satisfies the AVL Chile rule: "Recomendamos 10 a 15 segundos entre cada envío y en ese envío pueden enviar todo el paquete de posiciones"
+setInterval(async () => {
+  const tokens = Object.keys(batchQueues);
+  if (tokens.length === 0) return;
+
+  for (const token of tokens) {
+    const payload = batchQueues[token];
+    if (!payload || payload.length === 0) continue;
+    
+    // Extract and clear the queue for this token
+    batchQueues[token] = [];
+    const url = targetUrls[token];
+
+    console.log(`[AVL Chile] Flushing batch of ${payload.length} vehicles for token (masked: ${token.substring(0,4)}...)`);
+    
+    const headers = { 'Authorization': `AVLToken ${token}` };
+    try {
+      const res = await axios.post(url, payload, { headers, timeout: 15000 });
+      console.log(`[AVL Chile] Batch Success Response:`, JSON.stringify(res.data));
+    } catch (err) {
+      console.error(`[AVL Chile] Batch Forwarding failed:`, err.message);
+    }
+
+    // If there are multiple tokens (e.g. luisherrera and alirorios), 
+    // wait 6 seconds between their requests to prevent any global API IP limits
+    await new Promise(resolve => setTimeout(resolve, 6000));
+  }
+}, 15000);
 
 class AvlChileStrategy extends BaseStrategy {
-  /**
-   * Executes the AVL Chile integration.
-   * 
-   * @param {Object} telemetry - Raw telemetry from GPS Server.
-   * @param {Object} deviceConfig - Vehicle metadata.
-   * @param {Object} integrationConfig - AVL Chile specific overrides.
-   */
   async execute(telemetry, deviceConfig, integrationConfig) {
     const url = integrationConfig.endpoint || process.env.AVLCHILE_API_URL || 'https://webapp.avlchile.cl/api/v2/';
     const token = integrationConfig.token || process.env.AVLCHILE_TOKEN;
@@ -30,12 +51,7 @@ class AvlChileStrategy extends BaseStrategy {
     const rawPlate = deviceConfig.plate || telemetry.plate_number || telemetry.imei || '';
     const plate = rawPlate.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-    // Determine the source of the token for logging
-    const tokenSource = integrationConfig.token ? `integrationConfig (${integrationConfig.client || 'override'})` : (process.env.AVLCHILE_TOKEN ? 'process.env.AVLCHILE_TOKEN' : 'unknown');
-    const maskedToken = token.length <= 8 ? '***' : `${token.substring(0, 4)}...${token.substring(token.length - 4)}`;
-    console.log(`[AVL Chile] Using token from ${tokenSource} (masked: ${maskedToken}) for plate ${plate}`);
-
-    // Parse date and convert to UNIX timestamp (seconds)
+    // Parse date and convert to UNIX timestamp
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
     if (dateStr.includes(' ')) {
@@ -45,23 +61,12 @@ class AvlChileStrategy extends BaseStrategy {
     }
     const unixTimestamp = Math.floor((isNaN(parsedDate.getTime()) ? Date.now() : parsedDate.getTime()) / 1000);
 
-    // Enforce deduplication by exact telemetry timestamp to prevent duplicates on parked/static vehicles
+    // Enforce deduplication by exact telemetry timestamp
     const lastTelemetryTimestamp = lastSentTelemetryTimestamp[plate];
     if (lastTelemetryTimestamp && lastTelemetryTimestamp === unixTimestamp) {
-      console.log(`[AVL Chile] Skipping telemetry dispatch for ${plate}: Telemetry timestamp ${unixTimestamp} was already successfully sent.`);
-      return;
+      return; // Silently skip exact duplicate
     }
-
-    // Enforce 10-second deduplication window to comply with AVL Chile's rate limit
-    const now = Date.now();
-    const lastSent = lastSentCache[plate];
-    if (lastSent && (now - lastSent) < 10000) {
-      console.log(`[AVL Chile] Skipping telemetry dispatch for ${plate} to prevent rate limit (last sent ${((now - lastSent) / 1000).toFixed(1)}s ago).`);
-      return;
-    }
-
-    // Save timestamp before sending (optimistic cache lock)
-    lastSentCache[plate] = now;
+    lastSentTelemetryTimestamp[plate] = unixTimestamp;
 
     const paramsObj = this.parseParams(telemetry.params);
     const isEngineOn = paramsObj.acc === '1' || paramsObj.acc === 1 || 
@@ -73,15 +78,13 @@ class AvlChileStrategy extends BaseStrategy {
     const lngVal = parseFloat(telemetry.lng);
 
     if (isNaN(latVal) || isNaN(lngVal) || latVal === 0 || lngVal === 0) {
-      console.warn(`[AVL Chile] Skipping telemetry dispatch for ${plate}: Invalid coordinates (lat: ${telemetry.lat}, lng: ${telemetry.lng}).`);
+      console.warn(`[AVL Chile] Skipping telemetry dispatch for ${plate}: Invalid coordinates.`);
       return;
     }
 
-    // Satellites visible (Min 4 per spec)
     const satVal = Math.round(parseFloat(telemetry.gps_satellites || paramsObj.sat || paramsObj.satellites || paramsObj.gpslev || 4));
     const finalSat = satVal >= 4 ? satVal : 4;
 
-    // Build flat payload array with dot-notation keys
     const record = {
       "avl.id": 1,
       "avl.ident": plate,
@@ -102,53 +105,14 @@ class AvlChileStrategy extends BaseStrategy {
       "avl.data": []
     };
 
-    const payload = [record];
-
-    // Queue and throttle the HTTP request to satisfy AVL Chile's 5-second rate limit
-    const result = await new Promise((resolve) => {
-      avlRequestQueue = avlRequestQueue
-        .then(async () => {
-          const timeSinceLast = Date.now() - lastRequestTime;
-          const minDelay = 10000; // 10 seconds safety margin to comply strictly with AVL Chile API limits
-          if (timeSinceLast < minDelay) {
-            const waitTime = minDelay - timeSinceLast;
-            console.log(`[AVL Chile] Throttling request for ${plate}: waiting ${waitTime}ms to comply with 10-second rate limit...`);
-            await delay(waitTime);
-          }
-
-          console.log(`[AVL Chile] Dispatching telemetry for ${deviceConfig.plate || telemetry.plate_number} to ${url}...`);
-          const headers = {
-            'Authorization': `AVLToken ${token}`
-          };
-          
-          let res;
-          try {
-            res = await this.sendJSONRequest(url, headers, payload);
-          } finally {
-            // Update last request timestamp AFTER completion (success or failure) to account for connection latency
-            lastRequestTime = Date.now();
-          }
-          resolve(res);
-        })
-        .catch((err) => {
-          console.error(`[AVL Chile] Error in request queue:`, err.message);
-          lastRequestTime = Date.now();
-          resolve({ success: false, error: err.message });
-        });
-    });
-
-    if (result.success) {
-      console.log(`[AVL Chile] Success Response:`, JSON.stringify(result.data));
-      
-      // Save telemetry timestamp if it was successfully accepted (not unauthorized)
-      const isAccepted = result.data && result.data.status && 
-                         (result.data.status.result === true || result.data.status.valid_count > 0);
-      if (isAccepted) {
-        lastSentTelemetryTimestamp[plate] = unixTimestamp;
-      }
-    } else {
-      console.error(`[AVL Chile] Forwarding failed:`, result.error);
+    // Instead of sending instantly, we push to the token's batch queue
+    if (!batchQueues[token]) {
+      batchQueues[token] = [];
+      targetUrls[token] = url;
     }
+    
+    batchQueues[token].push(record);
+    console.log(`[AVL Chile] Added ${plate} to batch queue for token (masked: ${token.substring(0,4)}...)`);
   }
 }
 
