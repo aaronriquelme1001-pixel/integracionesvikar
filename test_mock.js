@@ -199,8 +199,8 @@ traccarApp.get('/', (req, res) => {
   if (deviceId && registeredDevices.has(deviceId)) {
     res.sendStatus(200);
   } else {
-    console.warn(`[Mock Traccar API] Rejecting update (404) for unregistered device ID: ${deviceId}`);
-    res.sendStatus(404);
+    console.warn(`[Mock Traccar API] Rejecting update (400) for unregistered device ID: ${deviceId}`);
+    res.sendStatus(400);
   }
 });
 

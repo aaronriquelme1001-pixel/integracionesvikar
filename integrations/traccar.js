@@ -52,8 +52,8 @@ class TraccarStrategy extends BaseStrategy {
       const response = await axios.get(url, { params, timeout: 8000 });
       console.log(`[Traccar] Success Response for ${id}: Status ${response.status}`);
     } catch (err) {
-      if (err.response && err.response.status === 404) {
-        console.warn(`[Traccar] Device ${id} not found (404) on Traccar server. Attempting auto-registration...`);
+      if (err.response && (err.response.status === 404 || err.response.status === 400)) {
+        console.warn(`[Traccar] Device ${id} rejected (${err.response.status}) by Traccar server. Attempting auto-registration...`);
         
         const username = integrationConfig.username || process.env.TRACCAR_USER;
         const password = integrationConfig.password || process.env.TRACCAR_PASSWORD;
