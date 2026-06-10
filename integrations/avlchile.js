@@ -27,6 +27,11 @@ class AvlChileStrategy extends BaseStrategy {
 
     const plate = deviceConfig.plate || telemetry.plate_number || telemetry.imei;
 
+    // Determine the source of the token for logging
+    const tokenSource = integrationConfig.token ? `integrationConfig (${integrationConfig.client || 'override'})` : (process.env.AVLCHILE_TOKEN ? 'process.env.AVLCHILE_TOKEN' : 'unknown');
+    const maskedToken = token.length <= 8 ? '***' : `${token.substring(0, 4)}...${token.substring(token.length - 4)}`;
+    console.log(`[AVL Chile] Using token from ${tokenSource} (masked: ${maskedToken}) for plate ${plate}`);
+
     // Enforce 10-second deduplication window to comply with AVL Chile's rate limit
     const now = Date.now();
     const lastSent = lastSentCache[plate];

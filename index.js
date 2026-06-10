@@ -133,6 +133,12 @@ function getDeviceConfig(imei) {
   }
 }
 
+function maskToken(token) {
+  if (!token) return 'not set';
+  if (token.length <= 8) return `*** (length ${token.length})`;
+  return `${token.substring(0, 4)}...${token.substring(token.length - 4)} (length ${token.length})`;
+}
+
 /**
  * Health check endpoint
  */
@@ -140,7 +146,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     service: 'integraciones-vikar',
-    version: '1.0.2-query-fix',
+    version: '1.0.3-diagnostic-fix',
     pattern: 'Strategy',
     time: new Date().toISOString(),
     config: {
@@ -161,6 +167,12 @@ app.get('/health', (req, res) => {
       intervalMs: GPSSERVER_POLL_INTERVAL,
       lastPollTime: lastGpsServerPollTime,
       lastPollStatus: lastGpsServerPollStatus
+    },
+    avlchileDiagnostics: {
+      AVLCHILE_API_URL: process.env.AVLCHILE_API_URL || 'not set',
+      AVLCHILE_TOKEN_LUISHERRERA: maskToken(process.env.AVLCHILE_TOKEN_LUISHERRERA),
+      AVLCHILE_TOKEN_ALIRORIOS: maskToken(process.env.AVLCHILE_TOKEN_ALIRORIOS),
+      AVLCHILE_TOKEN: maskToken(process.env.AVLCHILE_TOKEN)
     }
   });
 });
@@ -284,7 +296,14 @@ async function handleGpsServerWebhook(req, res) {
 
   // Execute integrations concurrently using their Strategy classes
   const promises = targets.map(async (target) => {
-    const integrationConfig = dynamicConfigs[target] || (deviceConfig.integrations && deviceConfig.integrations[target]);
+    let integrationConfig = dynamicConfigs[target];
+    if (!integrationConfig && deviceConfig.integrations && deviceConfig.integrations[target]) {
+      const staticIntegration = deviceConfig.integrations[target];
+      integrationConfig = {
+        ...getDynamicIntegrationConfig(target, staticIntegration.client || clientParam),
+        ...staticIntegration
+      };
+    }
     
     // Check if integration is explicitly enabled
     if (!integrationConfig || integrationConfig.enabled !== true) {
