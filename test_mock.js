@@ -95,12 +95,40 @@ process.env.AVLCHILE_TOKEN_LUISHERRERA = 'mock_luisherrera_token_456';
 // Traccar Mock environment variables
 process.env.TRACCAR_API_URL = 'http://localhost:4009/';
 
+// GPS Server Poller Mock environment variables
+process.env.GPSSERVER_POLL_CLIENTS = 'luisherrera';
+process.env.GPSSERVER_POLL_TRACCAR_CLIENTS = 'luisherrera';
+process.env.GPSSERVER_API_KEY_LUISHERRERA = 'mock_key_luisherrera';
+process.env.GPSSERVER_API_URL = 'http://localhost:4005/api/api.php';
+process.env.GPSSERVER_POLL_INTERVAL = '60000'; // high interval so it doesn't poll repeatedly in test background
+
+
 
 const gpsServerApp = express();
 gpsServerApp.get('/api/api_loc.php', (req, res) => {
   console.log('\n[Mock GPS Server] Received forwarded request:');
   console.log('Query:', req.query);
   res.send('ok');
+});
+
+gpsServerApp.get('/api/api.php', (req, res) => {
+  console.log('\n[Mock GPS Server API] Received request:', req.query);
+  if (req.query.api === 'user' && req.query.cmd === 'OBJECT_GET_LOCATIONS,*') {
+    return res.json({
+      "863719067827833": {
+        "name": "VPXW60",
+        "lat": -39.834478,
+        "lng": -73.212378,
+        "altitude": 15,
+        "angle": 212,
+        "speed": 0,
+        "dt_tracker": "2026-06-10 16:00:17",
+        "dt_server": "2026-06-10 16:00:26",
+        "loc_valid": 1
+      }
+    });
+  }
+  res.status(404).send('Not found');
 });
 
 const tracksolidApp = express();

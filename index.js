@@ -25,6 +25,7 @@ let lastTracksolidForwardStatus = 'No runs yet';
 
 // GPS Server Polling Engine Settings
 const GPSSERVER_POLL_CLIENTS = process.env.GPSSERVER_POLL_CLIENTS;
+const GPSSERVER_POLL_TRACCAR_CLIENTS = process.env.GPSSERVER_POLL_TRACCAR_CLIENTS;
 const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL || '60000', 10);
 const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
 
@@ -690,7 +691,36 @@ async function pollGpsServerLocations() {
           totalDevicesProcessed++;
           
           // Get B2B config for this device from config/devices.json
-          const deviceConfig = getDeviceConfig(imei);
+          let deviceConfig = getDeviceConfig(imei);
+
+          // Check for wildcard Traccar polling configuration
+          const traccarClients = (GPSSERVER_POLL_TRACCAR_CLIENTS || '')
+            .split(',')
+            .map(c => c.trim().toLowerCase())
+            .filter(Boolean);
+
+          const isTraccarWildcard = traccarClients.includes(client.toLowerCase());
+
+          if (isTraccarWildcard) {
+            if (!deviceConfig) {
+              deviceConfig = {
+                plate: device.name || 'SIN_PATENTE',
+                carrier: 'VIKARGPS',
+                integrations: {
+                  traccar: { enabled: true, client: client }
+                }
+              };
+            } else {
+              deviceConfig = {
+                ...deviceConfig,
+                integrations: {
+                  ...deviceConfig.integrations,
+                  traccar: { enabled: true, client: client, ...((deviceConfig.integrations && deviceConfig.integrations.traccar) || {}) }
+                }
+              };
+            }
+          }
+
           if (!deviceConfig || !deviceConfig.integrations) {
             // Not configured for B2B forwarding, skip
             continue;
