@@ -94,6 +94,9 @@ process.env.AVLCHILE_TOKEN_LUISHERRERA = 'mock_luisherrera_token_456';
 
 // Traccar Mock environment variables
 process.env.TRACCAR_API_URL = 'http://localhost:4009/';
+process.env.TRACCAR_USER = 'admin@example.com';
+process.env.TRACCAR_PASSWORD = 'secret_traccar_password';
+process.env.TRACCAR_WEB_URL = 'http://localhost:4009/';
 
 // GPS Server Poller Mock environment variables
 process.env.GPSSERVER_POLL_CLIENTS = 'luisherrera';
@@ -185,10 +188,31 @@ avlchileApp.post('/api/v2/', (req, res) => {
 });
 
 const traccarApp = express();
+traccarApp.use(bodyParser.json());
+
+const registeredDevices = new Set(['GLXP79']); // GLXP79 is pre-registered for Scenario 7 webhook test
+
 traccarApp.get('/', (req, res) => {
-  console.log('\n[Mock Traccar API] Received telemetry via GET:');
+  const deviceId = req.query.id;
+  console.log(`\n[Mock Traccar API] Received telemetry via GET for ID: ${deviceId}`);
   console.log('Query parameters:', req.query);
-  res.sendStatus(200);
+  if (deviceId && registeredDevices.has(deviceId)) {
+    res.sendStatus(200);
+  } else {
+    console.warn(`[Mock Traccar API] Rejecting update (404) for unregistered device ID: ${deviceId}`);
+    res.sendStatus(404);
+  }
+});
+
+traccarApp.post('/api/devices', (req, res) => {
+  const { name, uniqueId } = req.body;
+  console.log(`\n[Mock Traccar REST API] Creating device via POST: Name='${name}', uniqueId='${uniqueId}'`);
+  console.log('Headers:', { authorization: req.headers.authorization });
+  if (!uniqueId) {
+    return res.status(400).json({ error: 'Missing uniqueId' });
+  }
+  registeredDevices.add(uniqueId);
+  res.status(200).json({ id: Math.floor(Math.random() * 1000), name, uniqueId });
 });
 
 // Start all mock servers

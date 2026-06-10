@@ -233,6 +233,9 @@ function getDynamicIntegrationConfig(target, client) {
     config.token = process.env[`AVLCHILE_TOKEN${suffix}`] || process.env.AVLCHILE_TOKEN;
   } else if (target === 'traccar') {
     config.endpoint = process.env[`TRACCAR_API_URL${suffix}`] || process.env.TRACCAR_API_URL;
+    config.username = process.env[`TRACCAR_USER${suffix}`] || process.env.TRACCAR_USER;
+    config.password = process.env[`TRACCAR_PASSWORD${suffix}`] || process.env.TRACCAR_PASSWORD;
+    config.webUrl = process.env[`TRACCAR_WEB_URL${suffix}`] || process.env.TRACCAR_WEB_URL;
   }
   return config;
 }
