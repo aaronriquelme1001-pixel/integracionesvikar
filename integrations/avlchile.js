@@ -1,7 +1,12 @@
 const BaseStrategy = require('./BaseStrategy');
 
-// Memory cache to prevent duplicate transmissions within the 5-second rate-limit window
+// Memory cache to prevent duplicate transmissions within the 10-second rate-limit window per plate
 const lastSentCache = {};
+
+// Queue variables to ensure consecutive requests to AVL Chile are paced at least 5 seconds apart
+let avlRequestQueue = Promise.resolve();
+let lastRequestTime = 0;
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 class AvlChileStrategy extends BaseStrategy {
   /**
@@ -76,11 +81,33 @@ class AvlChileStrategy extends BaseStrategy {
 
     const payload = [record];
 
-    console.log(`[AVL Chile] Dispatching telemetry for ${deviceConfig.plate || telemetry.plate_number} to ${url}...`);
-    const headers = {
-      'Authorization': `AVLToken ${token}`
-    };
-    const result = await this.sendJSONRequest(url, headers, payload);
+    // Queue and throttle the HTTP request to satisfy AVL Chile's 5-second rate limit
+    const result = await new Promise((resolve) => {
+      avlRequestQueue = avlRequestQueue
+        .then(async () => {
+          const timeSinceLast = Date.now() - lastRequestTime;
+          const minDelay = 5100; // 5.1 seconds to be safe
+          if (timeSinceLast < minDelay) {
+            const waitTime = minDelay - timeSinceLast;
+            console.log(`[AVL Chile] Throttling request for ${plate}: waiting ${waitTime}ms to comply with 5-second rate limit...`);
+            await delay(waitTime);
+          }
+
+          // Update last request timestamp
+          lastRequestTime = Date.now();
+
+          console.log(`[AVL Chile] Dispatching telemetry for ${deviceConfig.plate || telemetry.plate_number} to ${url}...`);
+          const headers = {
+            'Authorization': `AVLToken ${token}`
+          };
+          const res = await this.sendJSONRequest(url, headers, payload);
+          resolve(res);
+        })
+        .catch((err) => {
+          console.error(`[AVL Chile] Error in request queue:`, err.message);
+          resolve({ success: false, error: err.message });
+        });
+    });
 
     if (result.success) {
       console.log(`[AVL Chile] Success Response:`, JSON.stringify(result.data));
