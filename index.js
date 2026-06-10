@@ -821,31 +821,33 @@ async function pollGpsServerLocations() {
           // Get B2B config for this device from config/devices.json
           let deviceConfig = getDeviceConfig(imei);
 
-          // Check for wildcard Traccar polling configuration
-          const traccarClients = (GPSSERVER_POLL_TRACCAR_CLIENTS || '')
-            .split(',')
-            .map(c => c.trim().toLowerCase())
-            .filter(Boolean);
+          // Dynamically check wildcard configurations for ALL available integrations
+          // For example, if process.env.GPSSERVER_POLL_AVLCHILE_CLIENTS = 'luisherrera', it injects avlchile for all luisherrera vehicles
+          for (const strategyName of Object.keys(strategies)) {
+            const envVarName = `GPSSERVER_POLL_${strategyName.toUpperCase()}_CLIENTS`;
+            const wildcardClients = (process.env[envVarName] || '')
+              .split(',')
+              .map(c => c.trim().toLowerCase())
+              .filter(Boolean);
 
-          const isTraccarWildcard = traccarClients.includes(client.toLowerCase());
-
-          if (isTraccarWildcard) {
-            if (!deviceConfig) {
-              deviceConfig = {
-                plate: device.name || 'SIN_PATENTE',
-                carrier: 'VIKARGPS',
-                integrations: {
-                  traccar: { enabled: true, client: client }
-                }
-              };
-            } else {
-              deviceConfig = {
-                ...deviceConfig,
-                integrations: {
-                  ...deviceConfig.integrations,
-                  traccar: { enabled: true, client: client, ...((deviceConfig.integrations && deviceConfig.integrations.traccar) || {}) }
-                }
-              };
+            if (wildcardClients.includes(client.toLowerCase())) {
+              if (!deviceConfig) {
+                deviceConfig = {
+                  plate: device.name || 'SIN_PATENTE',
+                  carrier: 'VIKARGPS',
+                  integrations: {
+                    [strategyName]: { enabled: true, client: client }
+                  }
+                };
+              } else {
+                deviceConfig = {
+                  ...deviceConfig,
+                  integrations: {
+                    ...deviceConfig.integrations,
+                    [strategyName]: { enabled: true, client: client, ...((deviceConfig.integrations && deviceConfig.integrations[strategyName]) || {}) }
+                  }
+                };
+              }
             }
           }
 
