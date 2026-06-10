@@ -66,5 +66,45 @@
         "client": "alirorios"
       }
     }
+  },
+  "865413053854286": {
+    "plate": "DFKT91",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "traccar": {
+        "enabled": true,
+        "client": "admin"
+      }
+    }
+  },
+  "865413054330609": {
+    "plate": "OPEL",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "traccar": {
+        "enabled": true,
+        "client": "admin"
+      }
+    }
+  },
+  "869671072743121": {
+    "plate": "RDXY48",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "traccar": {
+        "enabled": true,
+        "client": "admin"
+      }
+    }
+  },
+  "863719067827833": {
+    "plate": "VPXW60",
+    "carrier": "VIKARGPS",
+    "integrations": {
+      "traccar": {
+        "enabled": true,
+        "client": "admin"
+      }
+    }
   }
 }
