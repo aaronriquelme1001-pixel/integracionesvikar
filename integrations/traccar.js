@@ -23,18 +23,30 @@ class TraccarStrategy extends BaseStrategy {
     }
     const unixTimestamp = Math.floor((isNaN(parsedDate.getTime()) ? Date.now() : parsedDate.getTime()) / 1000);
 
+    const latVal = parseFloat(telemetry.lat);
+    const lonVal = parseFloat(telemetry.lng || telemetry.lon);
+
+    if (isNaN(latVal) || isNaN(lonVal)) {
+      console.warn(`[Traccar] Skipping update for ${id}: Invalid coordinates (lat: ${telemetry.lat}, lng/lon: ${telemetry.lng || telemetry.lon})`);
+      return;
+    }
+
+    const speedVal = isNaN(parseFloat(telemetry.speed)) ? 0 : Math.round(parseFloat(telemetry.speed));
+    const bearingVal = isNaN(parseFloat(telemetry.angle || telemetry.bearing)) ? 0 : Math.round(parseFloat(telemetry.angle || telemetry.bearing)) % 360;
+    const altitudeVal = isNaN(parseFloat(telemetry.altitude)) ? 0 : Math.round(parseFloat(telemetry.altitude));
+
     const params = {
       id: id,
-      lat: parseFloat(telemetry.lat),
-      lon: parseFloat(telemetry.lng),
-      speed: Math.round(parseFloat(telemetry.speed || 0)),
-      bearing: Math.round(parseFloat(telemetry.angle || 0)) % 360,
-      altitude: Math.round(parseFloat(telemetry.altitude || 0)),
+      lat: latVal,
+      lon: lonVal,
+      speed: speedVal,
+      bearing: bearingVal,
+      altitude: altitudeVal,
       timestamp: unixTimestamp,
       valid: telemetry.loc_valid !== undefined ? (String(telemetry.loc_valid) === '1' || telemetry.loc_valid === true ? 'true' : 'false') : 'true'
     };
 
-    console.log(`[Traccar] Forwarding telemetry for ${id} to ${url}...`);
+    console.log(`[Traccar] Forwarding telemetry for ${id} to ${url}... Parameters:`, JSON.stringify(params));
 
     try {
       const response = await axios.get(url, { params, timeout: 8000 });
