@@ -4,16 +4,16 @@
     "carrier": "VIKARGPS",
     "integrations": {
       "colun": {
-        "enabled": true
+        "enabled": false
       },
       "arauco": {
-        "enabled": true
+        "enabled": false
       },
       "melon": {
-        "enabled": true
+        "enabled": false
       },
       "falabella": {
-        "enabled": true
+        "enabled": false
       }
     }
   },

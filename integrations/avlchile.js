@@ -109,10 +109,10 @@ class AvlChileStrategy extends BaseStrategy {
       avlRequestQueue = avlRequestQueue
         .then(async () => {
           const timeSinceLast = Date.now() - lastRequestTime;
-          const minDelay = 5500; // 5.5 seconds safety margin from completion of previous request
+          const minDelay = 10000; // 10 seconds safety margin to comply strictly with AVL Chile API limits
           if (timeSinceLast < minDelay) {
             const waitTime = minDelay - timeSinceLast;
-            console.log(`[AVL Chile] Throttling request for ${plate}: waiting ${waitTime}ms to comply with 5-second rate limit...`);
+            console.log(`[AVL Chile] Throttling request for ${plate}: waiting ${waitTime}ms to comply with 10-second rate limit...`);
             await delay(waitTime);
           }
 
