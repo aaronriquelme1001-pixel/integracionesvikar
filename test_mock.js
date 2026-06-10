@@ -365,9 +365,21 @@ async function runTest() {
     });
     console.log('[Test Suite] Middleware Response Status:', res.status);
     console.log('[Test Suite] Middleware Response Body:', res.data);
+
+    console.log('\n[Test Suite] Dispatching duplicate Scenario 6 request (same telemetry timestamp)...');
+    const resDup = await axios.get(`http://localhost:${MIDDLEWARE_PORT}/webhook/gps-server`, {
+      params: {
+        ...gpsServerPayload,
+        target: 'avlchile',
+        client: 'alirorios'
+      }
+    });
+    console.log('[Test Suite] Duplicate Response Status:', resDup.status);
+    console.log('[Test Suite] Duplicate Response Body:', resDup.data);
   } catch (err) {
     console.error('[Test Suite] Error running Scenario 6:', err.response ? err.response.data : err.message);
   }
+
 
   try {
     console.log('\n================================================================');
