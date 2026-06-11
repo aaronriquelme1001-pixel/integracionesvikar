@@ -8,34 +8,46 @@ const lastSentTelemetryTimestamp = {};
 const batchQueues = {}; 
 const targetUrls = {};
 
-// Background worker that flushes batches every 10 seconds
-// This perfectly satisfies the AVL Chile rule while allowing the user's desired 10-second ultra-low latency
-setInterval(async () => {
-  const tokens = Object.keys(batchQueues);
-  if (tokens.length === 0) return;
-
-  for (const token of tokens) {
-    const payload = batchQueues[token];
-    if (!payload || payload.length === 0) continue;
-    
-    // Extract and clear the queue for this token
-    batchQueues[token] = [];
-    const url = targetUrls[token];
-
-    console.log(`[AVL Chile] Flushing batch of ${payload.length} vehicles for token (masked: ${token.substring(0,4)}...)`);
-    
-    const headers = { 'Authorization': `AVLToken ${token}` };
+// Background worker that flushes batches exactly every 10 seconds.
+// Using a recursive loop ensures that even if a request takes 15 seconds,
+// the next request will WAIT 10 seconds after the completion, avoiding any overlaps.
+async function startBatchWorker() {
+  while (true) {
     try {
-      const res = await axios.post(url, payload, { headers, timeout: 15000 });
-      console.log(`[AVL Chile] Batch Success Response:`, JSON.stringify(res.data));
-    } catch (err) {
-      console.error(`[AVL Chile] Batch Forwarding failed:`, err.message);
-    }
+      const tokens = Object.keys(batchQueues);
+      if (tokens.length > 0) {
+        for (const token of tokens) {
+          const payload = batchQueues[token];
+          if (!payload || payload.length === 0) continue;
+          
+          // Extract and clear the queue for this token
+          batchQueues[token] = [];
+          const url = targetUrls[token];
 
-    // Since rate limits are usually per-account, we just leave a tiny 1-second gap between different tokens
-    await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log(`[AVL Chile] Flushing batch of ${payload.length} vehicles for token (masked: ${token.substring(0,4)}...)`);
+          
+          const headers = { 'Authorization': `AVLToken ${token}` };
+          try {
+            const res = await axios.post(url, payload, { headers, timeout: 15000 });
+            console.log(`[AVL Chile] Batch Success Response:`, JSON.stringify(res.data));
+          } catch (err) {
+            console.error(`[AVL Chile] Batch Forwarding failed:`, err.message);
+          }
+
+          // Since rate limits are usually per-account, we leave a 1-second gap between different tokens
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    } catch (err) {
+      console.error('[AVL Chile] Batch worker error:', err);
+    }
+    // Wait exactly 10 seconds before checking the queues again
+    await new Promise(resolve => setTimeout(resolve, 10000));
   }
-}, 10000);
+}
+
+// Start the background worker
+startBatchWorker();
 
 class AvlChileStrategy extends BaseStrategy {
   async execute(telemetry, deviceConfig, integrationConfig) {
