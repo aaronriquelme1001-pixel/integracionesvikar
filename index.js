@@ -818,13 +818,33 @@ async function pollGpsServerLocations() {
           const device = devices[imei];
           if (!device) continue;
 
-          // Filtro Inteligente Anti-Spam: Saltar si la fecha/hora del GPS es idéntica a la anterior
+          const nowMs = Date.now();
+          const PARKED_HEARTBEAT_MS = 20 * 60 * 1000; // 20 minutos
+          let shouldSend = true;
+
+          // Filtro Inteligente Anti-Spam con Latido (Heartbeat)
           if (device.dt_tracker) {
-            if (lastDeviceTimestamps[imei] === device.dt_tracker) {
-              continue;
+            const state = lastDeviceTimestamps[imei] || {};
+            const timeSinceLastSend = nowMs - (state.lastSentAt || 0);
+
+            if (state.dt_tracker === device.dt_tracker) {
+              // El vehículo está estacionado (la hora del GPS no ha cambiado)
+              if (timeSinceLastSend < PARKED_HEARTBEAT_MS) {
+                shouldSend = false; // Bloquear spam
+              } else {
+                console.log(`[GPS Server Poller] Enviando latido de 20 minutos para estacionado: ${imei}`);
+              }
             }
-            lastDeviceTimestamps[imei] = device.dt_tracker;
+            
+            if (shouldSend) {
+              lastDeviceTimestamps[imei] = {
+                dt_tracker: device.dt_tracker,
+                lastSentAt: nowMs
+              };
+            }
           }
+
+          if (!shouldSend) continue;
 
           totalDevicesProcessed++;
           
