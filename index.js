@@ -767,6 +767,8 @@ async function pollTracksolidLocations() {
   }
 }
 
+const lastDeviceTimestamps = {};
+
 /**
  * Poll location updates for configured GPS Server clients and forward them to B2B targets
  */
@@ -815,6 +817,14 @@ async function pollGpsServerLocations() {
         for (const imei of imeis) {
           const device = devices[imei];
           if (!device) continue;
+
+          // Filtro Inteligente Anti-Spam: Saltar si la fecha/hora del GPS es idéntica a la anterior
+          if (device.dt_tracker) {
+            if (lastDeviceTimestamps[imei] === device.dt_tracker) {
+              continue;
+            }
+            lastDeviceTimestamps[imei] = device.dt_tracker;
+          }
 
           totalDevicesProcessed++;
           
