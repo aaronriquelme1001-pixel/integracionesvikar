@@ -43,6 +43,7 @@ class TraccarStrategy extends BaseStrategy {
       speed: speedVal,
       bearing: bearingVal,
       altitude: altitudeVal,
+      timestamp: unixTimestamp,
       valid: telemetry.loc_valid !== undefined ? (String(telemetry.loc_valid) === '1' || telemetry.loc_valid === true ? 'true' : 'false') : 'true'
     };
 
