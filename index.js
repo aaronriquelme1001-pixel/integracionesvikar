@@ -6,6 +6,39 @@ const path = require('path');
 const axios = require('axios');
 const { verifySignature, computeSignature } = require('./utils/signature');
 
+// ==============================================
+// 💾 MEMORIA PERSISTENTE (Inmunidad a Reinicios)
+// ==============================================
+const STATE_FILE = path.join(__dirname, 'data', 'state.json');
+
+let deviceAntiSpamState = {};
+let lastDeviceTimestamps = {};
+
+try {
+  if (!fs.existsSync(path.dirname(STATE_FILE))) {
+    fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
+  }
+  if (fs.existsSync(STATE_FILE)) {
+    const rawData = fs.readFileSync(STATE_FILE, 'utf8');
+    const parsedData = JSON.parse(rawData);
+    deviceAntiSpamState = parsedData.deviceAntiSpamState || {};
+    lastDeviceTimestamps = parsedData.lastDeviceTimestamps || {};
+    console.log(`[Persistencia] Memoria restaurada exitosamente. AntiSpam keys: ${Object.keys(deviceAntiSpamState).length}`);
+  }
+} catch (err) {
+  console.error(`[Persistencia] Error cargando memoria:`, err.message);
+}
+
+// Guardar memoria cada 1 minuto
+setInterval(() => {
+  try {
+    fs.writeFileSync(STATE_FILE, JSON.stringify({ deviceAntiSpamState, lastDeviceTimestamps }), 'utf8');
+  } catch (err) {
+    console.error(`[Persistencia] Error guardando memoria:`, err.message);
+  }
+}, 60000);
+// ==============================================
+
 // Tracksolid API configuration
 const TRACKSOLID_API_URL = process.env.TRACKSOLID_API_URL || 'https://us-open.tracksolidpro.com/route/rest';
 const TRACKSOLID_USER_ID = process.env.TRACKSOLID_USER_ID;
@@ -247,6 +280,7 @@ function getDynamicIntegrationConfig(target, client) {
  * Unified endpoint for GPS Server webhook (GET and POST support)
  */
 async function handleGpsServerWebhook(req, res) {
+  systemStats.totalWebhooksProcessed++;
   const telemetryObj = { ...req.query, ...req.body };
   const imei = telemetryObj.imei;
   if (!imei) {
@@ -283,7 +317,34 @@ app.get('/webhook/gps-server', handleGpsServerWebhook);
 app.post('/webhook/gps-server', handleGpsServerWebhook);
 
 
-const deviceAntiSpamState = {};
+/**
+ * Core Stats object for monitoring
+ */
+const systemStats = {
+  bootTime: new Date().toISOString(),
+  totalWebhooksProcessed: 0,
+  totalPolledPoints: 0,
+  totalPointsDispatched: 0,
+  backfillerTriggers: 0,
+  backfillerRecoveredPoints: 0,
+  lastDispatchTime: null
+};
+
+/**
+ * Health Check & Live Dashboard Endpoint
+ */
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'online',
+    version: '2.0.0 (B2B Engine)',
+    uptime_seconds: process.uptime(),
+    stats: systemStats,
+    activeDevicesInSpamFilter: Object.keys(deviceAntiSpamState).length,
+    pollerMemoryKeys: Object.keys(lastDeviceTimestamps).length
+  });
+});
+
+// deviceAntiSpamState is defined globally at the top for persistence
 
 /**
  * Core B2B Dispatch Engine.
@@ -374,6 +435,9 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
   }
 
   if (activeStrategies.size === 0) return;
+
+  systemStats.totalPointsDispatched++;
+  systemStats.lastDispatchTime = new Date().toISOString();
 
   console.log(`[B2B Dispatch] Device: ${deviceConfig.plate || imei} — Routing to: ${Array.from(activeStrategies).join(', ')}`);
 
@@ -763,7 +827,7 @@ async function pollTracksolidLocations() {
   }
 }
 
-const lastDeviceTimestamps = {}; // Usado para detectar saltos de tiempo en el Poller
+// lastDeviceTimestamps is defined globally at the top for persistence
 
 /**
  * Función asíncrona para recuperar historial perdido (Túneles o Gaps)
@@ -792,6 +856,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
      messages = messages.filter(m => m.dt_tracker && m.dt_tracker !== dt_old && m.dt_tracker !== dt_new);
      
      if (messages.length > 0) {
+       systemStats.backfillerRecoveredPoints += messages.length;
        console.log(`[Backfiller] 💎 ¡ÉXITO! Se recuperaron ${messages.length} puntos históricos perdidos para ${imei}. Inyectándolos a B2B...`);
        
        for (const msg of messages) {
@@ -868,6 +933,7 @@ async function pollGpsServerLocations() {
           if (!device) continue;
 
           totalDevicesProcessed++;
+          systemStats.totalPolledPoints++;
           
           const telemetry = {
             imei: imei,
@@ -897,6 +963,7 @@ async function pollGpsServerLocations() {
               
               // Si el salto es mayor a 15 segundos y menor a 3 horas (para evitar bloqueos masivos)
               if (gapSeconds > 15 && gapSeconds < 10800) {
+                 systemStats.backfillerTriggers++;
                  console.log(`[Poller] ⚠️ Salto de ${gapSeconds}s detectado en ${imei}. Disparando Backfiller...`);
                  // Disparar recuperación en segundo plano (sin await para no bloquear el poller)
                  recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
