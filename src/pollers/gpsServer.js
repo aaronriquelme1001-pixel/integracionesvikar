@@ -25,7 +25,25 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
      });
      
      if (response.data && Array.isArray(response.data)) {
-        let messages = response.data;
+        // GPS Server API returns an array of arrays for GET_MESSAGES, not objects!
+        // Format: [dt_tracker, lat, lng, altitude, angle, speed, params]
+        let messages = response.data.map(m => {
+           if (Array.isArray(m)) {
+              return {
+                 dt_tracker: m[0],
+                 dt_server: m[0], // GET_MESSAGES doesn't provide dt_server
+                 lat: m[1],
+                 lng: m[2],
+                 altitude: m[3] || 0,
+                 angle: m[4] || 0,
+                 speed: m[5] || 0,
+                 params: m[6] || {},
+                 loc_valid: 1
+              };
+           }
+           return m;
+        });
+        
         // Ordenar cronológicamente (el más antiguo primero)
         messages.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
         
