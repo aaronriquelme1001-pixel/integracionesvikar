@@ -2,6 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
+// ==============================================
+// 🛡️ ANTI-CRASH SHIELD (Seguro de Vida Node.js)
+// ==============================================
+process.on('uncaughtException', (err) => {
+  console.error(`[CRITICAL] Error no capturado:`, err.message, err.stack);
+  // No salimos del proceso (evitamos crash total)
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(`[CRITICAL] Promesa rechazada sin atrapar:`, reason);
+  // No salimos del proceso
+});
+
 const { systemStats, deviceAntiSpamState, lastDeviceTimestamps, retryQueue } = require('./src/core/state');
 const { handleGpsServerWebhook } = require('./src/webhooks/gpsServer');
 const { pollGpsServerLocations, getStatus: getGpsPollerStatus } = require('./src/pollers/gpsServer');

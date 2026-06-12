@@ -46,6 +46,28 @@ setInterval(() => {
   }
 }, 60000);
 
+// ==============================================
+// 🧹 GARBAGE COLLECTOR (Limpieza de RAM)
+// ==============================================
+// Se ejecuta cada 12 horas para borrar camiones que no han transmitido en 7 días
+setInterval(() => {
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  let deletedCount = 0;
+  
+  for (const imei in deviceAntiSpamState) {
+    if (now - (deviceAntiSpamState[imei].lastSentAt || 0) > SEVEN_DAYS_MS) {
+      delete deviceAntiSpamState[imei];
+      delete lastDeviceTimestamps[imei];
+      deletedCount++;
+    }
+  }
+  
+  if (deletedCount > 0) {
+    console.log(`[Garbage Collector] 🧹 Se limpiaron ${deletedCount} vehículos inactivos de la memoria RAM.`);
+  }
+}, 12 * 60 * 60 * 1000);
+
 module.exports = {
   systemStats,
   deviceAntiSpamState,

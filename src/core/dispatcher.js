@@ -126,7 +126,8 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
         telemetry,
         deviceConfig,
         resolvedConfig,
-        retries: 0
+        retries: 0,
+        nextAttempt: Date.now() + 5000
       });
     }
   });
@@ -137,7 +138,12 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
 // Background Worker: Cola de Reintentos
 setInterval(async () => {
   if (retryQueue.length === 0) return;
-  const item = retryQueue.shift();
+  
+  const now = Date.now();
+  const index = retryQueue.findIndex(i => now >= (i.nextAttempt || 0));
+  if (index === -1) return;
+  
+  const item = retryQueue.splice(index, 1)[0];
   
   if (item.retries > 10) {
      console.log(`[Retry Queue] ❌ Descartando carga para ${item.telemetry.imei} hacia ${item.target} tras 10 intentos fallidos.`);
@@ -154,9 +160,11 @@ setInterval(async () => {
   } catch (err) {
     console.error(`[Retry Queue] ⚠️ Reintento fallido para ${item.telemetry.imei} hacia ${item.target}:`, err.message);
     item.retries++;
+    const delay = 5000 * Math.pow(3, item.retries); // 15s, 45s, 135s, 405s...
+    item.nextAttempt = Date.now() + delay;
     retryQueue.push(item);
   }
-}, 5000);
+}, 2000);
 
 module.exports = {
   dispatchToB2B
