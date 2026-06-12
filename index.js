@@ -340,11 +340,40 @@ app.get('/health', (req, res) => {
     uptime_seconds: process.uptime(),
     stats: systemStats,
     activeDevicesInSpamFilter: Object.keys(deviceAntiSpamState).length,
-    pollerMemoryKeys: Object.keys(lastDeviceTimestamps).length
+    pollerMemoryKeys: Object.keys(lastDeviceTimestamps).length,
+    retryQueueLength: retryQueue.length
   });
 });
 
-// deviceAntiSpamState is defined globally at the top for persistence
+// deviceAntiSpamState ya fue declarado globalmente arriba
+// ==============================================
+// ♻️ COLA DE REINTENTOS (Tolerancia a fallos)
+// ==============================================
+const retryQueue = [];
+
+setInterval(async () => {
+  if (retryQueue.length === 0) return;
+  const item = retryQueue.shift();
+  
+  if (item.retries > 10) {
+     console.log(`[Retry Queue] ❌ Descartando carga para ${item.telemetry.imei} hacia ${item.target} tras 10 intentos fallidos.`);
+     return;
+  }
+  
+  console.log(`[Retry Queue] ♻️ Reintentando envío de ${item.telemetry.imei} hacia ${item.target} (Intento ${item.retries + 1})...`);
+  const strategy = strategies[item.target];
+  if (!strategy) return;
+  
+  try {
+    await strategy.execute(item.telemetry, item.deviceConfig, item.resolvedConfig);
+    console.log(`[Retry Queue] ✅ Reintento exitoso para ${item.telemetry.imei} hacia ${item.target}!`);
+  } catch (err) {
+    console.error(`[Retry Queue] ⚠️ Reintento fallido para ${item.telemetry.imei} hacia ${item.target}:`, err.message);
+    item.retries++;
+    retryQueue.push(item);
+  }
+}, 5000); // Procesa 1 item de la cola cada 5 segundos
+// ==============================================
 
 /**
  * Core B2B Dispatch Engine.
@@ -454,6 +483,13 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       await strategy.execute(telemetry, deviceConfig, resolvedConfig);
     } catch (err) {
       console.error(`[B2B Dispatch] Error executing strategy '${target}':`, err.message);
+      retryQueue.push({
+        target,
+        telemetry,
+        deviceConfig,
+        resolvedConfig,
+        retries: 0
+      });
     }
   });
 
