@@ -15,6 +15,7 @@ const systemStats = {
 
 let deviceAntiSpamState = {};
 let lastDeviceTimestamps = {};
+let pendingBackfills = [];
 const retryQueue = [];
 
 // ==============================================
@@ -29,6 +30,7 @@ try {
     const parsedData = JSON.parse(rawData);
     deviceAntiSpamState = parsedData.deviceAntiSpamState || {};
     lastDeviceTimestamps = parsedData.lastDeviceTimestamps || {};
+    pendingBackfills = parsedData.pendingBackfills || [];
     console.log(`[Persistencia] Memoria restaurada exitosamente. AntiSpam keys: ${Object.keys(deviceAntiSpamState).length}`);
   }
 } catch (err) {
@@ -38,7 +40,7 @@ try {
 // Guardar memoria cada 1 minuto
 setInterval(() => {
   try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify({ deviceAntiSpamState, lastDeviceTimestamps }), 'utf8');
+    fs.writeFileSync(STATE_FILE, JSON.stringify({ deviceAntiSpamState, lastDeviceTimestamps, pendingBackfills }), 'utf8');
   } catch (err) {
     console.error(`[Persistencia] Error guardando memoria:`, err.message);
   }
@@ -48,5 +50,6 @@ module.exports = {
   systemStats,
   deviceAntiSpamState,
   lastDeviceTimestamps,
+  pendingBackfills,
   retryQueue
 };

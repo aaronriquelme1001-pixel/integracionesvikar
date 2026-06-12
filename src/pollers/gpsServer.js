@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { dispatchToB2B } = require('../core/dispatcher');
-const { systemStats, lastDeviceTimestamps } = require('../core/state');
+const { systemStats, lastDeviceTimestamps, pendingBackfills } = require('../core/state');
 
 const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL, 10) || 10000;
 const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
@@ -151,8 +151,17 @@ async function pollGpsServerLocations() {
                // Evitar falsos positivos por frecuencia de reporte normal
                if (gapSeconds > gapThreshold && gapSeconds < 10800) {
                  systemStats.backfillerTriggers++;
-                 console.log(`[Poller] ⚠️ Salto de ${gapSeconds}s detectado en ${imei}. Disparando Backfiller...`);
-                 recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
+                 console.log(`[Poller] ⚠️ Salto de ${gapSeconds}s detectado en ${imei}. Programando Backfiller en 3 minutos para permitir descarga del tracker...`);
+                 
+                 // Encolar para 3 minutos en el futuro
+                 pendingBackfills.push({
+                    imei,
+                    dt_old: lastPollerState.dt_tracker,
+                    dt_new: device.dt_tracker,
+                    client,
+                    apiKey,
+                    executeAt: Date.now() + 180000 // 3 minutos de retraso
+                 });
                }
              }
           }
@@ -179,6 +188,26 @@ async function pollGpsServerLocations() {
   isGpsServerPolling = false;
   setTimeout(pollGpsServerLocations, GPSSERVER_POLL_INTERVAL);
 }
+
+// Background Worker: Procesar Backfills Pendientes
+setInterval(async () => {
+   if (!pendingBackfills || pendingBackfills.length === 0) return;
+   
+   const now = Date.now();
+   // Encontrar tareas listas para ejecutarse
+   const readyTasks = pendingBackfills.filter(task => now >= task.executeAt);
+   
+   if (readyTasks.length > 0) {
+      for (const task of readyTasks) {
+         // Remover la tarea de la cola
+         const index = pendingBackfills.indexOf(task);
+         if (index > -1) pendingBackfills.splice(index, 1);
+         
+         // Ejecutar recuperación
+         await recoverHistory(task.imei, task.dt_old, task.dt_new, task.client, task.apiKey);
+      }
+   }
+}, 30000); // Revisar cola cada 30 segundos
 
 module.exports = {
   pollGpsServerLocations,
