@@ -322,10 +322,13 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
     }
     
     if (shouldSend) {
-      deviceAntiSpamState[imei] = {
-        dt_tracker: telemetry.dt_tracker,
-        lastSentAt: nowMs
-      };
+      // Only update the anti-spam clock if the incoming point is chronologically newer
+      if (!state.dt_tracker || telemetry.dt_tracker >= state.dt_tracker) {
+        deviceAntiSpamState[imei] = {
+          dt_tracker: telemetry.dt_tracker,
+          lastSentAt: nowMs
+        };
+      }
     }
   }
 
@@ -772,6 +775,61 @@ async function pollTracksolidLocations() {
   }
 }
 
+const lastDeviceTimestamps = {}; // Usado para detectar saltos de tiempo en el Poller
+
+/**
+ * Función asíncrona para recuperar historial perdido (Túneles o Gaps)
+ */
+async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
+  try {
+     console.log(`[Backfiller] Iniciando recuperación de ruta para ${imei} desde ${dt_old} hasta ${dt_new}...`);
+     const res = await axios.get(GPSSERVER_API_URL, {
+       params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
+       timeout: 20000
+     });
+     
+     let messages = [];
+     if (Array.isArray(res.data)) {
+        messages = res.data;
+     } else if (res.data && typeof res.data === 'object') {
+        messages = Object.values(res.data);
+     }
+     
+     if (messages.length === 0) {
+       console.log(`[Backfiller] No se encontraron puntos intermedios para ${imei}.`);
+       return;
+     }
+
+     // Filtrar los extremos para no duplicar
+     messages = messages.filter(m => m.dt_tracker && m.dt_tracker !== dt_old && m.dt_tracker !== dt_new);
+     
+     if (messages.length > 0) {
+       console.log(`[Backfiller] 💎 ¡ÉXITO! Se recuperaron ${messages.length} puntos históricos perdidos para ${imei}. Inyectándolos a B2B...`);
+       
+       for (const msg of messages) {
+           const telemetry = {
+              imei: imei,
+              name: msg.name || imei,
+              lat: msg.lat,
+              lng: msg.lng,
+              altitude: msg.altitude || 0,
+              angle: msg.angle || 0,
+              speed: msg.speed || 0,
+              dt_tracker: msg.dt_tracker,
+              dt_server: msg.dt_server,
+              loc_valid: msg.loc_valid !== undefined ? msg.loc_valid : 1,
+              params: msg.params || ''
+           };
+           await dispatchToB2B(telemetry, client);
+           await new Promise(r => setTimeout(r, 100)); // Pequeña pausa para no saturar
+       }
+       console.log(`[Backfiller] ✅ Inyección de ${messages.length} puntos completada para ${imei}.`);
+     }
+  } catch (err) {
+     console.error(`[Backfiller] Error recuperando historial para ${imei}:`, err.message);
+  }
+}
+
 /**
  * Poll location updates for configured GPS Server clients and forward them to B2B targets
  */
@@ -838,6 +896,28 @@ async function pollGpsServerLocations() {
             engine_hours: device.engine_hours,
             params: device.params
           };
+
+          // ==============================================
+          // [Backfiller IA] Detección de Saltos de Tiempo
+          // ==============================================
+          if (device.dt_tracker) {
+            const lastPollerState = lastDeviceTimestamps[imei] || {};
+            if (lastPollerState.dt_tracker && lastPollerState.dt_tracker !== device.dt_tracker) {
+              const oldTime = new Date(lastPollerState.dt_tracker.replace(' ', 'T') + 'Z').getTime();
+              const newTime = new Date(device.dt_tracker.replace(' ', 'T') + 'Z').getTime();
+              const gapSeconds = (newTime - oldTime) / 1000;
+              
+              // Si el salto es mayor a 15 segundos y menor a 3 horas (para evitar bloqueos masivos)
+              if (gapSeconds > 15 && gapSeconds < 10800) {
+                 console.log(`[Poller] ⚠️ Salto de ${gapSeconds}s detectado en ${imei}. Disparando Backfiller...`);
+                 // Disparar recuperación en segundo plano (sin await para no bloquear el poller)
+                 recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
+              }
+            }
+            // Actualizar memoria del Poller para el siguiente ciclo
+            lastDeviceTimestamps[imei] = { dt_tracker: device.dt_tracker };
+          }
+          // ==============================================
 
           try {
             await dispatchToB2B(telemetry, client);
