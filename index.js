@@ -254,41 +254,29 @@ async function handleGpsServerWebhook(req, res) {
   }
 
   let targetParam = req.query.target;
-    if (!integrationConfig && deviceConfig.integrations && deviceConfig.integrations[target]) {
-      const staticIntegration = deviceConfig.integrations[target];
-      integrationConfig = {
-        ...getDynamicIntegrationConfig(target, staticIntegration.client || clientParam),
-        ...staticIntegration
-      };
-    }
-    
-    // Check if integration is explicitly enabled
-    if (!integrationConfig || integrationConfig.enabled !== true) {
-      console.log(`[Router] Integration '${target}' is disabled for device ${imei}.`);
-      return;
-    }
+  let clientParam = req.query.client || telemetryObj.client;
 
-    const strategy = strategies[target];
-    if (!strategy) {
-      console.warn(`[Router] Warning: No strategy implemented for target '${target}'`);
-      return;
-    }
+  if (targetParam && targetParam.includes('?')) targetParam = targetParam.split('?')[0];
+  if (clientParam && clientParam.includes('?')) clientParam = clientParam.split('?')[0];
 
-    try {
-      console.log(`[Router] Executing strategy for B2B target: '${target}'`);
-      await strategy.execute(telemetry, deviceConfig, integrationConfig);
-    } catch (err) {
-      console.error(`[Router] Error executing strategy '${target}':`, err.message);
-    }
-  });
+  const telemetry = {
+    imei: String(imei),
+    plate_number: telemetryObj.plate_number || telemetryObj.plate,
+    name: telemetryObj.name,
+    dt_tracker: telemetryObj.dt || null,
+    dt_server: telemetryObj.dt || null,
+    lat: telemetryObj.lat !== undefined ? String(telemetryObj.lat) : '0',
+    lng: telemetryObj.lng !== undefined ? String(telemetryObj.lng) : '0',
+    altitude: telemetryObj.altitude || 0,
+    angle: telemetryObj.angle || 0,
+    speed: telemetryObj.speed || 0,
+    loc_valid: telemetryObj.loc_valid !== undefined ? telemetryObj.loc_valid : 1,
+    params: telemetryObj.params || '',
+    event: telemetryObj.event || null
+  };
 
-  // Await dispatching to all platforms
-  await Promise.all(promises);
-
-  console.log(`[Router] Telemetry B2B routing complete.`);
-  console.log(`======================================================`);
-
-  res.send('ok'); // Always respond 'ok' to GPS Server
+  await dispatchToB2B(telemetry, clientParam, targetParam);
+  return res.status(200).send('ok');
 }
 
 app.get('/webhook/gps-server', handleGpsServerWebhook);
