@@ -3,7 +3,7 @@ const { dispatchToB2B } = require('../core/dispatcher');
 const { systemStats, lastDeviceTimestamps } = require('../core/state');
 
 const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL, 10) || 10000;
-const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'https://gsh7.net/api/api.php';
+const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
 
 let lastGpsServerPollTime = null;
 let lastGpsServerPollStatus = 'Waiting to start...';
