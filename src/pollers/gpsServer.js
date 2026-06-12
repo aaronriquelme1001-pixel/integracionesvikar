@@ -144,8 +144,12 @@ async function pollGpsServerLocations() {
                const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
                const gapSeconds = Math.floor(timeDiffMs / 1000);
                
-               // Si el salto es mayor a 15 segundos y menor a 3 horas
-               if (gapSeconds > 15 && gapSeconds < 10800) {
+               // Sensibilidad dinámica: 45s en movimiento, 5 min (300s) estacionado
+               const isMoving = parseFloat(device.speed || 0) > 0;
+               const gapThreshold = isMoving ? 45 : 300;
+               
+               // Evitar falsos positivos por frecuencia de reporte normal
+               if (gapSeconds > gapThreshold && gapSeconds < 10800) {
                  systemStats.backfillerTriggers++;
                  console.log(`[Poller] ⚠️ Salto de ${gapSeconds}s detectado en ${imei}. Disparando Backfiller...`);
                  recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
