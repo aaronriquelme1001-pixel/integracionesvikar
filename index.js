@@ -247,66 +247,13 @@ function getDynamicIntegrationConfig(target, client) {
  * Unified endpoint for GPS Server webhook (GET and POST support)
  */
 async function handleGpsServerWebhook(req, res) {
-  // Combine parameters from GET and POST requests
-  const telemetry = { ...req.query, ...req.body };
-
-  const imei = telemetry.imei;
+  const telemetryObj = { ...req.query, ...req.body };
+  const imei = telemetryObj.imei;
   if (!imei) {
-    console.log('Received connection ping or request without IMEI.');
     return res.status(200).send('ok');
   }
 
-  console.log(`\n======================================================`);
-  console.log(`[Webhook] New telemetry update for IMEI: ${imei}`);
-  console.log('Telemetry details:', telemetry);
-
-  // Check query parameters for explicit target routing first (Dynamic Zero-Code Administration)
   let targetParam = req.query.target;
-  let clientParam = req.query.client;
-
-  // Clean up any incorrectly appended query string parameters from GPS Server (e.g. client=luisherrera?username=trans.herrera)
-  if (targetParam && targetParam.includes('?')) {
-    targetParam = targetParam.split('?')[0];
-  }
-  if (clientParam && clientParam.includes('?')) {
-    clientParam = clientParam.split('?')[0];
-  }
-
-  let targets = [];
-  let deviceConfig = null;
-  let dynamicConfigs = {};
-
-  if (targetParam) {
-    const target = targetParam.toLowerCase();
-    if (strategies[target]) {
-      console.log(`[Router] Dynamic webhook routing triggered. Target: ${target}, Client: ${clientParam || 'default'}`);
-      targets = [target];
-      deviceConfig = {
-        plate: telemetry.plate_number || telemetry.plate || 'SIN_PATENTE',
-        carrier: telemetry.carrier || 'VIKARGPS'
-      };
-      dynamicConfigs[target] = getDynamicIntegrationConfig(target, clientParam);
-    } else {
-      console.warn(`[Router] Dynamic routing requested unknown target: ${targetParam}`);
-    }
-  }
-
-  // Fallback to config/devices.json if no target was resolved dynamically
-  if (targets.length === 0) {
-    const staticConfig = getDeviceConfig(imei);
-    if (!staticConfig || !staticConfig.integrations) {
-      console.log(`[Router] No B2B integrations mapped for IMEI: ${imei}. Skipping.`);
-      console.log(`======================================================`);
-      return res.status(200).send('ok');
-    }
-    deviceConfig = staticConfig;
-    targets = Object.keys(staticConfig.integrations);
-    console.log(`[Router] Found static integrations for ${deviceConfig.plate}:`, targets);
-  }
-
-  // Execute integrations concurrently using their Strategy classes
-  const promises = targets.map(async (target) => {
-    let integrationConfig = dynamicConfigs[target];
     if (!integrationConfig && deviceConfig.integrations && deviceConfig.integrations[target]) {
       const staticIntegration = deviceConfig.integrations[target];
       integrationConfig = {
@@ -348,46 +295,104 @@ app.get('/webhook/gps-server', handleGpsServerWebhook);
 app.post('/webhook/gps-server', handleGpsServerWebhook);
 
 
+const deviceAntiSpamState = {};
+
 /**
  * Core B2B Dispatch Engine.
  * Takes normalized telemetry (mirrors GPS Server OBJECT_GET_LOCATIONS format)
- * and dispatches it to all B2B strategies configured for the device in devices.json.
+ * and dispatches it to all B2B strategies configured for the device.
  */
-async function dispatchToB2B(telemetry) {
+async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null) {
   const { imei } = telemetry;
+  const nowMs = Date.now();
+  const PARKED_HEARTBEAT_MS = 20 * 60 * 1000; // 20 minutes
+  let shouldSend = true;
+
+  // Filtro Inteligente Anti-Spam con Latido (Heartbeat) - Aplica a Poller y Webhooks
+  if (telemetry.dt_tracker) {
+    const state = deviceAntiSpamState[imei] || {};
+    const timeSinceLastSend = nowMs - (state.lastSentAt || 0);
+
+    if (state.dt_tracker === telemetry.dt_tracker) {
+      if (timeSinceLastSend < PARKED_HEARTBEAT_MS) {
+        shouldSend = false; // Bloquear spam
+      } else {
+        console.log(`[B2B Dispatch] Enviando latido de 20 minutos para estacionado: ${imei}`);
+      }
+    }
+    
+    if (shouldSend) {
+      deviceAntiSpamState[imei] = {
+        dt_tracker: telemetry.dt_tracker,
+        lastSentAt: nowMs
+      };
+    }
+  }
+
+  if (!shouldSend) return;
 
   // Look up device configuration from devices.json
-  const deviceConfig = getDeviceConfig(imei);
-  if (!deviceConfig || !deviceConfig.integrations) {
-    // Only log if it's NOT the tracksolid periodic poll to avoid spam, or just don't log at all
-    return;
-  }
+  let deviceConfig = getDeviceConfig(imei);
+  let activeStrategies = new Set();
+  let strategyClients = {};
 
-  // Get only enabled targets
-  const enabledTargets = Object.keys(deviceConfig.integrations).filter(
-    target => deviceConfig.integrations[target] && deviceConfig.integrations[target].enabled === true
-  );
-
-  if (enabledTargets.length === 0) {
-    // Silently skip if all integrations are disabled to avoid log spam
-    return;
-  }
-
-  console.log(`[B2B Dispatch] Device: ${deviceConfig.plate || imei} — Routing to: ${enabledTargets.join(', ')}`);
-
-  // Dispatch all integrations concurrently
-  const promises = enabledTargets.map(async (target) => {
-    const integrationConfig = deviceConfig.integrations[target];
-    const strategy = strategies[target];
-    
-    if (!strategy) {
-      console.warn(`[B2B Dispatch] No strategy implemented for target '${target}'`);
-      return;
+  // 1. Añadir integraciones estáticas de devices.json
+  if (deviceConfig && deviceConfig.integrations) {
+    for (const target of Object.keys(deviceConfig.integrations)) {
+      if (deviceConfig.integrations[target] && deviceConfig.integrations[target].enabled) {
+        activeStrategies.add(target);
+        strategyClients[target] = deviceConfig.integrations[target].client;
+      }
     }
+  }
+
+  // 2. Añadir integraciones dinámicas (Ruteo Zero-Code)
+  if (clientName) {
+    const clientLower = clientName.toLowerCase();
+    for (const strategyName of Object.keys(strategies)) {
+      const envVarName = `GPSSERVER_POLL_${strategyName.toUpperCase()}_CLIENTS`;
+      const wildcardClients = (process.env[envVarName] || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+      
+      if (wildcardClients.includes(clientLower)) {
+        activeStrategies.add(strategyName);
+        strategyClients[strategyName] = clientLower;
+        
+        if (!deviceConfig) {
+          deviceConfig = {
+            plate: telemetry.plate_number || telemetry.name || telemetry.plate || 'SIN_PATENTE',
+            carrier: telemetry.carrier || 'VIKARGPS',
+            integrations: {}
+          };
+        }
+      }
+    }
+  }
+
+  // 3. Añadir target explícito (URL Webhook con ?target=)
+  if (explicitTarget && strategies[explicitTarget.toLowerCase()]) {
+    const target = explicitTarget.toLowerCase();
+    activeStrategies.add(target);
+    strategyClients[target] = clientName || 'default';
+    if (!deviceConfig) {
+      deviceConfig = {
+        plate: telemetry.plate_number || telemetry.name || telemetry.plate || 'SIN_PATENTE',
+        carrier: telemetry.carrier || 'VIKARGPS',
+        integrations: {}
+      };
+    }
+  }
+
+  if (activeStrategies.size === 0) return;
+
+  console.log(`[B2B Dispatch] Device: ${deviceConfig.plate || imei} — Routing to: ${Array.from(activeStrategies).join(', ')}`);
+
+  const promises = Array.from(activeStrategies).map(async (target) => {
+    const strategy = strategies[target];
+    if (!strategy) return;
 
     const resolvedConfig = {
-      ...getDynamicIntegrationConfig(target, integrationConfig.client),
-      ...integrationConfig
+      ...getDynamicIntegrationConfig(target, strategyClients[target]),
+      ...(deviceConfig.integrations && deviceConfig.integrations[target] ? deviceConfig.integrations[target] : { enabled: true, client: strategyClients[target] })
     };
 
     try {
@@ -767,8 +772,6 @@ async function pollTracksolidLocations() {
   }
 }
 
-const lastDeviceTimestamps = {};
-
 /**
  * Poll location updates for configured GPS Server clients and forward them to B2B targets
  */
@@ -818,75 +821,8 @@ async function pollGpsServerLocations() {
           const device = devices[imei];
           if (!device) continue;
 
-          const nowMs = Date.now();
-          const PARKED_HEARTBEAT_MS = 20 * 60 * 1000; // 20 minutos
-          let shouldSend = true;
-
-          // Filtro Inteligente Anti-Spam con Latido (Heartbeat)
-          if (device.dt_tracker) {
-            const state = lastDeviceTimestamps[imei] || {};
-            const timeSinceLastSend = nowMs - (state.lastSentAt || 0);
-
-            if (state.dt_tracker === device.dt_tracker) {
-              // El vehículo está estacionado (la hora del GPS no ha cambiado)
-              if (timeSinceLastSend < PARKED_HEARTBEAT_MS) {
-                shouldSend = false; // Bloquear spam
-              } else {
-                console.log(`[GPS Server Poller] Enviando latido de 20 minutos para estacionado: ${imei}`);
-              }
-            }
-            
-            if (shouldSend) {
-              lastDeviceTimestamps[imei] = {
-                dt_tracker: device.dt_tracker,
-                lastSentAt: nowMs
-              };
-            }
-          }
-
-          if (!shouldSend) continue;
-
           totalDevicesProcessed++;
           
-          // Get B2B config for this device from config/devices.json
-          let deviceConfig = getDeviceConfig(imei);
-
-          // Dynamically check wildcard configurations for ALL available integrations
-          // For example, if process.env.GPSSERVER_POLL_AVLCHILE_CLIENTS = 'luisherrera', it injects avlchile for all luisherrera vehicles
-          for (const strategyName of Object.keys(strategies)) {
-            const envVarName = `GPSSERVER_POLL_${strategyName.toUpperCase()}_CLIENTS`;
-            const wildcardClients = (process.env[envVarName] || '')
-              .split(',')
-              .map(c => c.trim().toLowerCase())
-              .filter(Boolean);
-
-            if (wildcardClients.includes(client.toLowerCase())) {
-              if (!deviceConfig) {
-                deviceConfig = {
-                  plate: device.name || 'SIN_PATENTE',
-                  carrier: 'VIKARGPS',
-                  integrations: {
-                    [strategyName]: { enabled: true, client: client }
-                  }
-                };
-              } else {
-                deviceConfig = {
-                  ...deviceConfig,
-                  integrations: {
-                    ...deviceConfig.integrations,
-                    [strategyName]: { enabled: true, client: client, ...((deviceConfig.integrations && deviceConfig.integrations[strategyName]) || {}) }
-                  }
-                };
-              }
-            }
-          }
-
-          if (!deviceConfig || !deviceConfig.integrations) {
-            // Not configured for B2B forwarding, skip
-            continue;
-          }
-
-          // Format telemetry to match what strategies expect
           const telemetry = {
             imei: imei,
             name: device.name,
@@ -900,12 +836,11 @@ async function pollGpsServerLocations() {
             loc_valid: device.loc_valid,
             odometer: device.odometer,
             engine_hours: device.engine_hours,
-            params: device.params // Can be JSON object directly since we upgraded parseParams
+            params: device.params
           };
 
           try {
-            // Ruteamos a B2B usando el motor de despacho central
-            await dispatchToB2B(telemetry);
+            await dispatchToB2B(telemetry, client);
           } catch (err) {
             console.error(`[GPS Server Poller] Error procesando B2B para IMEI ${imei}:`, err.message);
           }
