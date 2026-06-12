@@ -18,8 +18,9 @@ class TraccarStrategy extends BaseStrategy {
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
     if (dateStr.includes(' ')) {
-      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-      parsedDate = new Date(dateStr.replace(' ', 'T') + tz);
+      // Reverting manual offset. To use local time, ensure TZ env var is set on Render (e.g. TZ=America/Santiago)
+      // Otherwise, we force UTC to match the original behavior
+      parsedDate = new Date(dateStr.replace(' ', 'T') + (process.env.TZ ? '' : 'Z'));
     } else {
       parsedDate = new Date(dateStr);
     }
