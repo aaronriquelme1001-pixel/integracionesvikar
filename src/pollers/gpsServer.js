@@ -29,6 +29,11 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
         // Format: [dt_tracker, lat, lng, altitude, angle, speed, params]
         let messages = response.data.map(m => {
            if (Array.isArray(m)) {
+              const paramsObj = m[6] || {};
+              const satellites = parseInt(paramsObj.gpslev || paramsObj.sat || paramsObj.satellites || 0, 10);
+              // Si no hay satélites (0), es una triangulación LBS (saltos falsos de kilómetros). Marcamos como loc_valid=0
+              const isGpsValid = satellites > 0 ? 1 : 0;
+              
               return {
                  dt_tracker: m[0],
                  dt_server: m[0], // GET_MESSAGES doesn't provide dt_server
@@ -37,8 +42,8 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
                  altitude: m[3] || 0,
                  angle: m[4] || 0,
                  speed: m[5] || 0,
-                 params: m[6] || {},
-                 loc_valid: 1
+                 params: paramsObj,
+                 loc_valid: isGpsValid
               };
            }
            return m;
