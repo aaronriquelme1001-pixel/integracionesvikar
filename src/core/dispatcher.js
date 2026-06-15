@@ -121,14 +121,18 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       await strategy.execute(telemetry, deviceConfig, resolvedConfig);
     } catch (err) {
       console.error(`[B2B Dispatch] Error executing strategy '${target}':`, err.message);
-      retryQueue.push({
-        target,
-        telemetry,
-        deviceConfig,
-        resolvedConfig,
-        retries: 0,
-        nextAttempt: Date.now() + 5000
-      });
+      if (retryQueue.length < 5000) {
+        retryQueue.push({
+          target,
+          telemetry,
+          deviceConfig,
+          resolvedConfig,
+          retries: 0,
+          nextAttempt: Date.now() + 5000
+        });
+      } else {
+        console.warn(`[B2B Dispatch] 🚨 Cola de reintentos saturada (5000). Descartando carga para ${telemetry.imei}`);
+      }
     }
   });
 
@@ -145,8 +149,8 @@ setInterval(async () => {
   
   const item = retryQueue.splice(index, 1)[0];
   
-  if (item.retries > 10) {
-     console.log(`[Retry Queue] ❌ Descartando carga para ${item.telemetry.imei} hacia ${item.target} tras 10 intentos fallidos.`);
+  if (item.retries > 5) {
+     console.log(`[Retry Queue] ❌ Descartando carga para ${item.telemetry.imei} hacia ${item.target} tras 5 intentos fallidos. Backfiller lo recuperará más tarde si aplica.`);
      return;
   }
   

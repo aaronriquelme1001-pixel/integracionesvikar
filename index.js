@@ -44,10 +44,25 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * Security Middleware for Webhooks
+ */
+const requireWebhookAuth = (req, res, next) => {
+  const secret = process.env.WEBHOOK_SECRET_KEY;
+  if (!secret) return next(); // Permisivo si no se configura secreto en ENV
+  
+  const provided = req.query.secret || req.headers['x-webhook-secret'];
+  if (provided !== secret) {
+    console.warn(`[Security] Intento de acceso a webhook bloqueado (IP: ${req.ip})`);
+    return res.status(401).send('Unauthorized');
+  }
+  next();
+};
+
+/**
  * GPS Server Webhooks
  */
-app.get('/webhook/gps-server', handleGpsServerWebhook);
-app.post('/webhook/gps-server', handleGpsServerWebhook);
+app.get('/webhook/gps-server', requireWebhookAuth, handleGpsServerWebhook);
+app.post('/webhook/gps-server', requireWebhookAuth, handleGpsServerWebhook);
 
 /**
  * Root Endpoint

@@ -15,19 +15,49 @@ let isGpsServerPolling = false;
 async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
   try {
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
-     const response = await axios.get(GPSSERVER_API_URL, {
-        params: {
-           api: 'user',
-           key: apiKey,
-           cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}`
-        },
-        timeout: 30000
-     });
+     let allMessages = [];
+     const startEpoch = new Date(dt_old.replace(' ', 'T')).getTime();
+     const endEpoch = new Date(dt_new.replace(' ', 'T')).getTime();
+     const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
      
-     if (response.data && Array.isArray(response.data)) {
-        // GPS Server API returns an array of arrays for GET_MESSAGES, not objects!
+     if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > TWELVE_HOURS_MS) {
+       console.log(`[Backfiller] 📦 Rango gigante detectado. Paginando historial para ${imei}...`);
+       let currentStart = startEpoch;
+       while (currentStart < endEpoch) {
+         let currentEnd = currentStart + TWELVE_HOURS_MS;
+         if (currentEnd > endEpoch) currentEnd = endEpoch;
+         
+         const pad = n => n.toString().padStart(2, '0');
+         const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+         
+         const chunkStart = fmt(new Date(currentStart));
+         const chunkEnd = fmt(new Date(currentEnd));
+         
+         const response = await axios.get(GPSSERVER_API_URL, {
+            params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
+            timeout: 30000
+         });
+         
+         if (response.data && Array.isArray(response.data)) {
+            allMessages = allMessages.concat(response.data);
+         }
+         currentStart = currentEnd;
+         await new Promise(r => setTimeout(r, 500)); // Cuidar servidor API
+       }
+     } else {
+       const response = await axios.get(GPSSERVER_API_URL, {
+          params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
+          timeout: 30000
+       });
+       if (response.data && Array.isArray(response.data)) {
+          allMessages = response.data;
+       }
+     }
+     
+     if (allMessages.length > 0) {
+        // GPS Server API returns an array of arrays for GET_MESSAGES
         // Format: [dt_tracker, lat, lng, altitude, angle, speed, params]
-        let messages = response.data.map(m => {
+        let messages = allMessages.map(m => {
            if (Array.isArray(m)) {
               const paramsObj = m[6] || {};
               const satellites = parseInt(paramsObj.gpslev || paramsObj.sat || paramsObj.satellites || 0, 10);

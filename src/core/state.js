@@ -37,10 +37,13 @@ try {
   console.error(`[Persistencia] Error cargando memoria:`, err.message);
 }
 
-// Guardar memoria cada 1 minuto
-setInterval(() => {
+// Guardar memoria cada 1 minuto (Asíncrono Anti-Bloqueo)
+setInterval(async () => {
   try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify({ deviceAntiSpamState, lastDeviceTimestamps, pendingBackfills }), 'utf8');
+    const tmpFile = `${STATE_FILE}.tmp`;
+    const data = JSON.stringify({ deviceAntiSpamState, lastDeviceTimestamps, pendingBackfills });
+    await fs.promises.writeFile(tmpFile, data, 'utf8');
+    await fs.promises.rename(tmpFile, STATE_FILE);
   } catch (err) {
     console.error(`[Persistencia] Error guardando memoria:`, err.message);
   }
