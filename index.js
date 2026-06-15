@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/health', (req, res) => {
   res.json({
     status: 'online',
-    version: '2.0.0 (B2B Engine Modular)',
+    version: '3.0.0 (Enterprise V3)',
     uptime_seconds: process.uptime(),
     stats: systemStats,
     activeDevicesInSpamFilter: Object.keys(deviceAntiSpamState).length,
