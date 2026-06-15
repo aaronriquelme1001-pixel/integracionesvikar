@@ -38,11 +38,35 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       }
     }
     
+    if (shouldSend && state.lat !== undefined && state.lng !== undefined && telemetry.lat !== undefined && telemetry.lng !== undefined) {
+      // Filtro Inercial (Fórmula de Haversine)
+      const R = 6371e3; // Radio de la Tierra en metros
+      const lat1 = state.lat * Math.PI/180;
+      const lat2 = parseFloat(telemetry.lat) * Math.PI/180;
+      const dLat = (parseFloat(telemetry.lat) - state.lat) * Math.PI/180;
+      const dLng = (parseFloat(telemetry.lng) - state.lng) * Math.PI/180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distanceMeters = R * c;
+      
+      const timeDiffSeconds = (new Date(telemetry.dt_tracker).getTime() - new Date(state.dt_tracker).getTime()) / 1000;
+      
+      if (timeDiffSeconds > 0) {
+        const speedKmh = (distanceMeters / timeDiffSeconds) * 3.6;
+        if (speedKmh > 160) {
+           console.warn(`[Filtro Inercial] 🚨 Salto bloqueado para ${imei}: ${speedKmh.toFixed(1)} km/h (${distanceMeters.toFixed(0)}m en ${timeDiffSeconds}s).`);
+           shouldSend = false; // Bloquear el envío por salto físicamente imposible
+        }
+      }
+    }
+
     if (shouldSend) {
       if (!state.dt_tracker || telemetry.dt_tracker >= state.dt_tracker) {
         deviceAntiSpamState[imei] = {
           dt_tracker: telemetry.dt_tracker,
-          lastSentAt: nowMs
+          lastSentAt: nowMs,
+          lat: parseFloat(telemetry.lat),
+          lng: parseFloat(telemetry.lng)
         };
       }
     }
