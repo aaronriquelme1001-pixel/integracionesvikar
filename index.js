@@ -25,12 +25,46 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /**
- * Health Check & Live Dashboard Endpoint
+ * Health Check (Público)
  */
 app.get('/health', (req, res) => {
   res.json({
     status: 'online',
-    version: '3.0.0 (Enterprise V3)',
+    version: '4.0.0 (Enterprise V4)',
+    uptime_seconds: process.uptime()
+  });
+});
+
+/**
+ * Basic Auth Middleware for Dashboard
+ */
+const requireDashboardAuth = (req, res, next) => {
+  const adminPassword = process.env.DASHBOARD_PASSWORD;
+  if (!adminPassword) return next(); // Permisivo si no se configura contraseña en ENV
+  
+  const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+  const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+
+  if (login === 'admin' && password === adminPassword) {
+    return next();
+  }
+  
+  res.set('WWW-Authenticate', 'Basic realm="401"');
+  res.status(401).send('Authentication required.');
+};
+
+/**
+ * Live Dashboard & API Stats (Protegidos)
+ */
+const path = require('path');
+app.get('/dashboard', requireDashboardAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/ui/dashboard.html'));
+});
+
+app.get('/api/stats', requireDashboardAuth, (req, res) => {
+  res.json({
+    status: 'online',
+    version: '4.0.0 (Enterprise V4)',
     uptime_seconds: process.uptime(),
     stats: systemStats,
     activeDevicesInSpamFilter: Object.keys(deviceAntiSpamState).length,

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vikar B2B Engine | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090a0f;
+            --panel-bg: rgba(20, 22, 35, 0.7);
+            --accent-neon: #00f0ff;
+            --accent-purple: #7000ff;
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.15), transparent 25%);
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(9, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--accent-neon); }
+        .logo .badge { font-size: 0.7rem; background: var(--accent-purple); padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .status-dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88; animation: pulse 2s infinite; }
+
+        .container { padding: 3rem 4rem; flex-grow: 1; }
+
+        .grid-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover { transform: translateY(-5px); border-color: rgba(0, 240, 255, 0.3); }
+
+        .card-title { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .card-value { font-size: 2.5rem; font-weight: 800; display: flex; align-items: baseline; gap: 5px; }
+        .card-value.neon { color: var(--accent-neon); text-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+        .card-value.purple { color: #b785ff; text-shadow: 0 0 20px rgba(183, 133, 255, 0.3); }
+        
+        .grid-main { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+
+        .logs-container { background: #050608; border-radius: 12px; padding: 1rem; font-family: monospace; color: #00ff88; height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+        
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">VIKAR <span>B2B</span> <div class="badge">V4.0</div></div>
+        <div class="status-pill"><div class="status-dot"></div> ONLINE</div>
+    </header>
+
+    <main class="container">
+        <div class="grid-top">
+            <div class="card">
+                <div class="card-title">Puntos Procesados</div>
+                <div class="card-value neon" id="val-polled">--</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Puntos Despachados</div>
+                <div class="card-value purple" id="val-dispatched">--</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Spam Bloqueado</div>
+                <div class="card-value" id="val-spam">--%</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Backfiller (Recuperados)</div>
+                <div class="card-value" id="val-recovered" style="color: #ff9900;">--</div>
+            </div>
+        </div>
+
+        <div class="grid-main">
+            <div class="card">
+                <div class="card-title">Diagnóstico de Subsistemas</div>
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                        <span>Uptime del Servidor</span>
+                        <strong id="val-uptime">--</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                        <span>Camiones en Memoria RAM</span>
+                        <strong id="val-ram">--</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                        <span>Atascos en Cola de Reintento</span>
+                        <strong id="val-retry">--</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Estado de Extraordinarios</div>
+                <div class="logs-container" id="live-status">Cargando telemetría...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                if (res.status === 401) {
+                    window.location.reload(); // Reload to prompt auth if expired
+                    return;
+                }
+                const data = await res.json();
+                
+                document.getElementById('val-polled').innerText = data.stats.totalPolledPoints.toLocaleString();
+                document.getElementById('val-dispatched').innerText = data.stats.totalPointsDispatched.toLocaleString();
+                
+                let spamRatio = 0;
+                if(data.stats.totalPolledPoints > 0) {
+                    spamRatio = ((data.stats.totalPolledPoints - data.stats.totalPointsDispatched) / data.stats.totalPolledPoints) * 100;
+                }
+                document.getElementById('val-spam').innerText = spamRatio.toFixed(1) + '%';
+                
+                document.getElementById('val-recovered').innerText = data.stats.backfillerRecoveredPoints.toLocaleString();
+                
+                const hours = Math.floor(data.uptime_seconds / 3600);
+                const minutes = Math.floor((data.uptime_seconds % 3600) / 60);
+                document.getElementById('val-uptime').innerText = `${hours}h ${minutes}m`;
+                
+                document.getElementById('val-ram').innerText = data.activeDevicesInSpamFilter;
+                document.getElementById('val-retry').innerText = data.retryQueueLength;
+                
+                document.getElementById('live-status').innerHTML = `
+GPS Server Poller:
+> ${data.pollers.gpsServer.lastGpsServerPollStatus}
+> Last Run: ${new Date(data.pollers.gpsServer.lastGpsServerPollTime).toLocaleTimeString()}
+
+Tracksolid Poller:
+> ${data.pollers.tracksolid.lastTracksolidPollStatus}
+                `.trim().replace(/\n/g, '<br>');
+                
+            } catch (err) {
+                console.error("Error fetching stats", err);
+            }
+        }
+
+        setInterval(fetchStats, 3000);
+        fetchStats();
+    </script>
+</body>
+</html>
