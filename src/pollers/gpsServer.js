@@ -220,12 +220,10 @@ async function pollGpsServerLocations() {
                  // Extractor de Curvas Alta Fidelidad
                  // El hardware acaba de transmitir puntos ocultos entre el polling. Los pedimos inmediatamente.
                  systemStats.backfillerTriggers++;
-                 console.log(`[Poller] 🏎️ Posible curva (Gap ${gapSeconds}s) en ${imei}. Extrayendo historial oculto...`);
                  
-                 // Ejecutamos recoverHistory asíncronamente sin bloquear el Poller
-                 recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey).catch(err => {
-                    console.error(`[CurvaExtractor] Error extrayendo curvas para ${imei}:`, err.message);
-                 });
+                 // USAMOS AWAIT para obligar al servidor a inyectar los puntos de la curva PRIMERO.
+                 // Si no usamos await, se inyectaría el punto final antes de la curva, generando un Zig-Zag gigante.
+                 await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
                }
              }
           }
