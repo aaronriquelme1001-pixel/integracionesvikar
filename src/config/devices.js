@@ -9,20 +9,30 @@ if (!fs.existsSync(configPath) && fs.existsSync('/opt/render/project/src/config/
   configPath = path.join(__dirname, 'devices.json');
 }
 
+let cachedConfig = null;
+let lastCacheTime = 0;
+
 /**
- * Parses and returns the contents of config/devices.json
+ * Parses and returns the contents of config/devices.json (with 60-second in-memory cache)
  */
 function parseDevicesConfig() {
+  const now = Date.now();
+  if (cachedConfig && (now - lastCacheTime < 60000)) {
+    return cachedConfig;
+  }
+  
   try {
     if (!fs.existsSync(configPath)) {
       console.warn(`[Config] Warning: Configuration file not found at ${configPath}`);
       return {};
     }
     const rawData = fs.readFileSync(configPath, 'utf8');
-    return JSON.parse(rawData);
+    cachedConfig = JSON.parse(rawData);
+    lastCacheTime = now;
+    return cachedConfig;
   } catch (err) {
     console.error('[Config] Error reading config/devices.json:', err.message);
-    return {};
+    return cachedConfig || {};
   }
 }
 

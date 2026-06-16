@@ -28,7 +28,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
          if (currentEnd > endEpoch) currentEnd = endEpoch;
          
          const pad = n => n.toString().padStart(2, '0');
-         const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+         const fmt = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
          
          const chunkStart = fmt(new Date(currentStart));
          const chunkEnd = fmt(new Date(currentEnd));
@@ -179,11 +179,12 @@ async function pollGpsServerLocations() {
         console.log(`[GPS Server Poller] Client '${client}' returned ${imeis.length} devices.`);
         
         for (const imei of imeis) {
-          const device = devices[imei];
-          if (!device) continue;
-
-          totalDevicesProcessed++;
-          systemStats.totalPolledPoints++;
+          try {
+            const device = devices[imei];
+            if (!device) continue;
+  
+            totalDevicesProcessed++;
+            systemStats.totalPolledPoints++;
           
           const telemetry = {
             imei: imei,
@@ -245,6 +246,9 @@ async function pollGpsServerLocations() {
           // ---------------------------
 
           await dispatchToB2B(telemetry, client);
+          } catch (imeiErr) {
+            console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
+          }
         }
         successCount++;
       } else {
