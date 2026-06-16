@@ -203,8 +203,9 @@ async function pollGpsServerLocations() {
                
                // Evitar falsos positivos por frecuencia de reporte normal
                if (gapSeconds > gapThreshold && gapSeconds < 10800) {
+                 // Túneles largos: Esperar 3 minutos para que el hardware termine de descargar
                  systemStats.backfillerTriggers++;
-                 console.log(`[Poller] ⚠️ Salto de ${gapSeconds}s detectado en ${imei}. Programando Backfiller en 3 minutos para permitir descarga del tracker...`);
+                 console.log(`[Poller] ⚠️ Salto Largo de ${gapSeconds}s en ${imei}. Programando Backfiller en 3 mins...`);
                  
                  // Encolar para 3 minutos en el futuro
                  pendingBackfills.push({
@@ -214,6 +215,16 @@ async function pollGpsServerLocations() {
                     client,
                     apiKey,
                     executeAt: Date.now() + 180000 // 3 minutos de retraso
+                 });
+               } else if (isMoving && gapSeconds >= 3 && gapSeconds <= gapThreshold) {
+                 // Extractor de Curvas Alta Fidelidad
+                 // El hardware acaba de transmitir puntos ocultos entre el polling. Los pedimos inmediatamente.
+                 systemStats.backfillerTriggers++;
+                 console.log(`[Poller] 🏎️ Posible curva (Gap ${gapSeconds}s) en ${imei}. Extrayendo historial oculto...`);
+                 
+                 // Ejecutamos recoverHistory asíncronamente sin bloquear el Poller
+                 recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey).catch(err => {
+                    console.error(`[CurvaExtractor] Error extrayendo curvas para ${imei}:`, err.message);
                  });
                }
              }
