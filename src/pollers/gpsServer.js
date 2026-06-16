@@ -82,8 +82,19 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
         // Ordenar cronológicamente (el más antiguo primero)
         messages.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
         
-        // Filtrar los puntos exactos de los bordes para no duplicar
-        messages = messages.filter(m => m.dt_tracker && m.dt_tracker !== dt_old && m.dt_tracker !== dt_new);
+        // Filtrado Estricto de Bordes (Anti Zig-Zag)
+        // La API a veces retorna puntos fuera del rango. Exigimos que sean estrictamente mayores que dt_old y menores que dt_new.
+        const tz = process.env.TIMEZONE_OFFSET || '-04:00';
+        const getEpoch = (ds) => new Date(ds.replace(' ', 'T') + tz).getTime();
+        
+        const oldEpoch = getEpoch(dt_old);
+        const newEpoch = getEpoch(dt_new);
+        
+        messages = messages.filter(m => {
+           if (!m.dt_tracker) return false;
+           const mEpoch = getEpoch(m.dt_tracker);
+           return mEpoch > oldEpoch && mEpoch < newEpoch;
+        });
         
         if (messages.length > 0) {
           systemStats.backfillerRecoveredPoints += messages.length;
