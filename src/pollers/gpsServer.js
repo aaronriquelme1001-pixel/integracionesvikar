@@ -1,7 +1,8 @@
 const axios = require('axios');
+const { systemStats, deviceAntiSpamState, lastDeviceTimestamps, pendingBackfills, retryQueue } = require('../core/state');
 const { dispatchToB2B } = require('../core/dispatcher');
-const { systemStats, lastDeviceTimestamps, pendingBackfills } = require('../core/state');
 
+const waitBufferStates = {}; // { imei: firstWaitMs }
 const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL, 10) || 10000;
 const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
 
@@ -16,22 +17,34 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
   try {
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      let allMessages = [];
-     const startEpoch = new Date(dt_old.replace(' ', 'T')).getTime();
-     const endEpoch = new Date(dt_new.replace(' ', 'T')).getTime();
+     const tz = process.env.TIMEZONE_OFFSET || '-04:00';
+     const getEpoch = (ds) => new Date(ds.replace(' ', 'T') + tz).getTime();
+     const startEpoch = getEpoch(dt_old);
+     const endEpoch = getEpoch(dt_new);
      const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
      
      if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > TWELVE_HOURS_MS) {
        console.log(`[Backfiller] 📦 Rango gigante detectado. Paginando historial para ${imei}...`);
+       
+       // Parse offset to milliseconds
+       const sign = tz[0] === '+' ? 1 : -1;
+       const hours = parseInt(tz.substring(1, 3), 10);
+       const mins = parseInt(tz.substring(4, 6), 10);
+       const offsetMs = sign * ((hours * 60) + mins) * 60 * 1000;
+       
        let currentStart = startEpoch;
        while (currentStart < endEpoch) {
          let currentEnd = currentStart + TWELVE_HOURS_MS;
          if (currentEnd > endEpoch) currentEnd = endEpoch;
          
          const pad = n => n.toString().padStart(2, '0');
-         const fmt = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+         const fmt = epoch => {
+            const d = new Date(epoch + offsetMs);
+            return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+         };
          
-         const chunkStart = fmt(new Date(currentStart));
-         const chunkEnd = fmt(new Date(currentEnd));
+         const chunkStart = fmt(currentStart);
+         const chunkEnd = fmt(currentEnd);
          
          const response = await axios.get(GPSSERVER_API_URL, {
             params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
@@ -49,8 +62,13 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
           params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
           timeout: 30000
        });
-       if (response.data && Array.isArray(response.data)) {
-          allMessages = response.data;
+       let resData = response.data;
+       if (resData) {
+          if (Array.isArray(resData)) {
+             allMessages = resData;
+          } else if (typeof resData === 'object') {
+             allMessages = Object.values(resData);
+          }
        }
      }
      
@@ -118,10 +136,13 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
              await new Promise(r => setTimeout(r, 100)); // Pequeña pausa para no saturar
           }
           console.log(`[Backfiller] ✅ Inyección de ${messages.length} puntos completada para ${imei}.`);
+          return messages.length;
         }
      }
+     return 0;
   } catch (err) {
      console.error(`[Backfiller] Error recuperando historial para ${imei}:`, err.message);
+     return 0;
   }
 }
 
@@ -209,33 +230,29 @@ async function pollGpsServerLocations() {
                const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
                const gapSeconds = Math.floor(timeDiffMs / 1000);
                
-               // Sensibilidad dinámica: 45s en movimiento, 5 min (300s) estacionado
+               // Sensibilidad dinámica: 15s en movimiento, 5 min (300s) estacionado
                const isMoving = parseFloat(device.speed || 0) > 0;
-               const gapThreshold = isMoving ? 45 : 300;
+               const gapThreshold = isMoving ? 15 : 300;
                
-               // Evitar falsos positivos por frecuencia de reporte normal
                if (gapSeconds > gapThreshold && gapSeconds < 10800) {
-                 // Túneles largos: Esperar 3 minutos para que el hardware termine de descargar
                  systemStats.backfillerTriggers++;
-                 console.log(`[Poller] ⚠️ Salto Largo de ${gapSeconds}s en ${imei}. Programando Backfiller en 3 mins...`);
+                 const recovered = await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
                  
-                 // Encolar para 3 minutos en el futuro
-                 pendingBackfills.push({
-                    imei,
-                    dt_old: lastPollerState.dt_tracker,
-                    dt_new: device.dt_tracker,
-                    client,
-                    apiKey,
-                    executeAt: Date.now() + 180000 // 3 minutos de retraso
-                 });
-               } else if (isMoving && gapSeconds >= 3 && gapSeconds <= gapThreshold) {
-                 // Extractor de Curvas Alta Fidelidad
-                 // El hardware acaba de transmitir puntos ocultos entre el polling. Los pedimos inmediatamente.
-                 systemStats.backfillerTriggers++;
+                 if (recovered === 0) {
+                     if (!waitBufferStates[imei]) waitBufferStates[imei] = Date.now();
+                     const waitedSeconds = (Date.now() - waitBufferStates[imei]) / 1000;
+                     
+                     if (waitedSeconds < 180) { // Esperar hasta 3 minutos a que suba el buffer
+                         console.log(`[Poller] ⏳ Esperando que ${imei} suba su buffer... (${Math.round(waitedSeconds)}/180s)`);
+                         continue; 
+                     } else {
+                         console.log(`[Poller] ⚠️ Tiempo agotado para buffer de ${imei}. Asumiendo pérdida real.`);
+                     }
+                 } else {
+                     console.log(`[Poller] 🎉 Hueco histórico reconstruido para ${imei}.`);
+                 }
                  
-                 // USAMOS AWAIT para obligar al servidor a inyectar los puntos de la curva PRIMERO.
-                 // Si no usamos await, se inyectaría el punto final antes de la curva, generando un Zig-Zag gigante.
-                 await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
+                 delete waitBufferStates[imei];
                }
              }
           }
