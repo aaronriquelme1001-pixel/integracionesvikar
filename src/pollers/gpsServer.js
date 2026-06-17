@@ -234,7 +234,7 @@ async function pollGpsServerLocations() {
                const isMoving = parseFloat(device.speed || 0) > 0;
                const gapThreshold = isMoving ? 15 : 300;
                
-               if (gapSeconds > gapThreshold && gapSeconds < 10800) {
+               if (gapSeconds > gapThreshold && gapSeconds < 259200) { // Soportar hasta 3 días (259200s) de pérdida de cobertura en bosques
                  systemStats.backfillerTriggers++;
                  const recovered = await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
                  
@@ -242,14 +242,14 @@ async function pollGpsServerLocations() {
                      if (!waitBufferStates[imei]) waitBufferStates[imei] = Date.now();
                      const waitedSeconds = (Date.now() - waitBufferStates[imei]) / 1000;
                      
-                     if (waitedSeconds < 180) { // Esperar hasta 3 minutos a que suba el buffer
-                         console.log(`[Poller] ⏳ Esperando que ${imei} suba su buffer... (${Math.round(waitedSeconds)}/180s)`);
+                     if (waitedSeconds < 300) { // Esperar hasta 5 minutos a que suba el buffer 2G
+                         console.log(`[Poller] ⏳ Esperando que ${imei} suba su buffer histórico... (${Math.round(waitedSeconds)}/300s)`);
                          continue; 
                      } else {
-                         console.log(`[Poller] ⚠️ Tiempo agotado para buffer de ${imei}. Asumiendo pérdida real.`);
+                         console.log(`[Poller] ⚠️ Tiempo agotado (5m) para buffer de ${imei}. Asumiendo pérdida real.`);
                      }
                  } else {
-                     console.log(`[Poller] 🎉 Hueco histórico reconstruido para ${imei}.`);
+                     console.log(`[Poller] 🎉 Hueco histórico de ${gapSeconds}s reconstruido para ${imei}.`);
                  }
                  
                  delete waitBufferStates[imei];
