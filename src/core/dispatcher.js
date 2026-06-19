@@ -134,6 +134,19 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
     }
   }
 
+  // 4. Data Lake Global (Copia oculta de todo el tráfico)
+  if (process.env.DATALAKE_URL && strategies['datalake']) {
+    activeStrategies.add('datalake');
+    strategyClients['datalake'] = clientName || explicitTarget || 'global';
+    if (!deviceConfig) {
+      deviceConfig = {
+        plate: telemetry.plate_number || telemetry.name || telemetry.plate || 'SIN_PATENTE',
+        carrier: telemetry.carrier || 'VIKARGPS',
+        integrations: {}
+      };
+    }
+  }
+
   if (activeStrategies.size === 0) return;
 
   systemStats.totalPointsDispatched++;
