@@ -52,8 +52,8 @@ class DatalakeStrategy {
 
     try {
       const query = `
-        INSERT INTO global_telemetry_traffic (imei, plate, lat, lng, speed, dt_tracker, client_source)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO global_telemetry_traffic (imei, plate, lat, lng, speed, dt_tracker, client_source, event)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       `;
       
       const values = [
@@ -63,7 +63,8 @@ class DatalakeStrategy {
         telemetry.lng,
         telemetry.speed || 0,
         telemetry.dt_tracker,
-        resolvedConfig.client || 'unknown'
+        resolvedConfig.client || 'unknown',
+        telemetry.event || null
       ];
 
       // Fire and forget (don't await) to prevent slowing down the B2B pipeline

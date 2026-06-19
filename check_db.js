@@ -9,13 +9,13 @@ async function setup() {
   try {
     await client.connect();
     
-    // Add daily_grade column
+    // Add event column to telemetry table
     const alterQuery = `
-      ALTER TABLE billing_snapshots 
-      ADD COLUMN IF NOT EXISTS daily_grade NUMERIC NOT NULL DEFAULT 7.0;
+      ALTER TABLE global_telemetry_traffic 
+      ADD COLUMN IF NOT EXISTS event VARCHAR(50);
     `;
     await client.query(alterQuery);
-    console.log('Column daily_grade added.');
+    console.log('Column event added to global_telemetry_traffic.');
     
   } catch (e) {
     console.error('Error:', e);

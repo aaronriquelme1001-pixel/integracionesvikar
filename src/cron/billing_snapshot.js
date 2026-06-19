@@ -26,22 +26,77 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
   if (!pool) return 7.0;
   
   try {
-    // Buscar los puntos de velocidad de este vehículo en el día actual
+    // Buscar los puntos de velocidad y eventos de este vehículo en el día actual
     const query = `
-      SELECT speed 
+      SELECT speed, event, dt_tracker 
       FROM global_telemetry_traffic 
       WHERE imei = $1 AND DATE(dt_tracker) = $2
+      ORDER BY dt_tracker ASC
     `;
     const result = await pool.query(query, [imei, snapshotDateStr]);
     
     let penalty = 0.0;
+    
+    // Variables para algoritmo de Fatiga (Matemático)
+    let continuousDrivingMs = 0;
+    let lastMovingTime = null;
+    let lastPointTime = null;
+    let fatiguePenalized = false;
+    
     for (const row of result.rows) {
       const speed = parseFloat(row.speed) || 0;
+      const event = row.event ? row.event.toLowerCase() : null;
+      const dt = new Date(row.dt_tracker).getTime();
+      
+      // 1. Penalizaciones por Velocidad
       if (speed > 110) {
         penalty += 0.2;
       } else if (speed > 90) {
         penalty += 0.05;
       }
+      
+      // 2. Penalizaciones por Eventos Bruscos Nativos
+      if (event === 'haccel') penalty += 0.3; // Aceleración brusca
+      if (event === 'hbrake') penalty += 0.3; // Frenada brusca
+      if (event === 'hcorn') penalty += 0.3;  // Giro brusco
+      if (event === 'fatigue' || event === 'tired') {
+        penalty += 0.5;
+        fatiguePenalized = true; // Ya penalizado por evento nativo
+      }
+      
+      // 3. Algoritmo de Fatiga (Conducción Continua > 5 hrs)
+      if (!fatiguePenalized && dt && lastPointTime) {
+        const gapMs = dt - lastPointTime;
+        
+        if (speed > 5) {
+          // Si va manejando
+          if (!lastMovingTime) {
+            lastMovingTime = dt;
+          } else {
+            // Si el gap es menor a 30 mins, sigue siendo el mismo viaje continuo
+            if (gapMs < 30 * 60 * 1000) {
+              continuousDrivingMs += gapMs;
+            } else {
+              // Descansó más de 30 mins, reiniciar contador
+              continuousDrivingMs = 0;
+              lastMovingTime = dt;
+            }
+          }
+          
+          // 5 horas = 5 * 60 * 60 * 1000 = 18,000,000 ms
+          if (continuousDrivingMs > 18000000) {
+            penalty += 0.5; // Falta Grave por conducir +5 horas seguidas
+            fatiguePenalized = true; // Penalizar solo 1 vez al día para no hundir la nota a 1.0 por el mismo viaje
+          }
+        } else {
+          // Si está detenido por más de 30 mins, resetear
+          if (gapMs >= 30 * 60 * 1000) {
+             continuousDrivingMs = 0;
+             lastMovingTime = null;
+          }
+        }
+      }
+      lastPointTime = dt;
     }
     
     let finalGrade = 7.0 - penalty;
@@ -96,7 +151,7 @@ async function runBillingSnapshot() {
       
       if (clientId === 'unknown') continue; // We only care about mapped clients
 
-      // Calculate driving score for today
+      // Calculate driving score for today (Speed, Harsh Events, Fatigue)
       const dailyGrade = await calculateDailyGrade(imei, snapshotDate);
 
       // Insert or Update the snapshot for today
