@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { dispatchToB2B } = require('../core/dispatcher');
-const { computeSignature } = require('../../utils/signature');
+const { computeSignature } = require('../utils/signature');
 
 const TRACKSOLID_API_URL = process.env.TRACKSOLID_API_URL || 'https://us-open.tracksolidpro.com/route/rest';
 const TRACKSOLID_USER_ID = process.env.TRACKSOLID_USER_ID;

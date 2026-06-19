@@ -1,36 +1,39 @@
-# 🧠 Cerebro: B2B Telemetry Orchestrator
+# Vikar B2B Telemetry Orchestrator (V4)
 
-Motor de orquestación B2B de ultra-baja latencia diseñado para extraer, normalizar y rutear telemetría GPS desde múltiples fuentes hacia múltiples Web Services (Traccar, AVL Chile, Colun, Arauco, etc.).
+Este es el núcleo de integración, extracción y análisis forense de Vikar GPS. 
+El sistema extrae datos de proveedores GPS comerciales (Tracksolid Pro, GPS Server), los almacena de forma persistente en un **Data Lake** propio, y distribuye la telemetría en tiempo real hacia los sistemas de las grandes empresas mandantes (Arauco, CMPC, Walmart, CCU, etc.). Adicionalmente, cuenta con un Motor Forense para reconstrucción de incidentes.
 
-## 🚀 Arquitectura "Híbrida" (Push-Poll)
+## Arquitectura Modular (`/src`)
 
-El sistema funciona con un enfoque híbrido, garantizando 0% de pérdida de datos y cumplimiento normativo (MTT):
+El sistema está dividido en módulos de responsabilidad única:
 
-1. **Poller de 10 Segundos:** Extrae el estado actual de los dispositivos desde la API de GPS Server cada 10 segundos.
-2. **Backfiller de Inteligencia Artificial:** Detecta gaps o saltos en el tiempo (ej. salida de túneles) mayores a 15 segundos. Se conecta de forma asíncrona a la API de historial y recupera toda la ráfaga perdida, inyectándola en estricto orden cronológico.
-3. **Webhook Universal:** Soporta Data Forwarding nativo en la ruta `/webhook/gps-server`, procesando los paquetes bajo las mismas reglas Anti-Spam.
+- `src/pollers/`: Extractores de datos que se conectan a los proveedores (ej. Tracksolid, GPS Server) y normalizan la información a un formato estándar interno.
+- `src/core/`: El "Cerebro". Aquí reside el `dispatcher.js`, que toma un dato normalizado, consulta la configuración B2B del dispositivo, y lo despacha a los destinos correspondientes.
+- `src/integrations/`: Estrategias de envío hacia mandantes. Cada archivo (ej. `walmart.js`, `arauco.js`) implementa la autenticación y el formato específico exigido por esa empresa.
+- `src/webhooks/`: Endpoints de entrada pasiva para dispositivos que empujan datos (ej. Teltonika, Concox) directamente al servidor sin necesidad de Polling.
+- `src/routes/`: APIs REST expuestas para consumo de frontend o clientes. Destaca `forensics.js`, el Motor de Veredicto Determinístico.
+- `src/templates/`: Plantillas HTML y recursos gráficos, como el diseño del Reporte Forense Enriquecido.
+- `src/config/`: Archivos de configuración estática y resolución de variables de entorno.
+- `src/utils/`: Utilidades compartidas (criptografía de firmas, helpers de fecha).
 
-## 🛡️ Reglas de Despacho (Anti-Spam)
+## Capacidades Especiales
 
-Todas las integraciones están protegidas por el **Motor Central de Despacho**:
-*   **Filtro Inteligente:** Si un camión no se mueve (su timestamp no cambia), se bloquea el envío para no saturar al cliente destino.
-*   **Heartbeat de 20 min:** Todo vehículo estacionado enviará 1 solo punto estático cada 20 minutos para evitar estado "Desconectado".
-*   **Colas Recursivas:** Evita colisiones de peticiones HTTP utilizando `setTimeout` recursivos en lugar de ciclos paralelos, previniendo baneos por Rate Limiting (ej. AVL Chile).
+### 1. Multi-Routing B2B
+Un camión puede configurarse para transmitir a **múltiples destinos simultáneamente**. Por ejemplo, un paquete de posición puede ir a `Traccar` (espejo del cliente), a `Arauco` (mandante) y al `Data Lake` en paralelo y en milisegundos.
 
-## 🔀 Ruteo "Zero-Code" (Variables de Entorno)
+### 2. Backfiller Inteligente
+Si el servidor o el GPS pierden conexión temporal, el orquestador detecta los "huecos" de tiempo y usa una cola inteligente (`recovery`) para ir a buscar los históricos faltantes a la API del proveedor original, garantizando un Data Lake sin lagunas.
 
-Para mandar una flota a un Web Service destino, no se requiere modificar código. Basta con editar las variables en Render:
+### 3. Motor Pericial Forense (Veredicto Inteligente)
+El sistema puede generar un reporte legal exhaustivo `/api/forensic-report?plate=XYZ`.
+Este reporte:
+1. Extrae los últimos 30 minutos de conducción del Data Lake (Supabase).
+2. Calcula Excesos de Velocidad (vs Límite de 80km/h).
+3. Calcula Fatiga del Conductor (horas de manejo continuo).
+4. Consulta el Clima exacto (Open-Meteo) y la dirección postal (OpenStreetMap).
+5. Cruza las variables en un motor de reglas para dictar un **Veredicto Determinístico** inobjetable para aseguradoras.
 
-```env
-# Extraerá los camiones de luisherrera y transklett, y los mandará a AVL Chile y Traccar
-GPSSERVER_POLL_CLIENTS=luisherrera,transklett
-GPSSERVER_POLL_AVLCHILE_CLIENTS=luisherrera,transklett
-GPSSERVER_POLL_TRACCAR_CLIENTS=luisherrera
-```
+## Despliegue en Render
 
-## 🛠️ Instalación
-
-1. Clonar el repositorio.
-2. Copiar `.env.example` a `.env` y llenar las variables (API Keys, URLs).
-3. `npm install`
-4. `npm start`
+Este proyecto está optimizado para ejecutarse en Render (Node.js).
+Para despliegues productivos, asegúrate de configurar correctamente todas las variables de entorno (`.env`) detalladas en el archivo `.env.example`.
