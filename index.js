@@ -123,6 +123,12 @@ app.get('/webhook/gps-server', requireWebhookAuth, handleGpsServerWebhook);
 app.post('/webhook/gps-server', requireWebhookAuth, handleGpsServerWebhook);
 
 /**
+ * Forensic Report API
+ */
+const forensicsRoute = require('./src/routes/forensics');
+app.use('/api/forensic-report', forensicsRoute);
+
+/**
  * Root Endpoint
  */
 app.get('/', (req, res) => {
