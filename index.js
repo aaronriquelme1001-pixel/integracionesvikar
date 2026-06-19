@@ -129,10 +129,16 @@ const forensicsRoute = require('./src/routes/forensics');
 app.use('/api/forensic-report', forensicsRoute);
 
 /**
+ * Value-Added Billing API
+ */
+const billingRoute = require('./src/routes/billing');
+app.use('/api/billing-stats', billingRoute);
+
+/**
  * Root Endpoint
  */
 app.get('/', (req, res) => {
-  res.send('B2B Telemetry Orchestrator is running (V2.0 Modular).');
+  res.send('B2B Telemetry Orchestrator is running (V4 Enterprise).');
 });
 
 const PORT = process.env.PORT || 3000;
@@ -144,4 +150,13 @@ app.listen(PORT, () => {
      setTimeout(pollTracksolid, 2000);
   }
   setTimeout(pollGpsServerLocations, 5000);
+  
+  // Start Billing Cron Job (Daily at 3:00 AM)
+  const { runBillingSnapshot } = require('./src/cron/billing_snapshot');
+  setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === 3 && now.getMinutes() === 0) {
+      runBillingSnapshot();
+    }
+  }, 60000); // Check every minute
 });
