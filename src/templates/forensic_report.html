@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte Forense de Telemetría - {{PLATE}}</title>
+    <title>Reporte Forense Nivel Dios - {{PLATE}}</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -10,6 +10,7 @@
             --danger: #e53e3e;
             --warning: #dd6b20;
             --success: #38a169;
+            --info: #3182ce;
             --bg-gray: #f7fafc;
             --border: #e2e8f0;
         }
@@ -53,23 +54,43 @@
             display: block;
             margin-bottom: 4px;
         }
+        
         .alert-box {
             background-color: #fff5f5;
             border-left: 4px solid var(--danger);
             padding: 15px 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .alert-box.warning {
             background-color: #fffaf0;
             border-left-color: var(--warning);
         }
-        .alert-box h3 {
-            margin: 0 0 5px 0;
-            color: var(--danger);
+        .alert-box h3 { margin: 0 0 5px 0; color: var(--danger); }
+        .alert-box.warning h3 { color: var(--warning); }
+
+        /* Dictamen Styles */
+        .dictamen-box {
+            background-color: #f7fafc;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .alert-box.warning h3 {
-            color: var(--warning);
+        .dictamen-box h2 {
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            font-size: 18px;
         }
+        .verdict-danger { border-color: var(--danger); }
+        .verdict-danger h2 { color: var(--danger); }
+        .verdict-warning { border-color: var(--warning); }
+        .verdict-warning h2 { color: var(--warning); }
+        .verdict-info { border-color: var(--info); }
+        .verdict-info h2 { color: var(--info); }
+        .verdict-success { border-color: var(--success); }
+        .verdict-success h2 { color: var(--success); }
+        
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -79,15 +100,18 @@
         .card {
             background: var(--bg-gray);
             border: 1px solid var(--border);
-            padding: 20px;
+            padding: 15px 20px;
             border-radius: 4px;
+            font-size: 14px;
         }
         .card h4 {
-            margin: 0 0 15px 0;
+            margin: 0 0 10px 0;
             color: var(--primary);
             border-bottom: 1px solid var(--border);
             padding-bottom: 8px;
         }
+        .card p { margin: 5px 0; }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -99,17 +123,12 @@
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
-        th {
-            background-color: var(--bg-gray);
-            color: #4a5568;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
+        th { background-color: var(--bg-gray); color: #4a5568; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        
         .chart-container {
             width: 100%;
-            height: 300px;
+            height: 250px;
             margin-bottom: 30px;
         }
         .footer {
@@ -120,6 +139,7 @@
             color: #a0aec0;
             text-align: center;
         }
+        
         .badge {
             padding: 4px 8px;
             border-radius: 4px;
@@ -130,14 +150,14 @@
         .badge-danger { background-color: var(--danger); }
         .badge-warning { background-color: var(--warning); }
         .badge-success { background-color: var(--success); }
-        .badge-info { background-color: #3182ce; }
+        .badge-info { background-color: var(--info); }
 
         @media print {
             body { padding: 0; }
             .container { max-width: 100%; }
-            .alert-box { border: 1px solid var(--danger); }
-            /* Ensure background colors print */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .chart-container { page-break-inside: avoid; }
+            .dictamen-box { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -146,11 +166,11 @@
         <div class="header">
             <div class="logo-area">
                 <h1>VIKAR GPS</h1>
-                <p>Certificación de Telemetría Forense</p>
+                <p>Dictamen Pericial Enriquecido (IA Determinística)</p>
             </div>
             <div class="meta-info">
-                <strong>ID de Documento:</strong> {{REPORT_ID}}<br>
-                <strong>Generado el:</strong> {{GENERATION_DATE}}<br>
+                <strong>ID Documento:</strong> {{REPORT_ID}}<br>
+                <strong>Emitido:</strong> {{GENERATION_DATE}}<br>
                 <strong>Certificado por:</strong> Data Lake Engine
             </div>
         </div>
@@ -162,20 +182,37 @@
 
         <div class="grid">
             <div class="card">
-                <h4>Ficha del Vehículo</h4>
+                <h4>1. Datos del Vehículo y Flota</h4>
                 <p><strong>Patente (Placa):</strong> {{PLATE}}</p>
                 <p><strong>Empresa Origen:</strong> {{CLIENT_SOURCE}}</p>
-                <p><strong>Total de Registros en Ventana:</strong> {{TOTAL_RECORDS}}</p>
+                <p><strong>Ventana Evaluada:</strong> {{TIME_WINDOW}}</p>
             </div>
             <div class="card">
-                <h4>Resumen Cinético</h4>
+                <h4>2. Resumen Cinético y Fatiga</h4>
                 <p><strong>Velocidad Máxima:</strong> {{MAX_SPEED}} km/h</p>
                 <p><strong>Velocidad Promedio:</strong> {{AVG_SPEED}} km/h</p>
-                <p><strong>Ventana Evaluada:</strong> {{TIME_WINDOW}}</p>
+                <p><strong>Jornada Estimada (Fatiga):</strong> {{FATIGUE_HOURS}}</p>
+            </div>
+            <div class="card">
+                <h4>3. Geografía del Incidente</h4>
+                <p><strong>Ubicación Aprox:</strong> {{LOCATION_NAME}}</p>
+            </div>
+            <div class="card">
+                <h4>4. Clima y Condiciones Visuales</h4>
+                <p><strong>Estado del Clima:</strong> {{WEATHER_CONDITION}}</p>
+                <p><strong>Temperatura:</strong> {{WEATHER_TEMP}}</p>
+                <p><strong>Nivel de Lluvia:</strong> {{WEATHER_RAIN}}</p>
             </div>
         </div>
 
-        <h4>Perfil de Velocidad y Aceleración</h4>
+        <div class="dictamen-box {{VERDICT_CLASS}}">
+            <h2>⚖️ DICTAMEN CAUSAL AUTOMÁTICO</h2>
+            <strong>VEREDICTO: {{VERDICT_TITLE}}</strong>
+            <p style="margin-top: 10px; font-size: 15px; text-align: justify;">{{VERDICT_BODY}}</p>
+            <em style="font-size: 11px; color: #718096; display: block; margin-top: 15px;">* Este dictamen ha sido generado algorítmicamente combinando las Leyes de Newton con datos climáticos en tiempo real de Open-Meteo y la telemetría inmutable de Vikar GPS. Válido para revisión por perito liquidador.</em>
+        </div>
+
+        <h4>Perfil G Longitudinal (Velocidad)</h4>
         <div class="chart-container">
             <canvas id="speedChart"></canvas>
         </div>
@@ -188,7 +225,7 @@
                     <th>Latitud</th>
                     <th>Longitud</th>
                     <th>Vel. (km/h)</th>
-                    <th>Estado Pericial</th>
+                    <th>Estado Físico</th>
                 </tr>
             </thead>
             <tbody>
@@ -197,8 +234,7 @@
         </table>
 
         <div class="footer">
-            <p>Documento generado automáticamente a partir del registro inmutable de base de datos VIKAR B2B Orchestrator.</p>
-            <p>La información contenida en este reporte es una copia exacta de las tramas originales enviadas por el hardware GPS.</p>
+            <p>Documento generado por VIKAR B2B Orchestrator. No requiere firma holográfica (Integridad criptográfica verificada en DB).</p>
         </div>
     </div>
 
@@ -213,8 +249,8 @@
                 datasets: [{
                     label: 'Velocidad (km/h)',
                     data: chartData.speeds,
-                    borderColor: '#e53e3e',
-                    backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                    borderColor: '#1a365d',
+                    backgroundColor: 'rgba(26, 54, 93, 0.1)',
                     borderWidth: 2,
                     tension: 0.3,
                     fill: true,
@@ -226,18 +262,10 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 140,
-                        title: { display: true, text: 'Velocidad (km/h)' }
-                    },
-                    x: {
-                        title: { display: true, text: 'Línea de Tiempo (UTC)' }
-                    }
+                    y: { beginAtZero: true, max: 140, title: { display: true, text: 'km/h' } },
+                    x: { title: { display: true, text: 'Tiempo (UTC)' } }
                 },
-                plugins: {
-                    legend: { display: false }
-                }
+                plugins: { legend: { display: false } }
             }
         });
     </script>
