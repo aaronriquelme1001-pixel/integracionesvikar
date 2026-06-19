@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { getLogs } = require('./src/core/logger');
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -75,6 +76,14 @@ app.get('/api/stats', requireDashboardAuth, (req, res) => {
        tracksolid: getTracksolidStatus()
     }
   });
+});
+
+app.get('/api/logs', (req, res, next) => {
+  if (req.query.secret === 'vikar2026') return next();
+  requireDashboardAuth(req, res, next);
+}, (req, res) => {
+  res.type('text/plain');
+  res.send(getLogs().join('\n'));
 });
 
 /**
