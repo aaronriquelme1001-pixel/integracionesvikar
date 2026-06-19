@@ -86,6 +86,21 @@ app.get('/api/logs', (req, res, next) => {
   res.send(getLogs().join('\n'));
 });
 
+app.get('/api/datalake-facts', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  if (!process.env.DATALAKE_URL) return res.json({ error: 'Data Lake no configurado' });
+  
+  try {
+    const { Pool } = require('pg');
+    const pool = new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } });
+    const { rows: countRows } = await pool.query('SELECT count(*) as total FROM global_telemetry_traffic');
+    const { rows: recentRows } = await pool.query('SELECT imei, plate, speed, dt_tracker, client_source FROM global_telemetry_traffic ORDER BY created_at DESC LIMIT 5');
+    res.json({ total_records: countRows[0].total, recent: recentRows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /**
  * Security Middleware for Webhooks
  */
