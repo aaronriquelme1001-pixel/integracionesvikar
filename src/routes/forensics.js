@@ -75,7 +75,7 @@ router.get('/', async (req, res) => {
     const chartLabels = [];
     const chartSpeeds = [];
     const chartColors = [];
-    let tableRowsHTML = '';
+    const mapData = [];
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -102,15 +102,20 @@ router.get('/', async (req, res) => {
       chartSpeeds.push(speed);
       chartColors.push(getPointColor(speed));
 
-      tableRowsHTML += `
-        <tr>
-          <td>${dateStr}</td>
-          <td>${row.lat}</td>
-          <td>${row.lng}</td>
-          <td>${speed}</td>
-          <td>${getStatusBadge(speed, prevSpeed)}</td>
-        </tr>
-      `;
+      mapData.push({
+        lat: row.lat,
+        lng: row.lng,
+        speed: speed,
+        time: dateStr.substring(11),
+        isIncident: false // Will mark the highest delta as incident later if needed
+      });
+    }
+
+    if (incidentRow) {
+      // Find the incident in mapData and mark it
+      const incTime = new Date(incidentRow.dt_tracker).toISOString().replace('T', ' ').substring(11, 19);
+      const m = mapData.find(d => d.time === incTime);
+      if (m) m.isIncident = true;
     }
 
     const avgSpeed = Math.round(sumSpeed / rows.length);
@@ -228,7 +233,7 @@ router.get('/', async (req, res) => {
       .replace(/{{VERDICT_CLASS}}/g, verdictClass)
       .replace(/{{VERDICT_TITLE}}/g, verdictTitle)
       .replace(/{{VERDICT_BODY}}/g, verdictBody)
-      .replace(/{{TABLE_ROWS}}/g, tableRowsHTML)
+      .replace(/{{MAP_DATA_JSON}}/g, JSON.stringify(mapData))
       .replace(/{{CHART_DATA_JSON}}/g, JSON.stringify({
         labels: chartLabels,
         speeds: chartSpeeds,

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Reporte Forense Nivel Dios - {{PLATE}}</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --primary: #1a365d;
@@ -217,21 +219,8 @@
             <canvas id="speedChart"></canvas>
         </div>
 
-        <h4>Registro Cronológico Inmutable</h4>
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha / Hora (UTC)</th>
-                    <th>Latitud</th>
-                    <th>Longitud</th>
-                    <th>Vel. (km/h)</th>
-                    <th>Estado Físico</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{TABLE_ROWS}}
-            </tbody>
-        </table>
+        <h4>Reconstrucción Geoespacial del Incidente (Mapa)</h4>
+        <div id="mapContainer" style="height: 400px; width: 100%; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 30px; z-index: 1;"></div>
 
         <div class="footer">
             <p>Documento generado por VIKAR B2B Orchestrator. No requiere firma holográfica (Integridad criptográfica verificada en DB).</p>
@@ -268,6 +257,37 @@
                 plugins: { legend: { display: false } }
             }
         });
+
+        // Map Initialization
+        const mapData = {{MAP_DATA_JSON}};
+        
+        if (mapData && mapData.length > 0) {
+            const map = L.map('mapContainer').setView([mapData[0].lat, mapData[0].lng], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const latlngs = mapData.map(p => [p.lat, p.lng]);
+            const polyline = L.polyline(latlngs, {color: '#1a365d', weight: 4}).addTo(map);
+            
+            map.fitBounds(polyline.getBounds(), { padding: [20, 20] });
+
+            mapData.forEach((p, idx) => {
+                let color = p.speed > 90 ? '#dd6b20' : (p.speed === 0 ? '#e53e3e' : '#3182ce');
+                if (p.isIncident) color = '#805ad5';
+                
+                const circle = L.circleMarker([p.lat, p.lng], {
+                    radius: p.isIncident ? 8 : 4,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 1
+                }).addTo(map);
+                
+                circle.bindPopup(`<b>Hora:</b> ${p.time}<br><b>Velocidad:</b> ${p.speed} km/h`);
+            });
+        }
     </script>
 </body>
 </html>
