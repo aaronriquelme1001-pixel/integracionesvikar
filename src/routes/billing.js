@@ -13,7 +13,7 @@ if (process.env.DATALAKE_URL) {
 
 /**
  * GET /api/billing-stats
- * Returns the 4 Value-Added Metrics for a given client in the current month.
+ * Returns the Value-Added Metrics for a given client in the current month.
  * Required query params: clientId, secret
  */
 router.get('/', async (req, res) => {
@@ -38,13 +38,12 @@ router.get('/', async (req, res) => {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    // Metric 1 & 4: Total KM and Engine Hours
-    // We get the min and max odometer/engine_hours for each IMEI in the current month
+    // Metric 1: Total KM
+    // We get the min and max odometer for each IMEI in the current month
     const deltaQuery = `
       SELECT 
         imei, 
-        MAX(odometer) - MIN(odometer) as km_driven,
-        MAX(engine_hours) - MIN(engine_hours) as hours_driven
+        MAX(odometer) - MIN(odometer) as km_driven
       FROM billing_snapshots
       WHERE client_id = $1 
         AND snapshot_date >= $2 
@@ -54,19 +53,14 @@ router.get('/', async (req, res) => {
     const deltaResult = await pool.query(deltaQuery, [clientId, startOfMonth, endOfMonth]);
     
     let totalKm = 0;
-    let totalEngineHours = 0;
-    
     deltaResult.rows.forEach(row => {
       totalKm += parseFloat(row.km_driven) || 0;
-      totalEngineHours += parseFloat(row.hours_driven) || 0;
     });
 
     // Metric 2: Active Vehicles
-    // Distinct IMEIs seen this month
     const activeVehicles = deltaResult.rows.length;
 
-    // Metric 3: Max Speed and Hard Braking (approximated from Datalake if no events are captured)
-    // We look at the telemetry table for this client in the current month
+    // Metric 3: Max Speed
     const speedQuery = `
       SELECT MAX(speed) as max_speed
       FROM global_telemetry_traffic
@@ -76,6 +70,27 @@ router.get('/', async (req, res) => {
     const speedResult = await pool.query(speedQuery, [clientId, startOfMonth]);
     const maxSpeed = speedResult.rows[0]?.max_speed || 0;
 
+    // Metric 4: Driver Ranking (Top Conductores)
+    const rankingQuery = `
+      SELECT 
+        bs.imei,
+        ROUND(AVG(bs.daily_grade), 1) as grade,
+        MAX(gt.plate) as plate
+      FROM billing_snapshots bs
+      LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei
+      WHERE bs.client_id = $1 
+        AND bs.snapshot_date >= $2 
+        AND bs.snapshot_date <= $3
+      GROUP BY bs.imei
+      ORDER BY grade DESC
+      LIMIT 10
+    `;
+    const rankingResult = await pool.query(rankingQuery, [clientId, startOfMonth, endOfMonth]);
+    const driverRanking = rankingResult.rows.map(row => ({
+      plate: row.plate || row.imei || 'Desconocido',
+      grade: parseFloat(row.grade) || 7.0
+    }));
+
     // Construct the UI-ready response
     return res.json({
       month: `${now.getMonth() + 1}/${now.getFullYear()}`,
@@ -84,7 +99,7 @@ router.get('/', async (req, res) => {
         total_kilometers: Math.round(totalKm),
         active_vehicles: activeVehicles,
         max_speed_kmh: Math.round(maxSpeed),
-        engine_hours: Math.round(totalEngineHours)
+        driver_ranking: driverRanking
       },
       ui_texts: {
         title1: "Kilometraje Total",
@@ -93,8 +108,8 @@ router.get('/', async (req, res) => {
         desc2: `${activeVehicles} vehículos transmitiendo correctamente este mes.`,
         title3: "Prevención de Riesgos",
         desc3: `Velocidad Máxima detectada: ${Math.round(maxSpeed)} km/h.`,
-        title4: "Horas de Operación",
-        desc4: `${Math.round(totalEngineHours)} horas de motor encendido en total.`
+        title4: "Top Conductores",
+        desc4: `Basado en análisis de telemetría de velocidad y comportamiento.`
       }
     });
 
