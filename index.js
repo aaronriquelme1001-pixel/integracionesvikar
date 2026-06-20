@@ -163,11 +163,11 @@ app.listen(PORT, () => {
   }
   setTimeout(pollGpsServerLocations, 5000);
   
-  // Start Billing Cron Job (Daily at 3:00 AM)
+  // Start Billing Cron Job (Every 20 minutes)
   const { runBillingSnapshot } = require('./src/cron/billing_snapshot');
   setInterval(() => {
     const now = new Date();
-    if (now.getHours() === 3 && now.getMinutes() === 0) {
+    if (now.getMinutes() % 20 === 0) {
       runBillingSnapshot();
     }
   }, 60000); // Check every minute
