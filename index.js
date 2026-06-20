@@ -146,6 +146,23 @@ app.get('/api/trigger-billing', async (req, res) => {
   res.json({ message: 'Billing snapshot job started in background.' });
 });
 
+app.get('/api/debug-gps-server', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  const axios = require('axios');
+  const masterKey = process.env.GPS_SERVER_MASTER_KEY;
+  const gpsUrl = 'http://gsh7.net/id39/api/api.php';
+  
+  try {
+    const response = await axios.get(`${gpsUrl}?api=server&key=${masterKey}&cmd=OBJECT_GET_LOCATIONS`);
+    const objects = response.data;
+    // Retornamos el primer objeto para analizar su estructura
+    const firstImei = Object.keys(objects)[0];
+    res.json({ firstImei, data: objects[firstImei] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 /**
  * Root Endpoint
  */
