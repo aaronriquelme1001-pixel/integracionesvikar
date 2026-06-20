@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
         imei, 
         MAX(odometer) - MIN(odometer) as km_driven
       FROM billing_snapshots
-      WHERE client_id = $1
+      WHERE LOWER(client_id) = LOWER($1)
       GROUP BY imei
     `;
     const deltaResult = await pool.query(deltaQuery, [clientId]);
@@ -61,7 +61,7 @@ router.get('/', async (req, res) => {
     const speedQuery = `
       SELECT MAX(speed) as max_speed
       FROM global_telemetry_traffic
-      WHERE client_source = $1
+      WHERE LOWER(client_source) = LOWER($1)
     `;
     const speedResult = await pool.query(speedQuery, [clientId]);
     const maxSpeed = speedResult.rows[0]?.max_speed || 0;
@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
         MAX(gt.plate) as plate
       FROM billing_snapshots bs
       LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei
-      WHERE bs.client_id = $1
+      WHERE LOWER(bs.client_id) = LOWER($1)
       GROUP BY bs.imei
       ORDER BY grade DESC
       LIMIT 10
