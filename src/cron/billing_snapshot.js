@@ -142,7 +142,7 @@ async function runBillingSnapshot() {
       // Analizador robusto: no sabemos la estructura exacta, así que buscamos patrones
       if (Array.isArray(usersData)) {
         for (const userObj of usersData) {
-          const clientName = userObj.email || userObj.username || 'unknown';
+          const clientName = userObj.username || userObj.email || 'unknown';
           const items = userObj.objects || userObj.items || {};
           
           if (Array.isArray(items)) {
