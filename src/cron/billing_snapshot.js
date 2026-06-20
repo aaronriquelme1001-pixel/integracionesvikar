@@ -129,13 +129,20 @@ async function runBillingSnapshot() {
   const snapshotDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   
   try {
-    // We use the Server API to get all locations at once
+    // 1. Fetch all telemetry from GPS Server (Master Key)
     const response = await axios.get(`${gpsUrl}?api=server&key=${masterKey}&cmd=OBJECT_GET_LOCATIONS`);
     const objects = response.data;
     
-    if (!objects || typeof objects !== 'object') {
-      console.error('[Billing Cron] Invalid response from GPS Server:', objects);
-      return;
+    // 2. Auto-Discover Mappings from Data Lake
+    const { rows: mappingRows } = await pool.query(`
+      SELECT imei, MAX(client_source) as client_source 
+      FROM global_telemetry_traffic 
+      WHERE client_source IS NOT NULL AND client_source != 'unknown' 
+      GROUP BY imei
+    `);
+    const dynamicMappings = {};
+    for (const row of mappingRows) {
+      dynamicMappings[row.imei] = row.client_source;
     }
 
     let insertedCount = 0;
@@ -145,20 +152,22 @@ async function runBillingSnapshot() {
       const odometer = data.odometer || 0;
       const engineHours = data.engine_hours || 0;
       
-      // Look up the client_id from our config/devices.json
-      const config = deviceMappings[imei];
-      let clientId = 'unknown';
-      if (config && config.integrations) {
-        // Obtenemos el cliente desde la primera integración que lo tenga configurado
-        for (const key in config.integrations) {
-          if (config.integrations[key].client) {
-            clientId = config.integrations[key].client;
-            break;
+      // Auto-assign client based on Data Lake history, fallback to config file
+      let clientId = dynamicMappings[imei];
+      
+      if (!clientId) {
+        const config = deviceMappings[imei];
+        if (config && config.integrations) {
+          for (const key in config.integrations) {
+            if (config.integrations[key].client) {
+              clientId = config.integrations[key].client;
+              break;
+            }
           }
         }
       }
       
-      if (clientId === 'unknown') continue; // We only care about mapped clients
+      if (!clientId || clientId === 'unknown') continue; // We only care about mapped clients
 
       // Calculate driving score for today (Speed, Harsh Events, Fatigue)
       const dailyGrade = await calculateDailyGrade(imei, snapshotDate);
