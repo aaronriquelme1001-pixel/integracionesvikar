@@ -258,7 +258,7 @@ async function pollGpsServerLocations() {
             params: device.params
           };
 
-          // --- BACKFILLER IA LOGIC ---
+           // --- BACKFILLER IA LOGIC ---
           const lastPollerState = lastDeviceTimestamps[imei];
           if (lastPollerState && lastPollerState.dt_tracker) {
              if (device.dt_tracker && device.dt_tracker > lastPollerState.dt_tracker) {
@@ -266,27 +266,22 @@ async function pollGpsServerLocations() {
                const gapSeconds = Math.floor(timeDiffMs / 1000);
                
                const isMoving = parseFloat(device.speed || 0) > 0;
-               const gapThreshold = isMoving ? 15 : 300;
+               // Thresholds: 3 mins if moving, 20 mins if parked
+               const gapThreshold = isMoving ? 180 : 1200;
                
                if (gapSeconds > gapThreshold && gapSeconds < 259200) {
                  systemStats.backfillerTriggers++;
-                 const recovered = await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, masterKey, true);
+                 console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 3 mins para permitir que suba su historial...`);
                  
-                 if (recovered === 0) {
-                     if (!waitBufferStates[imei]) waitBufferStates[imei] = Date.now();
-                     const waitedSeconds = (Date.now() - waitBufferStates[imei]) / 1000;
-                     
-                     if (waitedSeconds < 300) { 
-                         console.log(`[Poller] ⏳ Esperando que ${imei} suba su buffer histórico... (${Math.round(waitedSeconds)}/300s)`);
-                         continue; 
-                     } else {
-                         console.log(`[Poller] ⚠️ Tiempo agotado (5m) para buffer de ${imei}. Asumiendo pérdida real.`);
-                     }
-                 } else {
-                     console.log(`[Poller] 🎉 Hueco histórico de ${gapSeconds}s reconstruido para ${imei}.`);
-                 }
-                 
-                 delete waitBufferStates[imei];
+                 // Queue the backfill to run in 3 minutes, giving the tracker time to upload over GPRS
+                 pendingBackfills.push({
+                   imei: imei,
+                   dt_old: lastPollerState.dt_tracker,
+                   dt_new: device.dt_tracker,
+                   client: client,
+                   apiKey: masterKey,
+                   executeAt: Date.now() + (3 * 60 * 1000)
+                 });
                }
              }
           }
