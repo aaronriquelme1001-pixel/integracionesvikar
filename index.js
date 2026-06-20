@@ -141,9 +141,12 @@ app.get('/api/trigger-billing', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
   const { runBillingSnapshot } = require('./src/cron/billing_snapshot');
   
-  // No esperamos a que termine, lo lanzamos en background
-  runBillingSnapshot().catch(console.error);
-  res.json({ message: 'Billing snapshot job started in background.' });
+  try {
+    const result = await runBillingSnapshot();
+    res.json({ message: 'Billing snapshot completed', result });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
 });
 
 app.get('/api/debug-users-objects', async (req, res) => {

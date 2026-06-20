@@ -211,9 +211,15 @@ async function runBillingSnapshot() {
     }
     
     console.log(`[Billing Cron] Successfully took snapshot and graded ${insertedCount} devices on ${snapshotDate}.`);
-    
-  } catch (error) {
-    console.error('[Billing Cron] Error executing snapshot:', error.message);
+    return {
+      status: 'success',
+      insertedCount,
+      dynamicMappingsCount: Object.keys(dynamicMappings).length,
+      sampleMappings: Object.entries(dynamicMappings).slice(0, 5)
+    };
+  } catch (err) {
+    console.error('[Billing Cron] Critical Error:', err);
+    throw err; // throw to be caught by the endpoint
   } finally {
     // Let pool open since it might be used by index.js in production, but in cron script standalone we should close it.
     // The pool is a global singleton, so we'll leave it as is.
