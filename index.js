@@ -93,9 +93,14 @@ app.get('/api/datalake-facts', async (req, res) => {
   try {
     const { Pool } = require('pg');
     const pool = new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } });
-    const { rows: countRows } = await pool.query('SELECT count(*) as total FROM global_telemetry_traffic');
-    const { rows: recentRows } = await pool.query('SELECT imei, plate, speed, dt_tracker, client_source FROM global_telemetry_traffic ORDER BY created_at DESC LIMIT 5');
-    res.json({ total_records: countRows[0].total, recent: recentRows });
+    const { rows: countRows } = await pool.query('SELECT count(*) as total FROM billing_snapshots');
+    const { rows: transklettRows } = await pool.query(`SELECT * FROM billing_snapshots WHERE client_id='transklett' LIMIT 5`);
+    const { rows: anyRows } = await pool.query('SELECT * FROM billing_snapshots LIMIT 5');
+    res.json({ 
+      total_snapshots: countRows[0].total, 
+      transklett_snapshots: transklettRows,
+      any_snapshots: anyRows
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
