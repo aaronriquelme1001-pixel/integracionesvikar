@@ -17,7 +17,7 @@ function getDeviceMappings() {
   const configPath = path.join(__dirname, '../../config/devices.json');
   if (fs.existsSync(configPath)) {
     const data = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    return data.devices || {};
+    return data.devices || data || {};
   }
   return {};
 }
