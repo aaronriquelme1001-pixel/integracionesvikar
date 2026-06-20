@@ -133,16 +133,40 @@ async function runBillingSnapshot() {
     const response = await axios.get(`${gpsUrl}?api=server&key=${masterKey}&cmd=OBJECT_GET_LOCATIONS`);
     const objects = response.data;
     
-    // 2. Auto-Discover Mappings from Data Lake
-    const { rows: mappingRows } = await pool.query(`
-      SELECT imei, MAX(client_source) as client_source 
-      FROM global_telemetry_traffic 
-      WHERE client_source IS NOT NULL AND client_source != 'unknown' 
-      GROUP BY imei
-    `);
-    const dynamicMappings = {};
-    for (const row of mappingRows) {
-      dynamicMappings[row.imei] = row.client_source;
+    // 2. Auto-Discover Mappings from GPS Server (GET_USERS_OBJECTS)
+    let dynamicMappings = {};
+    try {
+      const mappingResponse = await axios.get(`${gpsUrl}?api=server&key=${masterKey}&cmd=GET_USERS_OBJECTS`);
+      const usersData = mappingResponse.data;
+      
+      // Analizador robusto: no sabemos la estructura exacta, así que buscamos patrones
+      if (Array.isArray(usersData)) {
+        for (const userObj of usersData) {
+          const clientName = userObj.email || userObj.username || 'unknown';
+          const items = userObj.objects || userObj.items || {};
+          for (const imei in items) {
+            dynamicMappings[imei] = clientName;
+          }
+        }
+      } else if (typeof usersData === 'object' && usersData !== null) {
+        for (const clientName in usersData) {
+          const items = usersData[clientName];
+          // Si el valor es un objeto de vehículos
+          if (typeof items === 'object' && items !== null && !Array.isArray(items)) {
+             for (const imei in items) {
+                dynamicMappings[imei] = clientName;
+             }
+          } else if (Array.isArray(items)) {
+             for (const item of items) {
+                if (item.imei) dynamicMappings[item.imei] = clientName;
+                else dynamicMappings[item] = clientName; // array of strings
+             }
+          }
+        }
+      }
+      console.log(`[Billing Cron] Auto-discovered ${Object.keys(dynamicMappings).length} vehicle mappings from GPS Server.`);
+    } catch (err) {
+      console.error('[Billing Cron] Failed to auto-discover from GET_USERS_OBJECTS:', err.message);
     }
 
     let insertedCount = 0;
