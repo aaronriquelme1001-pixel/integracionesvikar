@@ -42,7 +42,7 @@ function parseDevicesConfig() {
  */
 function getDeviceConfig(imei) {
   const configObj = parseDevicesConfig();
-  const devices = configObj.devices || {};
+  const devices = configObj.devices || configObj || {};
   return devices[imei] || null;
 }
 
