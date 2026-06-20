@@ -153,8 +153,15 @@ async function runBillingSnapshot() {
           const items = usersData[clientName];
           // Si el valor es un objeto de vehículos
           if (typeof items === 'object' && items !== null && !Array.isArray(items)) {
-             for (const imei in items) {
-                dynamicMappings[imei] = clientName;
+             for (const key in items) {
+                const val = items[key];
+                if (typeof val === 'string') {
+                   // Formato: { "0": "imei123" }
+                   dynamicMappings[val] = clientName;
+                } else {
+                   // Formato: { "imei123": { ... } }
+                   dynamicMappings[key] = clientName;
+                }
              }
           } else if (Array.isArray(items)) {
              for (const item of items) {
