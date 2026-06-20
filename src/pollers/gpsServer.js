@@ -10,10 +10,66 @@ let lastGpsServerPollTime = null;
 let lastGpsServerPollStatus = 'Waiting to start...';
 let isGpsServerPolling = false;
 
+// Global mapping cache
+let mappingCache = {};
+let lastMappingRefresh = 0;
+const MAPPING_REFRESH_INTERVAL = 20 * 60 * 1000; // 20 minutes
+
+async function refreshMappingCache(masterKey) {
+  try {
+    const response = await axios.get(GPSSERVER_API_URL, {
+      params: { api: 'server', key: masterKey, cmd: 'GET_USERS_OBJECTS' },
+      timeout: 30000
+    });
+    const usersData = response.data;
+    let newMappings = {};
+    
+    if (Array.isArray(usersData)) {
+      for (const userObj of usersData) {
+        const clientName = userObj.username || userObj.email || 'unknown';
+        const items = userObj.objects || userObj.items || {};
+        if (Array.isArray(items)) {
+          for (const item of items) {
+             if (typeof item === 'string') newMappings[item] = clientName;
+             else if (item.imei) newMappings[item.imei] = clientName;
+          }
+        } else if (typeof items === 'object' && items !== null) {
+          for (const key in items) {
+             const val = items[key];
+             if (typeof val === 'string') newMappings[val] = clientName;
+             else newMappings[key] = clientName;
+          }
+        }
+      }
+    } else if (typeof usersData === 'object' && usersData !== null) {
+      for (const clientName in usersData) {
+        const items = usersData[clientName];
+        if (typeof items === 'object' && items !== null && !Array.isArray(items)) {
+           for (const key in items) {
+              const val = items[key];
+              if (typeof val === 'string') newMappings[val] = clientName;
+              else newMappings[key] = clientName;
+           }
+        } else if (Array.isArray(items)) {
+           for (const item of items) {
+              if (item.imei) newMappings[item.imei] = clientName;
+              else newMappings[item] = clientName;
+           }
+        }
+      }
+    }
+    mappingCache = newMappings;
+    lastMappingRefresh = Date.now();
+    console.log(`[GPS Server Poller] Mapping cache refreshed. Discovered ${Object.keys(mappingCache).length} vehicles.`);
+  } catch (err) {
+    console.error('[GPS Server Poller] Error refreshing mapping cache:', err.message);
+  }
+}
+
 /**
  * Función asíncrona para recuperar historial perdido (Túneles o Gaps)
  */
-async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
+async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = false) {
   try {
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      let allMessages = [];
@@ -22,11 +78,11 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
      const startEpoch = getEpoch(dt_old);
      const endEpoch = getEpoch(dt_new);
      const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
+     const apiTarget = isMaster ? 'server' : 'user';
      
      if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > TWELVE_HOURS_MS) {
        console.log(`[Backfiller] 📦 Rango gigante detectado. Paginando historial para ${imei}...`);
        
-       // Parse offset to milliseconds
        const sign = tz[0] === '+' ? 1 : -1;
        const hours = parseInt(tz.substring(1, 3), 10);
        const mins = parseInt(tz.substring(4, 6), 10);
@@ -47,7 +103,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
          const chunkEnd = fmt(currentEnd);
          
          const response = await axios.get(GPSSERVER_API_URL, {
-            params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
+            params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
             timeout: 30000
          });
          
@@ -55,11 +111,11 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
             allMessages = allMessages.concat(response.data);
          }
          currentStart = currentEnd;
-         await new Promise(r => setTimeout(r, 500)); // Cuidar servidor API
+         await new Promise(r => setTimeout(r, 500));
        }
      } else {
        const response = await axios.get(GPSSERVER_API_URL, {
-          params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
+          params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
           timeout: 30000
        });
        let resData = response.data;
@@ -73,18 +129,15 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
      }
      
      if (allMessages.length > 0) {
-        // GPS Server API returns an array of arrays for GET_MESSAGES
-        // Format: [dt_tracker, lat, lng, altitude, angle, speed, params]
         let messages = allMessages.map(m => {
            if (Array.isArray(m)) {
               const paramsObj = m[6] || {};
               const satellites = parseInt(paramsObj.gpslev || paramsObj.sat || paramsObj.satellites || 0, 10);
-              // Si no hay satélites (0), es una triangulación LBS (saltos falsos de kilómetros). Marcamos como loc_valid=0
               const isGpsValid = satellites > 0 ? 1 : 0;
               
               return {
                  dt_tracker: m[0],
-                 dt_server: m[0], // GET_MESSAGES doesn't provide dt_server
+                 dt_server: m[0],
                  lat: m[1],
                  lng: m[2],
                  altitude: m[3] || 0,
@@ -97,13 +150,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
            return m;
         });
         
-        // Ordenar cronológicamente (el más antiguo primero)
         messages.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
-        
-        // Filtrado Estricto de Bordes (Anti Zig-Zag)
-        // La API a veces retorna puntos fuera del rango. Exigimos que sean estrictamente mayores que dt_old y menores que dt_new.
-        const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-        const getEpoch = (ds) => new Date(ds.replace(' ', 'T') + tz).getTime();
         
         const oldEpoch = getEpoch(dt_old);
         const newEpoch = getEpoch(dt_new);
@@ -133,7 +180,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
                  params: msg.params || ''
              };
              await dispatchToB2B(telemetry, client);
-             await new Promise(r => setTimeout(r, 100)); // Pequeña pausa para no saturar
+             await new Promise(r => setTimeout(r, 100));
           }
           console.log(`[Backfiller] ✅ Inyección de ${messages.length} puntos completada para ${imei}.`);
           return messages.length;
@@ -147,66 +194,54 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey) {
 }
 
 /**
- * Poll location updates for configured GPS Server clients and forward them to B2B targets
+ * Poll location updates for ALL devices using the Master Key
  */
 async function pollGpsServerLocations() {
   if (isGpsServerPolling) return;
   isGpsServerPolling = true;
 
   lastGpsServerPollTime = new Date().toISOString();
-  const GPSSERVER_POLL_CLIENTS = process.env.GPSSERVER_POLL_CLIENTS;
-  if (!GPSSERVER_POLL_CLIENTS) {
-    lastGpsServerPollStatus = 'Disabled: GPSSERVER_POLL_CLIENTS is not configured';
+  
+  const masterKey = process.env.GPS_SERVER_MASTER_KEY;
+  if (!masterKey) {
+    lastGpsServerPollStatus = 'Disabled: GPS_SERVER_MASTER_KEY is not configured';
     isGpsServerPolling = false;
     setTimeout(pollGpsServerLocations, GPSSERVER_POLL_INTERVAL);
     return;
   }
 
-  const clientsList = GPSSERVER_POLL_CLIENTS.split(',').map(c => c.trim()).filter(Boolean);
-  if (clientsList.length === 0) {
-    lastGpsServerPollStatus = 'Disabled: Empty client list';
-    isGpsServerPolling = false;
-    setTimeout(pollGpsServerLocations, GPSSERVER_POLL_INTERVAL);
-    return;
+  if (Date.now() - lastMappingRefresh > MAPPING_REFRESH_INTERVAL || Object.keys(mappingCache).length === 0) {
+    await refreshMappingCache(masterKey);
   }
 
-  console.log(`[GPS Server Poller] Starting poll cycle for clients: ${clientsList.join(', ')}`);
-  let successCount = 0;
   let totalDevicesProcessed = 0;
 
-  for (const client of clientsList) {
-    const apiKeyEnvName = `GPSSERVER_API_KEY_${client.toUpperCase()}`;
-    const apiKey = process.env[apiKeyEnvName];
+  try {
+    const response = await axios.get(GPSSERVER_API_URL, {
+      params: {
+        api: 'server',
+        key: masterKey,
+        cmd: 'OBJECT_GET_LOCATIONS,*'
+      },
+      timeout: 15000
+    });
 
-    if (!apiKey) {
-      console.warn(`[GPS Server Poller] Missing API Key environment variable: ${apiKeyEnvName}`);
-      continue;
-    }
+    if (response.data && typeof response.data === 'object') {
+      const devices = response.data;
+      const imeis = Object.keys(devices);
+      console.log(`[GPS Server Poller] Master Key returned ${imeis.length} devices.`);
+      
+      for (const imei of imeis) {
+        try {
+          const device = devices[imei];
+          if (!device) continue;
 
-    try {
-      console.log(`[GPS Server Poller] Querying locations for client '${client}'...`);
-      const response = await axios.get(GPSSERVER_API_URL, {
-        params: {
-          api: 'user',
-          key: apiKey,
-          cmd: 'OBJECT_GET_LOCATIONS,*'
-        },
-        timeout: 15000
-      });
+          // Resolve client from cache
+          const client = mappingCache[imei] || 'unknown';
 
-      if (response.data && typeof response.data === 'object') {
-        const devices = response.data;
-        const imeis = Object.keys(devices);
-        console.log(`[GPS Server Poller] Client '${client}' returned ${imeis.length} devices.`);
+          totalDevicesProcessed++;
+          systemStats.totalPolledPoints++;
         
-        for (const imei of imeis) {
-          try {
-            const device = devices[imei];
-            if (!device) continue;
-  
-            totalDevicesProcessed++;
-            systemStats.totalPolledPoints++;
-          
           const telemetry = {
             imei: imei,
             name: device.name,
@@ -230,19 +265,18 @@ async function pollGpsServerLocations() {
                const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
                const gapSeconds = Math.floor(timeDiffMs / 1000);
                
-               // Sensibilidad dinámica: 15s en movimiento, 5 min (300s) estacionado
                const isMoving = parseFloat(device.speed || 0) > 0;
                const gapThreshold = isMoving ? 15 : 300;
                
-               if (gapSeconds > gapThreshold && gapSeconds < 259200) { // Soportar hasta 3 días (259200s) de pérdida de cobertura en bosques
+               if (gapSeconds > gapThreshold && gapSeconds < 259200) {
                  systemStats.backfillerTriggers++;
-                 const recovered = await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, apiKey);
+                 const recovered = await recoverHistory(imei, lastPollerState.dt_tracker, device.dt_tracker, client, masterKey, true);
                  
                  if (recovered === 0) {
                      if (!waitBufferStates[imei]) waitBufferStates[imei] = Date.now();
                      const waitedSeconds = (Date.now() - waitBufferStates[imei]) / 1000;
                      
-                     if (waitedSeconds < 300) { // Esperar hasta 5 minutos a que suba el buffer 2G
+                     if (waitedSeconds < 300) { 
                          console.log(`[Poller] ⏳ Esperando que ${imei} suba su buffer histórico... (${Math.round(waitedSeconds)}/300s)`);
                          continue; 
                      } else {
@@ -263,20 +297,18 @@ async function pollGpsServerLocations() {
           // ---------------------------
 
           await dispatchToB2B(telemetry, client);
-          } catch (imeiErr) {
-            console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
-          }
+        } catch (imeiErr) {
+          console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
         }
-        successCount++;
-      } else {
-        console.warn(`[GPS Server Poller] Unexpected response format for client '${client}'.`);
       }
-    } catch (err) {
-      console.error(`[GPS Server Poller] Error polling for client '${client}':`, err.message);
+    } else {
+      console.warn(`[GPS Server Poller] Unexpected response format from master key.`);
     }
+  } catch (err) {
+    console.error(`[GPS Server Poller] Error polling master key:`, err.message);
   }
 
-  lastGpsServerPollStatus = `Cycle complete: Success for ${successCount}/${clientsList.length} clients, processed ${totalDevicesProcessed} devices.`;
+  lastGpsServerPollStatus = `Cycle complete: processed ${totalDevicesProcessed} devices across ${Object.keys(mappingCache).length} mapped users.`;
   console.log(`[GPS Server Poller] ${lastGpsServerPollStatus}`);
   
   isGpsServerPolling = false;
@@ -288,20 +320,18 @@ setInterval(async () => {
    if (!pendingBackfills || pendingBackfills.length === 0) return;
    
    const now = Date.now();
-   // Encontrar tareas listas para ejecutarse
    const readyTasks = pendingBackfills.filter(task => now >= task.executeAt);
    
    if (readyTasks.length > 0) {
       for (const task of readyTasks) {
-         // Remover la tarea de la cola
          const index = pendingBackfills.indexOf(task);
          if (index > -1) pendingBackfills.splice(index, 1);
-         
-         // Ejecutar recuperación
+         // Se asume que las tareas pendientes usarán sus keys antiguas (si eran locales),
+         // pero si usamos Master Key a partir de ahora, todo el tráfico nuevo usará Master Key.
          await recoverHistory(task.imei, task.dt_old, task.dt_new, task.client, task.apiKey);
       }
    }
-}, 30000); // Revisar cola cada 30 segundos
+}, 30000);
 
 module.exports = {
   pollGpsServerLocations,
