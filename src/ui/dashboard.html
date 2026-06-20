@@ -79,7 +79,7 @@
         .card-value.neon { color: var(--accent-neon); text-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
         .card-value.purple { color: #b785ff; text-shadow: 0 0 20px rgba(183, 133, 255, 0.3); }
         
-        .grid-main { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        .grid-main { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
 
         .logs-container { background: #050608; border-radius: 12px; padding: 1rem; font-family: monospace; color: #00ff88; height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
         
@@ -134,10 +134,24 @@
                 <div class="card-title">Estado de Extraordinarios</div>
                 <div class="logs-container" id="live-status">Cargando telemetría...</div>
             </div>
+            <div class="card">
+                <div class="card-title">Generador de Reportes Forenses</div>
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Genera un análisis cinemático para accidentes o incidentes ingresando la patente.</p>
+                    <input type="text" id="forensic-plate" placeholder="Ej: LWPS57" style="padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; outline: none; text-transform: uppercase;">
+                    <button onclick="generateForensicReport()" style="padding: 10px; border-radius: 8px; border: none; background: var(--accent-purple); color: white; font-weight: bold; cursor: pointer; transition: 0.2s;">Generar Reporte AI</button>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
+        function generateForensicReport() {
+            const plate = document.getElementById('forensic-plate').value.trim();
+            if (!plate) return alert('Por favor ingresa una patente');
+            const url = '/api/forensic-report?secret=vikar2026&plate=' + encodeURIComponent(plate);
+            window.open(url, '_blank');
+        }
         async function fetchStats() {
             try {
                 const res = await fetch('/api/stats');
