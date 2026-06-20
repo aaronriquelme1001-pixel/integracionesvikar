@@ -163,6 +163,22 @@ app.get('/api/debug-gps-server', async (req, res) => {
   }
 });
 
+app.get('/api/debug-objects', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  const axios = require('axios');
+  const masterKey = process.env.GPS_SERVER_MASTER_KEY;
+  const gpsUrl = 'http://gsh7.net/id39/api/api.php';
+  
+  try {
+    const response = await axios.get(`${gpsUrl}?api=server&key=${masterKey}&cmd=GET_OBJECTS`);
+    const objects = response.data;
+    // Retornamos el primer objeto o la estructura base
+    res.json(objects.length ? objects[0] : objects);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 /**
  * Root Endpoint
  */
