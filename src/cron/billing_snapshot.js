@@ -218,6 +218,7 @@ async function runBillingSnapshot() {
         INSERT INTO billing_snapshots (client_id, imei, snapshot_date, odometer, engine_hours, daily_grade)
         VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (imei, snapshot_date) DO UPDATE SET 
+          client_id = EXCLUDED.client_id,
           odometer = EXCLUDED.odometer, 
           engine_hours = EXCLUDED.engine_hours,
           daily_grade = EXCLUDED.daily_grade;
