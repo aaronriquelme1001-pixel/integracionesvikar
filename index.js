@@ -95,11 +95,11 @@ app.get('/api/datalake-facts', async (req, res) => {
     const pool = new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } });
     const { rows: countRows } = await pool.query('SELECT count(*) as total FROM billing_snapshots');
     const { rows: transklettRows } = await pool.query(`SELECT * FROM billing_snapshots WHERE client_id='transklett' LIMIT 5`);
-    const { rows: anyRows } = await pool.query('SELECT * FROM billing_snapshots LIMIT 5');
+    const { rows: anyRows } = await pool.query('SELECT client_id, count(*) as count FROM billing_snapshots GROUP BY client_id');
     res.json({ 
       total_snapshots: countRows[0].total, 
       transklett_snapshots: transklettRows,
-      any_snapshots: anyRows
+      clients: anyRows
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
