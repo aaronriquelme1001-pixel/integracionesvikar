@@ -147,7 +147,16 @@ async function runBillingSnapshot() {
       
       // Look up the client_id from our config/devices.json
       const config = deviceMappings[imei];
-      const clientId = config ? config.client_source : 'unknown';
+      let clientId = 'unknown';
+      if (config && config.integrations) {
+        // Obtenemos el cliente desde la primera integración que lo tenga configurado
+        for (const key in config.integrations) {
+          if (config.integrations[key].client) {
+            clientId = config.integrations[key].client;
+            break;
+          }
+        }
+      }
       
       if (clientId === 'unknown') continue; // We only care about mapped clients
 
