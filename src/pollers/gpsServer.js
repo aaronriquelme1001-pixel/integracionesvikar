@@ -1,6 +1,15 @@
 const axios = require('axios');
 const { systemStats, deviceAntiSpamState, lastDeviceTimestamps, pendingBackfills, retryQueue } = require('../core/state');
 const { dispatchToB2B } = require('../core/dispatcher');
+const { Pool } = require('pg');
+
+let pool = null;
+if (process.env.DATALAKE_URL) {
+  pool = new Pool({
+    connectionString: process.env.DATALAKE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+}
 
 const waitBufferStates = {}; // { imei: firstWaitMs }
 const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL, 10) || 10000;
@@ -9,6 +18,7 @@ const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39
 let lastGpsServerPollTime = null;
 let lastGpsServerPollStatus = 'Waiting to start...';
 let isGpsServerPolling = false;
+let isStateHydrated = false;
 
 // Global mapping cache
 let mappingCache = {};
@@ -208,6 +218,31 @@ async function pollGpsServerLocations() {
     isGpsServerPolling = false;
     setTimeout(pollGpsServerLocations, GPSSERVER_POLL_INTERVAL);
     return;
+  }
+
+  // --- HYDRATE STATE FROM DATALAKE TO SURVIVE RESTARTS ---
+  if (!isStateHydrated && pool) {
+    try {
+      console.log('[GPS Server Poller] Hydrating state from Datalake to survive restarts...');
+      const query = `
+        SELECT imei, MAX(dt_tracker) as dt_tracker 
+        FROM global_telemetry_traffic 
+        WHERE dt_server >= NOW() - INTERVAL '1 day'
+        GROUP BY imei
+      `;
+      const res = await pool.query(query);
+      for (const row of res.rows) {
+        if (!lastDeviceTimestamps[row.imei]) {
+          // Convert JS Date object to ISO string matching format expected by new Date() comparison
+          lastDeviceTimestamps[row.imei] = { dt_tracker: new Date(row.dt_tracker).toISOString().replace('T', ' ').substring(0, 19) };
+        }
+      }
+      console.log(`[GPS Server Poller] Hydrated state for ${res.rows.length} devices. Backfiller is ready for past gaps!`);
+      isStateHydrated = true;
+    } catch (err) {
+      console.error('[GPS Server Poller] Failed to hydrate state:', err.message);
+      // We will try again next poll if it failed
+    }
   }
 
   if (Date.now() - lastMappingRefresh > MAPPING_REFRESH_INTERVAL || Object.keys(mappingCache).length === 0) {
