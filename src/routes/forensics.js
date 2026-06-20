@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
 
   try {
     // 1. Telemetry Query
-    let query = `SELECT lat, lng, speed, dt_tracker, client_source FROM global_telemetry_traffic WHERE plate = $1`;
+    let query = `SELECT lat, lng, speed, dt_tracker, client_source FROM global_telemetry_traffic WHERE LOWER(plate) = LOWER($1)`;
     const params = [plate];
 
     if (time) {
