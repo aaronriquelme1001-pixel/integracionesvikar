@@ -38,19 +38,16 @@ router.get('/', async (req, res) => {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    // Metric 1: Total KM
-    // We get the min and max odometer for each IMEI in the current month
+    // Metric 1: Total KM (Lifetime)
     const deltaQuery = `
       SELECT 
         imei, 
         MAX(odometer) - MIN(odometer) as km_driven
       FROM billing_snapshots
-      WHERE client_id = $1 
-        AND snapshot_date >= $2 
-        AND snapshot_date <= $3
+      WHERE client_id = $1
       GROUP BY imei
     `;
-    const deltaResult = await pool.query(deltaQuery, [clientId, startOfMonth, endOfMonth]);
+    const deltaResult = await pool.query(deltaQuery, [clientId]);
     
     let totalKm = 0;
     deltaResult.rows.forEach(row => {
@@ -64,10 +61,9 @@ router.get('/', async (req, res) => {
     const speedQuery = `
       SELECT MAX(speed) as max_speed
       FROM global_telemetry_traffic
-      WHERE client_source = $1 
-        AND dt_tracker >= $2
+      WHERE client_source = $1
     `;
-    const speedResult = await pool.query(speedQuery, [clientId, startOfMonth]);
+    const speedResult = await pool.query(speedQuery, [clientId]);
     const maxSpeed = speedResult.rows[0]?.max_speed || 0;
 
     // Metric 4: Driver Ranking (Top Conductores)
@@ -78,14 +74,12 @@ router.get('/', async (req, res) => {
         MAX(gt.plate) as plate
       FROM billing_snapshots bs
       LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei
-      WHERE bs.client_id = $1 
-        AND bs.snapshot_date >= $2 
-        AND bs.snapshot_date <= $3
+      WHERE bs.client_id = $1
       GROUP BY bs.imei
       ORDER BY grade DESC
       LIMIT 10
     `;
-    const rankingResult = await pool.query(rankingQuery, [clientId, startOfMonth, endOfMonth]);
+    const rankingResult = await pool.query(rankingQuery, [clientId]);
     const driverRanking = rankingResult.rows.map(row => ({
       plate: row.plate || row.imei || 'Desconocido',
       grade: parseFloat(row.grade) || 7.0
@@ -93,7 +87,7 @@ router.get('/', async (req, res) => {
 
     // Construct the UI-ready response
     return res.json({
-      month: `${now.getMonth() + 1}/${now.getFullYear()}`,
+      period: "Histórico",
       client: clientId,
       metrics: {
         total_kilometers: Math.round(totalKm),
@@ -102,14 +96,14 @@ router.get('/', async (req, res) => {
         driver_ranking: driverRanking
       },
       ui_texts: {
-        title1: "Kilometraje Total",
-        desc1: `Tus vehículos recorrieron ${Math.round(totalKm).toLocaleString()} km bajo nuestra supervisión.`,
+        title1: "Kilometraje Histórico",
+        desc1: `Tus vehículos recorrieron ${Math.round(totalKm).toLocaleString()} km en total bajo nuestra supervisión.`,
         title2: "Activos Protegidos",
-        desc2: `${activeVehicles} vehículos transmitiendo correctamente este mes.`,
+        desc2: `${activeVehicles} vehículos registrados en el historial.`,
         title3: "Prevención de Riesgos",
-        desc3: `Velocidad Máxima detectada: ${Math.round(maxSpeed)} km/h.`,
-        title4: "Top Conductores",
-        desc4: `Basado en análisis de telemetría de velocidad y comportamiento.`
+        desc3: `Velocidad Máxima histórica detectada: ${Math.round(maxSpeed)} km/h.`,
+        title4: "Top Conductores Histórico",
+        desc4: `Basado en análisis acumulado de telemetría y comportamiento.`
       }
     });
 
