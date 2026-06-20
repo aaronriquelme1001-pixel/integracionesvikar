@@ -146,6 +146,21 @@ app.get('/api/trigger-billing', async (req, res) => {
   res.json({ message: 'Billing snapshot job started in background.' });
 });
 
+app.get('/api/debug-users-objects', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  const axios = require('axios');
+  const masterKey = process.env.GPS_SERVER_MASTER_KEY;
+  const gpsUrl = 'http://gsh7.net/id39/api/api.php';
+  
+  try {
+    const response = await axios.get(`${gpsUrl}?api=server&key=${masterKey}&cmd=GET_USERS_OBJECTS`);
+    const objects = response.data;
+    res.json(objects);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 /**
  * Root Endpoint
  */
