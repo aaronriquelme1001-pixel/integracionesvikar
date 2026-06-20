@@ -227,7 +227,7 @@ async function pollGpsServerLocations() {
       const query = `
         SELECT imei, MAX(dt_tracker) as dt_tracker 
         FROM global_telemetry_traffic 
-        WHERE dt_server >= NOW() - INTERVAL '1 day'
+        WHERE created_at >= NOW() - INTERVAL '1 day'
         GROUP BY imei
       `;
       const res = await pool.query(query);
