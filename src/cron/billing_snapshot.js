@@ -144,8 +144,18 @@ async function runBillingSnapshot() {
         for (const userObj of usersData) {
           const clientName = userObj.email || userObj.username || 'unknown';
           const items = userObj.objects || userObj.items || {};
-          for (const imei in items) {
-            dynamicMappings[imei] = clientName;
+          
+          if (Array.isArray(items)) {
+            for (const item of items) {
+               if (typeof item === 'string') dynamicMappings[item] = clientName;
+               else if (item.imei) dynamicMappings[item.imei] = clientName;
+            }
+          } else if (typeof items === 'object' && items !== null) {
+            for (const key in items) {
+               const val = items[key];
+               if (typeof val === 'string') dynamicMappings[val] = clientName;
+               else dynamicMappings[key] = clientName;
+            }
           }
         }
       } else if (typeof usersData === 'object' && usersData !== null) {
