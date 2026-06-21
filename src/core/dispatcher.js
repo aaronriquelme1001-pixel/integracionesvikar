@@ -45,7 +45,8 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       const lat2 = parseFloat(telemetry.lat) * Math.PI/180;
       const dLat = (parseFloat(telemetry.lat) - state.lat) * Math.PI/180;
       const dLng = (parseFloat(telemetry.lng) - state.lng) * Math.PI/180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) * Math.sin(dLng/2);
+      const rawA = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) * Math.sin(dLng/2);
+      const a = Math.min(1, Math.max(0, rawA));
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       const distanceMeters = R * c;
       
@@ -53,18 +54,19 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
         const timeDiffSeconds = (new Date(telemetry.dt_tracker).getTime() - new Date(state.dt_tracker).getTime()) / 1000;
         
         if (timeDiffSeconds > 0) {
-          const speedKmh = (distanceMeters / timeDiffSeconds) * 3.6;
-          const currentSpeed = parseFloat(telemetry.speed || 0);
-          const lastSpeed = state.speed || 0;
-          
-          if (speedKmh > 160) {
-             console.warn(`[Filtro Inercial] 🚨 Salto bloqueado para ${imei}: ${speedKmh.toFixed(1)} km/h (${distanceMeters.toFixed(0)}m en ${timeDiffSeconds}s).`);
-             shouldSend = false; // Bloquear el envío por salto físicamente imposible
-          } else if (speedKmh > 15 && currentSpeed < 5 && lastSpeed < 5) {
-             // Si estaba detenido en el punto anterior, y sigue detenido, pero las coordenadas 
-             // viajaron a más de 15 km/h, es físicamente imposible (salto LBS/multipath en semáforo o edificio).
-             console.warn(`[Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para ${imei}. Vehículo detenido pero saltó ${distanceMeters.toFixed(0)}m a ${speedKmh.toFixed(1)} km/h.`);
-             shouldSend = false;
+          // Piso de ruido físico: ignorar micro-saltos de multipath (<15m en <5s)
+          if (distanceMeters >= 15 || timeDiffSeconds >= 5) {
+            const speedKmh = (distanceMeters / timeDiffSeconds) * 3.6;
+            const currentSpeed = parseFloat(telemetry.speed || 0);
+            const lastSpeed = state.speed || 0;
+            
+            if (speedKmh > 160) {
+               console.warn(`[Filtro Inercial] 🚨 Salto bloqueado para ${imei}: ${speedKmh.toFixed(1)} km/h (${distanceMeters.toFixed(0)}m en ${timeDiffSeconds}s).`);
+               shouldSend = false; // Bloquear el envío por salto físicamente imposible
+            } else if (speedKmh > 15 && currentSpeed < 5 && lastSpeed < 5) {
+               console.warn(`[Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para ${imei}. Vehículo detenido pero saltó ${distanceMeters.toFixed(0)}m a ${speedKmh.toFixed(1)} km/h.`);
+               shouldSend = false;
+            }
           }
         }
       }

@@ -305,29 +305,50 @@ async function pollGpsServerLocations() {
                  const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
                  const gapSeconds = Math.floor(timeDiffMs / 1000);
                  
-                 const isMoving = parseFloat(device.speed || 0) > 0;
-                 // Thresholds: 3 mins if moving, 20 mins if parked
-                 const gapThreshold = isMoving ? 180 : 1200;
-                 
-                 if (gapSeconds > gapThreshold && gapSeconds < 259200) {
-                   systemStats.backfillerTriggers++;
-                   console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 3 mins para permitir que suba su historial...`);
+                 if (!isNaN(gapSeconds)) {
+                   let distanceMeters = 0;
+                   if (lastPollerState.lat && lastPollerState.lng && device.lat && device.lng) {
+                     const R = 6371e3;
+                     const lat1 = parseFloat(lastPollerState.lat) * Math.PI/180;
+                     const lat2 = parseFloat(device.lat) * Math.PI/180;
+                     const dLat = (parseFloat(device.lat) - parseFloat(lastPollerState.lat)) * Math.PI/180;
+                     const dLng = (parseFloat(device.lng) - parseFloat(lastPollerState.lng)) * Math.PI/180;
+                     const rawA = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) * Math.sin(dLng/2);
+                     const a = Math.min(1, Math.max(0, rawA));
+                     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                     distanceMeters = R * c;
+                   }
+
+                   // Was it moving at the end of the trip, OR did it travel > 5km/h on average during the gap?
+                   const isMoving = parseFloat(device.speed || 0) > 0 || (gapSeconds > 0 && (distanceMeters / gapSeconds) > 1.38);
                    
-                   // Queue the backfill to run in 3 minutes, giving the tracker time to upload over GPRS
-                   pendingBackfills.push({
-                     imei: imei,
-                     dt_old: lastPollerState.dt_tracker,
-                     dt_new: device.dt_tracker,
-                     client: client,
-                     apiKey: masterKey,
-                     executeAt: Date.now() + (3 * 60 * 1000)
-                   });
+                   // Thresholds: 3 mins if moving, 20 mins if parked
+                   const gapThreshold = isMoving ? 180 : 1200;
+                   
+                   if (gapSeconds > gapThreshold && gapSeconds < 259200) {
+                     systemStats.backfillerTriggers++;
+                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 3 mins para permitir que suba su historial...`);
+                     
+                     // Queue the backfill to run in 3 minutes, giving the tracker time to upload over GPRS
+                     pendingBackfills.push({
+                       imei: imei,
+                       dt_old: lastPollerState.dt_tracker,
+                       dt_new: device.dt_tracker,
+                       client: client,
+                       apiKey: masterKey,
+                       executeAt: Date.now() + (3 * 60 * 1000)
+                     });
+                   }
                  }
                }
             }
 
             if (device.dt_tracker) {
-               lastDeviceTimestamps[imei] = { dt_tracker: device.dt_tracker };
+               lastDeviceTimestamps[imei] = { 
+                 dt_tracker: device.dt_tracker,
+                 lat: device.lat,
+                 lng: device.lng
+               };
             }
             // ---------------------------
 

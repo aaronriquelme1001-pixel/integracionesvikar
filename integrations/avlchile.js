@@ -103,6 +103,20 @@ class AvlChileStrategy extends BaseStrategy {
     const satVal = Math.round(parseFloat(telemetry.gps_satellites || paramsObj.sat || paramsObj.satellites || paramsObj.gpslev || 4));
     const finalSat = satVal >= 4 ? satVal : 4;
 
+    let batteryVoltage = 4.0;
+    if (paramsObj.batp !== undefined && paramsObj.batp !== null) {
+      const val = parseFloat(paramsObj.batp);
+      if (!isNaN(val)) {
+        if (val > 4.5 && val <= 100) {
+          // It's a percentage (Li-Ion max voltage is ~4.35V). Interpolate to 3.5V - 4.2V
+          batteryVoltage = parseFloat((3.5 + (val / 100) * 0.7).toFixed(2));
+        } else {
+          // It's raw voltage (e.g., 4.1, 3.8, 0)
+          batteryVoltage = val;
+        }
+      }
+    }
+
     const record = {
       "avl.id": 1,
       "avl.ident": plate,
@@ -114,7 +128,7 @@ class AvlChileStrategy extends BaseStrategy {
       "avl.position.longitude": lngVal,
       "avl.position.satellites": finalSat,
       "avl.position.speed": Math.round(parseFloat(telemetry.speed || 0)),
-      "avl.device.battery.voltage": paramsObj.batp ? (parseFloat(paramsObj.batp) > 10 ? parseFloat((3.5 + (parseFloat(paramsObj.batp) / 100) * 0.7).toFixed(2)) : parseFloat(paramsObj.batp)) : 4.0,
+      "avl.device.battery.voltage": batteryVoltage,
       "avl.device.external.voltage": paramsObj.voltage ? parseFloat(paramsObj.voltage) : 12.0,
       "avl.device.gsm": paramsObj.gsm ? parseInt(paramsObj.gsm, 10) : (paramsObj.gsmlev ? parseInt(paramsObj.gsmlev, 10) : 3),
       "avl.device.ignition": isEngineOn,
