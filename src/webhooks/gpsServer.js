@@ -34,13 +34,8 @@ async function handleGpsServerWebhook(req, res) {
     event: telemetryObj.event || null
   };
 
-  try {
-    await dispatchToB2B(telemetry, clientParam, targetParam);
-    return res.status(200).send('ok');
-  } catch (err) {
-    console.error('[Webhook] ❌ Critical failure dispatching B2B event:', err.message);
-    return res.status(500).send('Internal Server Error');
-  }
+  res.status(200).send('ok');
+  dispatchToB2B(telemetry, clientParam, targetParam).catch(err => console.error('[Webhook] Dispatch error:', err.message));
 }
 
 module.exports = {

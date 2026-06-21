@@ -9,7 +9,8 @@ class AmazonStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Amazon specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.AMAZON_API_URL || 'https://sellingpartnerapi-na.amazon.com/shipping/v2/carrier/telemetry';
+    try {
+      const url = integrationConfig.endpoint || process.env.AMAZON_API_URL || 'https://sellingpartnerapi-na.amazon.com/shipping/v2/carrier/telemetry';
     const token = integrationConfig.token || process.env.AMAZON_ACCESS_TOKEN;
 
     if (!token) {
@@ -47,6 +48,9 @@ class AmazonStrategy extends BaseStrategy {
       console.log(`[Amazon] Success Response:`, result.data);
     } else {
       console.error(`[Amazon] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[Amazon] Integration error:', error.message);
     }
   }
 }

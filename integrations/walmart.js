@@ -9,7 +9,8 @@ class WalmartStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Walmart specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.WALMART_API_URL || 'https://api.walmart.com/logistics/v1/carrier/gps';
+    try {
+      const url = integrationConfig.endpoint || process.env.WALMART_API_URL || 'https://api.walmart.com/logistics/v1/carrier/gps';
     const clientSecret = integrationConfig.client_secret || process.env.WALMART_CLIENT_SECRET;
     const clientId = integrationConfig.client_id || process.env.WALMART_CLIENT_ID;
 
@@ -40,10 +41,13 @@ class WalmartStrategy extends BaseStrategy {
     };
     const result = await this.sendJSONRequest(url, headers, payload);
 
-    if (result.success) {
-      console.log(`[Walmart] Success Response:`, result.data);
-    } else {
-      console.error(`[Walmart] Forwarding failed:`, result.error);
+      if (result.success) {
+        console.log(`[Walmart] Success Response:`, result.data);
+      } else {
+        console.error(`[Walmart] Forwarding failed:`, result.error);
+      }
+    } catch (error) {
+      console.error('[Walmart] Integration error:', error.message);
     }
   }
 }

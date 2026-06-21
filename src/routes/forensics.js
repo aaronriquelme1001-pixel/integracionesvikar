@@ -14,6 +14,9 @@ if (process.env.DATALAKE_URL) {
   });
 }
 
+const templatePath = path.join(__dirname, '../templates/forensic_report.html');
+const forensicTemplate = fs.readFileSync(templatePath, 'utf8');
+
 function getStatusBadge(speed, previousSpeed) {
   if (speed === 0) return '<span class="badge badge-danger">Detenido</span>';
   if (speed > 90) return '<span class="badge badge-warning">Exceso Vel.</span>';
@@ -208,8 +211,7 @@ router.get('/', async (req, res) => {
     }
 
     // 7. Render Template
-    const templatePath = path.join(__dirname, '../templates/forensic_report.html');
-    let template = fs.readFileSync(templatePath, 'utf8');
+    let template = forensicTemplate;
 
     const clientSource = rows[0].client_source;
 

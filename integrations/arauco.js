@@ -9,7 +9,8 @@ class AraucoStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Arauco specific config overrides from devices.json.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.ARAUCO_API_URL || 'http://clsclwebqas09.arauco.cl/GPSChileWS/GPSChileWS.asmx';
+    try {
+      const url = integrationConfig.endpoint || process.env.ARAUCO_API_URL || 'http://clsclwebqas09.arauco.cl/GPSChileWS/GPSChileWS.asmx';
     const provider = integrationConfig.provider || process.env.ARAUCO_PROVIDER_NAME || 'VIKARGPS';
     const nomFlota = integrationConfig.nom_flota || process.env.ARAUCO_NOM_FLOTA || 'VIKARGPS';
     const codFlota = integrationConfig.cod_flota || process.env.ARAUCO_COD_FLOTA || '1539';
@@ -84,6 +85,9 @@ class AraucoStrategy extends BaseStrategy {
       console.log(`[Arauco] Success Response:`, result.data.substring(0, 300));
     } else {
       console.error(`[Arauco] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[Arauco] Integration error:', error.message);
     }
   }
 }

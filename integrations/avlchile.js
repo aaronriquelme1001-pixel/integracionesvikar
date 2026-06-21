@@ -3,6 +3,7 @@ const axios = require('axios');
 
 // Memory cache to prevent duplicate transmissions of the exact same coordinate timestamp
 const lastSentTelemetryTimestamp = {};
+setInterval(() => { for(let k in lastSentTelemetryTimestamp) delete lastSentTelemetryTimestamp[k]; }, 12 * 60 * 60 * 1000);
 
 // Batch queues grouped by token: { 'tokenXYZ': [record1, record2] }
 const batchQueues = {}; 
@@ -17,11 +18,12 @@ async function startBatchWorker() {
       const tokens = Object.keys(batchQueues);
       if (tokens.length > 0) {
         for (const token of tokens) {
-          const payload = batchQueues[token];
+          let payload = batchQueues[token];
           if (!payload || payload.length === 0) continue;
           
           // Extract and clear the queue for this token
           batchQueues[token] = [];
+          if (payload.length > 500) { batchQueues[token] = payload.slice(500); payload = payload.slice(0, 500); }
           const url = targetUrls[token];
 
           console.log(`[AVL Chile] Flushing batch of ${payload.length} vehicles for token (masked: ${token.substring(0,4)}...)`);
@@ -51,7 +53,8 @@ startBatchWorker();
 
 class AvlChileStrategy extends BaseStrategy {
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.AVLCHILE_API_URL || 'https://webapp.avlchile.cl/api/v2/';
+    try {
+      const url = integrationConfig.endpoint || process.env.AVLCHILE_API_URL || 'https://webapp.avlchile.cl/api/v2/';
     const token = integrationConfig.token || process.env.AVLCHILE_TOKEN;
 
     if (!token) {
@@ -125,6 +128,9 @@ class AvlChileStrategy extends BaseStrategy {
     
     batchQueues[token].push(record);
     console.log(`[AVL Chile] Added ${plate} to batch queue for token (masked: ${token.substring(0,4)}...)`);
+    } catch (error) {
+      console.error('[AVL Chile] Integration error:', error.message);
+    }
   }
 }
 

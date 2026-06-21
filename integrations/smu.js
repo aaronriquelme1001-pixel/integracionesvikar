@@ -9,7 +9,8 @@ class SmuStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - SMU specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.SMU_API_URL || 'https://api.smu.cl/tracking/gps';
+    try {
+      const url = integrationConfig.endpoint || process.env.SMU_API_URL || 'https://api.smu.cl/tracking/gps';
     const token = integrationConfig.token || process.env.SMU_API_TOKEN;
 
     if (!token) {
@@ -34,10 +35,13 @@ class SmuStrategy extends BaseStrategy {
     console.log(`[SMU] Dispatching telemetry for ${deviceConfig.plate} to ${url}...`);
     const result = await this.sendJSONRequest(url, { 'Authorization': `Token ${token}` }, payload);
 
-    if (result.success) {
-      console.log(`[SMU] Success Response:`, result.data);
-    } else {
-      console.error(`[SMU] Forwarding failed:`, result.error);
+      if (result.success) {
+        console.log(`[SMU] Success Response:`, result.data);
+      } else {
+        console.error(`[SMU] Forwarding failed:`, result.error);
+      }
+    } catch (error) {
+      console.error('[SMU] Integration error:', error.message);
     }
   }
 }

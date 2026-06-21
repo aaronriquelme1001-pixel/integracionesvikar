@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vikar B2B Engine | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Vikar B2B Engine | Premium Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090a0f;
-            --panel-bg: rgba(20, 22, 35, 0.7);
-            --accent-neon: #00f0ff;
-            --accent-purple: #7000ff;
-            --text-main: #ffffff;
-            --text-muted: #8b92a5;
+            --bg-dark: #030305;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --accent-cyan: #00f0ff;
+            --accent-purple: #8a2be2;
+            --accent-green: #00ff88;
+            --accent-orange: #ff9900;
+            --text-main: #f8f9fa;
+            --text-muted: #a0aabf;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -21,72 +25,324 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.15), transparent 25%);
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Blobs */
+        .bg-blobs {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            border-radius: 50%;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .blob-1 { width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(112,0,255,0.4), transparent 70%); top: -20%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(0,240,255,0.3), transparent 70%); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .blob-3 { width: 30vw; height: 30vw; background: radial-gradient(circle, rgba(0,255,136,0.15), transparent 70%); top: 40%; left: 40%; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
         }
 
         .header {
-            padding: 2rem 4rem;
+            padding: 1.5rem 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(9, 10, 15, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(3, 3, 5, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--accent-neon); }
-        .logo .badge { font-size: 0.7rem; background: var(--accent-purple); padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+        .logo { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            letter-spacing: -0.5px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .logo span { 
+            background: linear-gradient(135deg, var(--accent-cyan), #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo .badge { 
+            font-size: 0.65rem; 
+            background: linear-gradient(135deg, var(--accent-purple), #ff007f); 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-weight: 800; 
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
+        }
 
         .status-pill {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(0, 255, 136, 0.1);
-            color: #00ff88;
-            padding: 8px 16px;
-            border-radius: 20px;
+            gap: 10px;
+            background: rgba(0, 255, 136, 0.05);
+            color: var(--accent-green);
+            padding: 8px 20px;
+            border-radius: 30px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             border: 1px solid rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
         }
         
-        .status-dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 10px #00ff88; animation: pulse 2s infinite; }
+        .status-dot { 
+            width: 8px; height: 8px; 
+            background: var(--accent-green); 
+            border-radius: 50%; 
+            box-shadow: 0 0 12px var(--accent-green); 
+            animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1); 
+        }
 
-        .container { padding: 3rem 4rem; flex-grow: 1; }
+        .container { 
+            padding: 3rem 4rem; 
+            flex-grow: 1; 
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
 
-        .grid-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
-
-        .card {
-            background: var(--panel-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 1.5rem;
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            border-left: 1px solid var(--glass-highlight);
+            border-radius: 24px;
+            padding: 2rem;
             backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
         }
 
-        .card:hover { transform: translateY(-5px); border-color: rgba(0, 240, 255, 0.3); }
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.03), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
 
-        .card-title { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .card-value { font-size: 2.5rem; font-weight: 800; display: flex; align-items: baseline; gap: 5px; }
-        .card-value.neon { color: var(--accent-neon); text-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
-        .card-value.purple { color: #b785ff; text-shadow: 0 0 20px rgba(183, 133, 255, 0.3); }
-        
-        .grid-main { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+        .glass-card:hover::before {
+            left: 150%;
+        }
 
-        .logs-container { background: #050608; border-radius: 12px; padding: 1rem; font-family: monospace; color: #00ff88; height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+        .glass-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .grid-top { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 1.5rem; 
+        }
+
+        .card-title { 
+            color: var(--text-muted); 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            margin-bottom: 15px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        .card-title i {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-style: normal;
+        }
+
+        .card-value { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+        .card-value.cyan { 
+            background: linear-gradient(135deg, #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.2); 
+        }
+        .card-value.purple { 
+            background: linear-gradient(135deg, #fff, var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.2); 
+        }
+        .card-value.green {
+            background: linear-gradient(135deg, #fff, var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card-value.orange {
+            background: linear-gradient(135deg, #fff, var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .grid-main { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+            gap: 1.5rem; 
+        }
+
+        /* List Items Styling */
+        .list-item {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--glass-border);
+            transition: 0.3s;
+        }
+        .list-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .list-item:hover {
+            padding-left: 10px;
+            padding-right: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            border-color: transparent;
+        }
+        .list-item span { color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+        .list-item strong { font-size: 1.1rem; font-weight: 600; color: #fff; }
+
+        /* Logs Container */
+        .logs-container { 
+            background: rgba(0, 0, 0, 0.4); 
+            border-radius: 16px; 
+            padding: 1.5rem; 
+            font-family: 'JetBrains Mono', 'Fira Code', monospace; 
+            color: var(--accent-cyan); 
+            height: 250px; 
+            overflow-y: auto; 
+            border: 1px solid var(--glass-border); 
+            box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        
+        .logs-container::-webkit-scrollbar { width: 6px; }
+        .logs-container::-webkit-scrollbar-track { background: transparent; }
+        .logs-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        
+        /* Input & Button */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .input-glass {
+            padding: 14px 18px; 
+            border-radius: 12px; 
+            border: 1px solid var(--glass-border); 
+            background: rgba(0, 0, 0, 0.2); 
+            color: white; 
+            font-size: 1rem;
+            outline: none; 
+            text-transform: uppercase;
+            transition: 0.3s;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-glass:focus {
+            border-color: var(--accent-purple);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.15);
+        }
+        .input-glass::placeholder { color: rgba(255,255,255,0.2); text-transform: none; }
+
+        .btn-glass {
+            padding: 14px 24px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(138, 43, 226, 0.5); 
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.8), rgba(89, 13, 226, 0.8)); 
+            color: white; 
+            font-weight: 600; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-glass::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: 0.3s;
+        }
+        .btn-glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.5);
+            border-color: rgba(138, 43, 226, 0.8);
+        }
+        .btn-glass:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .btn-glass:active { transform: translateY(1px); }
+
+        @keyframes pulse { 
+            0% { opacity: 0.6; transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); } 
+            70% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); } 
+            100% { opacity: 0.6; transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); } 
+        }
     </style>
 </head>
 <body>
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
     <header class="header">
         <div class="logo">VIKAR <span>B2B</span> <div class="badge">V4.0</div></div>
         <div class="status-pill"><div class="status-dot"></div> ONLINE</div>
@@ -94,52 +350,52 @@
 
     <main class="container">
         <div class="grid-top">
-            <div class="card">
-                <div class="card-title">Puntos Procesados</div>
-                <div class="card-value neon" id="val-polled">--</div>
+            <div class="glass-card">
+                <div class="card-title"><i>📍</i> Puntos Procesados</div>
+                <div class="card-value cyan" id="val-polled">--</div>
             </div>
-            <div class="card">
-                <div class="card-title">Puntos Despachados</div>
+            <div class="glass-card">
+                <div class="card-title"><i>🚀</i> Puntos Despachados</div>
                 <div class="card-value purple" id="val-dispatched">--</div>
             </div>
-            <div class="card">
-                <div class="card-title">Spam Bloqueado</div>
-                <div class="card-value" id="val-spam">--%</div>
+            <div class="glass-card">
+                <div class="card-title"><i>🛡️</i> Spam Bloqueado</div>
+                <div class="card-value green" id="val-spam">--%</div>
             </div>
-            <div class="card">
-                <div class="card-title">Backfiller (Recuperados)</div>
-                <div class="card-value" id="val-recovered" style="color: #ff9900;">--</div>
+            <div class="glass-card">
+                <div class="card-title"><i>🔄</i> Backfiller (Recuperados)</div>
+                <div class="card-value orange" id="val-recovered">--</div>
             </div>
         </div>
 
         <div class="grid-main">
-            <div class="card">
-                <div class="card-title">Diagnóstico de Subsistemas</div>
-                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px;">
+            <div class="glass-card">
+                <div class="card-title"><i>📊</i> Diagnóstico de Subsistemas</div>
+                <div style="margin-top: 24px;">
+                    <div class="list-item">
                         <span>Uptime del Servidor</span>
                         <strong id="val-uptime">--</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <div class="list-item">
                         <span>Camiones en Memoria RAM</span>
                         <strong id="val-ram">--</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                    <div class="list-item">
                         <span>Atascos en Cola de Reintento</span>
                         <strong id="val-retry">--</strong>
                     </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-title">Estado de Extraordinarios</div>
+            <div class="glass-card" style="grid-column: span 1;">
+                <div class="card-title"><i>📡</i> Estado de Extraordinarios</div>
                 <div class="logs-container" id="live-status">Cargando telemetría...</div>
             </div>
-            <div class="card">
-                <div class="card-title">Generador de Reportes Forenses</div>
-                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">Genera un análisis cinemático para accidentes o incidentes ingresando la patente.</p>
-                    <input type="text" id="forensic-plate" placeholder="Ej: LWPS57" style="padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); color: white; outline: none; text-transform: uppercase;">
-                    <button onclick="generateForensicReport()" style="padding: 10px; border-radius: 8px; border: none; background: var(--accent-purple); color: white; font-weight: bold; cursor: pointer; transition: 0.2s;">Generar Reporte AI</button>
+            <div class="glass-card">
+                <div class="card-title"><i>🧠</i> Reportes Forenses</div>
+                <div class="input-group">
+                    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">Genera un análisis cinemático avanzado para accidentes o incidentes ingresando la patente.</p>
+                    <input type="text" class="input-glass" id="forensic-plate" placeholder="Ej: LWPS57">
+                    <button class="btn-glass" onclick="generateForensicReport()">Generar Reporte AI</button>
                 </div>
             </div>
         </div>

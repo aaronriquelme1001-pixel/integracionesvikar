@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 // ==============================================
 process.on('uncaughtException', (err) => {
   console.error(`[CRITICAL] Error no capturado:`, err.message, err.stack);
-  // No salimos del proceso (evitamos crash total)
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -86,13 +86,14 @@ app.get('/api/logs', (req, res, next) => {
   res.send(getLogs().join('\n'));
 });
 
+const { Pool } = require('pg');
+const pool = process.env.DATALAKE_URL ? new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } }) : null;
+
 app.get('/api/datalake-facts', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
   if (!process.env.DATALAKE_URL) return res.json({ error: 'Data Lake no configurado' });
   
   try {
-    const { Pool } = require('pg');
-    const pool = new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } });
     const { rows: countRows } = await pool.query('SELECT count(*) as total FROM billing_snapshots');
     const { rows: opelOldest } = await pool.query(`SELECT dt_tracker, lat, lng, speed FROM global_telemetry_traffic WHERE imei='865413054330609' ORDER BY dt_tracker ASC LIMIT 1`);
     const { rows: opelYesterday } = await pool.query(`SELECT dt_tracker, lat, lng, speed FROM global_telemetry_traffic WHERE imei='865413054330609' AND dt_tracker >= '2026-06-19 13:00:00' AND dt_tracker <= '2026-06-19 15:00:00' LIMIT 5`);

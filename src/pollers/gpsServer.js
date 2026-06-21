@@ -353,9 +353,8 @@ setInterval(async () => {
    const readyTasks = pendingBackfills.filter(task => now >= task.executeAt);
    
    if (readyTasks.length > 0) {
+      pendingBackfills.splice(0, pendingBackfills.length, ...pendingBackfills.filter(t => now < t.executeAt));
       for (const task of readyTasks) {
-         const index = pendingBackfills.indexOf(task);
-         if (index > -1) pendingBackfills.splice(index, 1);
          // Se asume que las tareas pendientes usarán sus keys antiguas (si eran locales),
          // pero si usamos Master Key a partir de ahora, todo el tráfico nuevo usará Master Key.
          await recoverHistory(task.imei, task.dt_old, task.dt_new, task.client, task.apiKey);

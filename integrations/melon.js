@@ -9,7 +9,8 @@ class MelonStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Melon specific config overrides from devices.json.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.UNIGIS_API_URL || 'https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx';
+    try {
+      const url = integrationConfig.endpoint || process.env.UNIGIS_API_URL || 'https://cloud-test.unigis.com/hub_TEST/mapi/soap/gps/service.asmx';
     const user = integrationConfig.user || process.env.UNIGIS_SYSTEM_USER || 'VIKARGPS';
     const pass = integrationConfig.password || process.env.UNIGIS_PASSWORD || 'VIKARGPS2024';
 
@@ -60,10 +61,13 @@ class MelonStrategy extends BaseStrategy {
     console.log(`[UNIGIS] Dispatching SOAP request for ${deviceConfig.plate} to ${url}...`);
     const result = await this.sendSOAPRequest(url, 'http://unisolutions.com.ar/LoginYInsertarEvento2', soapEnvelope);
 
-    if (result.success) {
-      console.log(`[UNIGIS] Success Response:`, result.data.substring(0, 300));
-    } else {
-      console.error(`[UNIGIS] Forwarding failed:`, result.error);
+      if (result.success) {
+        console.log(`[UNIGIS] Success Response:`, result.data.substring(0, 300));
+      } else {
+        console.error(`[UNIGIS] Forwarding failed:`, result.error);
+      }
+    } catch (error) {
+      console.error('[UNIGIS] Integration error:', error.message);
     }
   }
 }

@@ -9,7 +9,8 @@ class CencosudStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Cencosud specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.CENCOSUD_API_URL || 'https://api.cencosud.com/logistics/v1/telemetry';
+    try {
+      const url = integrationConfig.endpoint || process.env.CENCOSUD_API_URL || 'https://api.cencosud.com/logistics/v1/telemetry';
     const apiKey = integrationConfig.api_key || process.env.CENCOSUD_API_KEY;
 
     if (!apiKey) {
@@ -39,6 +40,9 @@ class CencosudStrategy extends BaseStrategy {
       console.log(`[Cencosud] Success Response:`, result.data);
     } else {
       console.error(`[Cencosud] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[Cencosud] Integration error:', error.message);
     }
   }
 }

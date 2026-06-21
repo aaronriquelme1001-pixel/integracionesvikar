@@ -10,7 +10,8 @@ class TraccarStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Traccar specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.TRACCAR_API_URL || 'http://demo3.traccar.org:5055/';
+    try {
+      const url = integrationConfig.endpoint || process.env.TRACCAR_API_URL || 'http://demo3.traccar.org:5055/';
     const idType = integrationConfig.idType || process.env.TRACCAR_ID_TYPE || 'plate';
     const id = idType === 'imei' ? telemetry.imei : (deviceConfig.plate || telemetry.plate_number || telemetry.imei);
 
@@ -50,11 +51,14 @@ class TraccarStrategy extends BaseStrategy {
 
     console.log(`[Traccar] Forwarding telemetry for ${id} to ${url}... Parameters:`, JSON.stringify(params));
 
-    try {
-      const response = await axios.get(url, { params, timeout: 8000 });
-      console.log(`[Traccar] Success Response for ${id}: Status ${response.status}`);
-    } catch (err) {
-      console.error(`[Traccar] Forwarding failed for ${id}:`, err.message);
+      try {
+        const response = await axios.get(url, { params, timeout: 8000 });
+        console.log(`[Traccar] Success Response for ${id}: Status ${response.status}`);
+      } catch (err) {
+        console.error(`[Traccar] Forwarding failed for ${id}:`, err.message);
+      }
+    } catch (error) {
+      console.error('[Traccar] Integration error:', error.message);
     }
   }
 }

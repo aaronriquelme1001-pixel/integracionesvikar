@@ -9,7 +9,8 @@ class CcuStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - CCU specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.CCU_API_URL || 'https://api.ccu.cl/distribucion/gps';
+    try {
+      const url = integrationConfig.endpoint || process.env.CCU_API_URL || 'https://api.ccu.cl/distribucion/gps';
     const token = integrationConfig.token || process.env.CCU_BEARER_TOKEN;
 
     if (!token) {
@@ -38,6 +39,9 @@ class CcuStrategy extends BaseStrategy {
       console.log(`[CCU] Success Response:`, result.data);
     } else {
       console.error(`[CCU] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[CCU] Integration error:', error.message);
     }
   }
 }

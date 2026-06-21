@@ -9,7 +9,8 @@ class ColunStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Colun specific config overrides from devices.json.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.COLUN_API_URL || 'https://services.wing.cl/tracking/receiver/hub/v2';
+    try {
+      const url = integrationConfig.endpoint || process.env.COLUN_API_URL || 'https://services.wing.cl/tracking/receiver/hub/v2';
     const token = integrationConfig.token || process.env.COLUN_BEARER_TOKEN;
 
     if (!token) {
@@ -44,6 +45,9 @@ class ColunStrategy extends BaseStrategy {
       console.log(`[Colun] Success Response:`, result.data);
     } else {
       console.error(`[Colun] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[Colun] Integration error:', error.message);
     }
   }
 }

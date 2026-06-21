@@ -9,7 +9,8 @@ class DhlStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - DHL specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.DHL_API_URL || 'https://api.dhl.com/transport/v1/telemetry';
+    try {
+      const url = integrationConfig.endpoint || process.env.DHL_API_URL || 'https://api.dhl.com/transport/v1/telemetry';
     const apiKey = integrationConfig.api_key || process.env.DHL_API_KEY;
 
     if (!apiKey) {
@@ -39,6 +40,9 @@ class DhlStrategy extends BaseStrategy {
       console.log(`[DHL] Success Response:`, result.data);
     } else {
       console.error(`[DHL] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[DHL] Integration error:', error.message);
     }
   }
 }

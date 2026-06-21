@@ -9,7 +9,8 @@ class FalabellaStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Falabella specific config overrides from devices.json.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.FALABELLA_API_URL || 'http://ww3.qanalytics.cl/gps_test/service.asmx';
+    try {
+      const url = integrationConfig.endpoint || process.env.FALABELLA_API_URL || 'http://ww3.qanalytics.cl/gps_test/service.asmx';
     const user = integrationConfig.user || process.env.FALABELLA_USER || 'WS_test';
     const pass = integrationConfig.password || process.env.FALABELLA_PASSWORD || '$$WS17';
 
@@ -63,10 +64,13 @@ class FalabellaStrategy extends BaseStrategy {
     console.log(`[Falabella] Dispatching SOAP request for ${deviceConfig.plate} to ${url}...`);
     const result = await this.sendSOAPRequest(url, 'http://tempuri.org/WM_INS_REPORTE_CLASS', soapEnvelope);
 
-    if (result.success) {
-      console.log(`[Falabella] Success Response:`, result.data.substring(0, 300));
-    } else {
-      console.error(`[Falabella] Forwarding failed:`, result.error);
+      if (result.success) {
+        console.log(`[Falabella] Success Response:`, result.data.substring(0, 300));
+      } else {
+        console.error(`[Falabella] Forwarding failed:`, result.error);
+      }
+    } catch (error) {
+      console.error('[Falabella] Integration error:', error.message);
     }
   }
 }

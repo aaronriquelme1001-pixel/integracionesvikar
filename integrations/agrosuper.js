@@ -9,7 +9,8 @@ class AgrosuperStrategy extends BaseStrategy {
    * @param {Object} integrationConfig - Agrosuper specific overrides.
    */
   async execute(telemetry, deviceConfig, integrationConfig) {
-    const url = integrationConfig.endpoint || process.env.AGROSUPER_API_URL || 'https://api.agrosuper.cl/logistica/telemetria/gps';
+    try {
+      const url = integrationConfig.endpoint || process.env.AGROSUPER_API_URL || 'https://api.agrosuper.cl/logistica/telemetria/gps';
     const apiKey = integrationConfig.api_key || process.env.AGROSUPER_API_KEY;
 
     if (!apiKey) {
@@ -39,6 +40,9 @@ class AgrosuperStrategy extends BaseStrategy {
       console.log(`[Agrosuper] Success Response:`, result.data);
     } else {
       console.error(`[Agrosuper] Forwarding failed:`, result.error);
+    }
+    } catch (error) {
+      console.error('[Agrosuper] Integration error:', error.message);
     }
   }
 }
