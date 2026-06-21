@@ -42,7 +42,7 @@ async function loginToTracksolid() {
   params.sign = computeSignature(params, TRACKSOLID_APP_SECRET);
 
   try {
-    const response = await axios.post(TRACKSOLID_API_URL, null, { params });
+    const response = await axios.post(TRACKSOLID_API_URL, null, { params, timeout: 5000 });
     if (response.data && response.data.code === 0 && response.data.result) {
       tracksolidAccessToken = response.data.result.accessToken;
       tracksolidTokenExpiry = Date.now() + (response.data.result.expiresIn * 1000) - 300000; 

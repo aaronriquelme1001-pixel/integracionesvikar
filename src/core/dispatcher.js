@@ -49,21 +49,23 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       const distanceMeters = R * c;
       
-      const timeDiffSeconds = (new Date(telemetry.dt_tracker).getTime() - new Date(state.dt_tracker).getTime()) / 1000;
-      
-      if (timeDiffSeconds > 0) {
-        const speedKmh = (distanceMeters / timeDiffSeconds) * 3.6;
-        const currentSpeed = parseFloat(telemetry.speed || 0);
-        const lastSpeed = state.speed || 0;
+      if (state.dt_tracker) {
+        const timeDiffSeconds = (new Date(telemetry.dt_tracker).getTime() - new Date(state.dt_tracker).getTime()) / 1000;
         
-        if (speedKmh > 160) {
-           console.warn(`[Filtro Inercial] 🚨 Salto bloqueado para ${imei}: ${speedKmh.toFixed(1)} km/h (${distanceMeters.toFixed(0)}m en ${timeDiffSeconds}s).`);
-           shouldSend = false; // Bloquear el envío por salto físicamente imposible
-        } else if (speedKmh > 15 && currentSpeed < 5 && lastSpeed < 5) {
-           // Si estaba detenido en el punto anterior, y sigue detenido, pero las coordenadas 
-           // viajaron a más de 15 km/h, es físicamente imposible (salto LBS/multipath en semáforo o edificio).
-           console.warn(`[Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para ${imei}. Vehículo detenido pero saltó ${distanceMeters.toFixed(0)}m a ${speedKmh.toFixed(1)} km/h.`);
-           shouldSend = false;
+        if (timeDiffSeconds > 0) {
+          const speedKmh = (distanceMeters / timeDiffSeconds) * 3.6;
+          const currentSpeed = parseFloat(telemetry.speed || 0);
+          const lastSpeed = state.speed || 0;
+          
+          if (speedKmh > 160) {
+             console.warn(`[Filtro Inercial] 🚨 Salto bloqueado para ${imei}: ${speedKmh.toFixed(1)} km/h (${distanceMeters.toFixed(0)}m en ${timeDiffSeconds}s).`);
+             shouldSend = false; // Bloquear el envío por salto físicamente imposible
+          } else if (speedKmh > 15 && currentSpeed < 5 && lastSpeed < 5) {
+             // Si estaba detenido en el punto anterior, y sigue detenido, pero las coordenadas 
+             // viajaron a más de 15 km/h, es físicamente imposible (salto LBS/multipath en semáforo o edificio).
+             console.warn(`[Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para ${imei}. Vehículo detenido pero saltó ${distanceMeters.toFixed(0)}m a ${speedKmh.toFixed(1)} km/h.`);
+             shouldSend = false;
+          }
         }
       }
     }

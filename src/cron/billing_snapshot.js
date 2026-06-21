@@ -12,11 +12,10 @@ if (process.env.DATALAKE_URL) {
   });
 }
 
-// Get the static mapping of devices to find their client_source
-function getDeviceMappings() {
+async function getDeviceMappings() {
   const configPath = path.join(__dirname, '../../config/devices.json');
   if (fs.existsSync(configPath)) {
-    const data = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const data = JSON.parse(await fs.promises.readFile(configPath, 'utf8'));
     return data.devices || data || {};
   }
   return {};
@@ -27,11 +26,15 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
   
   try {
     // Buscar los puntos de velocidad y eventos de este vehículo en el día actual
+    // OPTIMIZADO: Usa rango de fechas para aprovechar el índice B-Tree en dt_tracker y limita a 10000 para evitar OOM
     const query = `
       SELECT speed, event, dt_tracker 
       FROM global_telemetry_traffic 
-      WHERE imei = $1 AND DATE(dt_tracker) = $2
+      WHERE imei = $1 
+      AND dt_tracker >= $2::date 
+      AND dt_tracker < ($2::date + INTERVAL '1 day')
       ORDER BY dt_tracker ASC
+      LIMIT 10000
     `;
     const result = await pool.query(query, [imei, snapshotDateStr]);
     
@@ -125,7 +128,7 @@ async function runBillingSnapshot() {
   }
 
   console.log('[Billing Cron] Starting daily snapshot of odometers and driver grading...');
-  const deviceMappings = getDeviceMappings();
+  const deviceMappings = await getDeviceMappings();
   
   // Create Date and adjust for UTC-4 (Chile Standard Time) to prevent "tomorrow" jumps at night
   const d = new Date();

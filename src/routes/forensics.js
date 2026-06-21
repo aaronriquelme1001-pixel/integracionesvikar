@@ -127,7 +127,10 @@ router.get('/', async (req, res) => {
     let locationName = 'Desconocida';
     try {
       const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${incidentRow.lat}&lon=${incidentRow.lng}&format=json`;
-      const geoRes = await axios.get(geoUrl, { headers: { 'User-Agent': 'VikarGPS-Forensics/1.0' } });
+      const geoRes = await axios.get(geoUrl, { 
+        headers: { 'User-Agent': 'VikarGPS-Forensics/1.0' },
+        timeout: 5000
+      });
       if (geoRes.data && geoRes.data.display_name) {
         locationName = geoRes.data.display_name;
       }
@@ -142,7 +145,7 @@ router.get('/', async (req, res) => {
     try {
       // Simplification: query current weather at that lat/lng (since it's recent)
       const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${incidentRow.lat}&longitude=${incidentRow.lng}&current=temperature_2m,rain,weather_code`;
-      const wRes = await axios.get(wUrl);
+      const wRes = await axios.get(wUrl, { timeout: 5000 });
       const wData = wRes.data.current;
       temp = wData.temperature_2m + '°C';
       rain = wData.rain + ' mm';
@@ -162,7 +165,9 @@ router.get('/', async (req, res) => {
          const diffMs = new Date() - new Date(fatRes.rows[0].start_time);
          fatigueHours = (diffMs / (1000 * 60 * 60)).toFixed(1) + ' hrs';
       }
-    } catch (e) { }
+    } catch (e) {
+      console.warn('[Forensics] Fatigue Calculation Error:', e.message);
+    }
 
     // 6. Deterministic Verdict Engine
     let verdictTitle = '';

@@ -52,8 +52,8 @@ class DatalakeStrategy {
 
     try {
       const query = `
-        INSERT INTO global_telemetry_traffic (imei, plate, lat, lng, speed, dt_tracker, client_source, event)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO global_telemetry_traffic (imei, plate, lat, lng, speed, dt_tracker, client_source)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
       `;
       
       const values = [
@@ -63,18 +63,13 @@ class DatalakeStrategy {
         telemetry.lng,
         telemetry.speed || 0,
         telemetry.dt_tracker,
-        resolvedConfig.client || 'unknown',
-        telemetry.event || null
+        resolvedConfig.client || 'unknown'
       ];
 
-      // Fire and forget (don't await) to prevent slowing down the B2B pipeline
-      pool.query(query, values).catch(err => {
-        // Silently log errors so we don't crash or flood retry queues
-        // console.error('[Data Lake] ⚠️ Error insertando punto:', err.message);
-      });
-
+      // Await to ensure we don't flood the pg pool queue
+      await pool.query(query, values);
     } catch (error) {
-      console.error('[Data Lake] ❌ Error preparando inserción:', error.message);
+      console.error('[Data Lake] ❌ Error insertando punto en datalake:', error.message);
     }
   }
 }

@@ -84,7 +84,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      let allMessages = [];
      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-     const getEpoch = (ds) => new Date(ds.replace(' ', 'T') + tz).getTime();
+     const getEpoch = (ds) => ds ? new Date(ds.replace(' ', 'T') + tz).getTime() : NaN;
      const startEpoch = getEpoch(dt_old);
      const endEpoch = getEpoch(dt_new);
      const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
@@ -266,70 +266,76 @@ async function pollGpsServerLocations() {
       const imeis = Object.keys(devices);
       console.log(`[GPS Server Poller] Master Key returned ${imeis.length} devices.`);
       
-      for (const imei of imeis) {
-        try {
-          const device = devices[imei];
-          if (!device) continue;
-
-          // Resolve client from cache
-          const client = mappingCache[imei] || 'unknown';
-
-          totalDevicesProcessed++;
-          systemStats.totalPolledPoints++;
+      // Ejecución concurrente en lotes de 50 para evitar estrangular la RAM pero maximizar I/O
+      const chunkSize = 50;
+      for (let i = 0; i < imeis.length; i += chunkSize) {
+        const chunk = imeis.slice(i, i + chunkSize);
         
-          const telemetry = {
-            imei: imei,
-            name: device.name,
-            lat: device.lat,
-            lng: device.lng,
-            altitude: device.altitude || 0,
-            angle: device.angle || 0,
-            speed: device.speed || 0,
-            dt_tracker: device.dt_tracker,
-            dt_server: device.dt_server,
-            loc_valid: device.loc_valid,
-            odometer: device.odometer,
-            engine_hours: device.engine_hours,
-            params: device.params
-          };
+        await Promise.all(chunk.map(async (imei) => {
+          try {
+            const device = devices[imei];
+            if (!device) return;
 
-           // --- BACKFILLER IA LOGIC ---
-          const lastPollerState = lastDeviceTimestamps[imei];
-          if (lastPollerState && lastPollerState.dt_tracker) {
-             if (device.dt_tracker && device.dt_tracker > lastPollerState.dt_tracker) {
-               const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
-               const gapSeconds = Math.floor(timeDiffMs / 1000);
-               
-               const isMoving = parseFloat(device.speed || 0) > 0;
-               // Thresholds: 3 mins if moving, 20 mins if parked
-               const gapThreshold = isMoving ? 180 : 1200;
-               
-               if (gapSeconds > gapThreshold && gapSeconds < 259200) {
-                 systemStats.backfillerTriggers++;
-                 console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 3 mins para permitir que suba su historial...`);
+            // Resolve client from cache
+            const client = mappingCache[imei] || 'unknown';
+
+            totalDevicesProcessed++;
+            systemStats.totalPolledPoints++;
+          
+            const telemetry = {
+              imei: imei,
+              name: device.name,
+              lat: device.lat,
+              lng: device.lng,
+              altitude: device.altitude || 0,
+              angle: device.angle || 0,
+              speed: device.speed || 0,
+              dt_tracker: device.dt_tracker,
+              dt_server: device.dt_server,
+              loc_valid: device.loc_valid,
+              odometer: device.odometer,
+              engine_hours: device.engine_hours,
+              params: device.params
+            };
+
+            // --- BACKFILLER IA LOGIC ---
+            const lastPollerState = lastDeviceTimestamps[imei];
+            if (lastPollerState && lastPollerState.dt_tracker) {
+               if (device.dt_tracker && device.dt_tracker > lastPollerState.dt_tracker) {
+                 const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
+                 const gapSeconds = Math.floor(timeDiffMs / 1000);
                  
-                 // Queue the backfill to run in 3 minutes, giving the tracker time to upload over GPRS
-                 pendingBackfills.push({
-                   imei: imei,
-                   dt_old: lastPollerState.dt_tracker,
-                   dt_new: device.dt_tracker,
-                   client: client,
-                   apiKey: masterKey,
-                   executeAt: Date.now() + (3 * 60 * 1000)
-                 });
+                 const isMoving = parseFloat(device.speed || 0) > 0;
+                 // Thresholds: 3 mins if moving, 20 mins if parked
+                 const gapThreshold = isMoving ? 180 : 1200;
+                 
+                 if (gapSeconds > gapThreshold && gapSeconds < 259200) {
+                   systemStats.backfillerTriggers++;
+                   console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 3 mins para permitir que suba su historial...`);
+                   
+                   // Queue the backfill to run in 3 minutes, giving the tracker time to upload over GPRS
+                   pendingBackfills.push({
+                     imei: imei,
+                     dt_old: lastPollerState.dt_tracker,
+                     dt_new: device.dt_tracker,
+                     client: client,
+                     apiKey: masterKey,
+                     executeAt: Date.now() + (3 * 60 * 1000)
+                   });
+                 }
                }
-             }
-          }
+            }
 
-          if (device.dt_tracker) {
-             lastDeviceTimestamps[imei] = { dt_tracker: device.dt_tracker };
-          }
-          // ---------------------------
+            if (device.dt_tracker) {
+               lastDeviceTimestamps[imei] = { dt_tracker: device.dt_tracker };
+            }
+            // ---------------------------
 
-          await dispatchToB2B(telemetry, client);
-        } catch (imeiErr) {
-          console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
-        }
+            await dispatchToB2B(telemetry, client);
+          } catch (imeiErr) {
+            console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
+          }
+        }));
       }
     } else {
       console.warn(`[GPS Server Poller] Unexpected response format from master key.`);

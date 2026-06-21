@@ -18,26 +18,29 @@ async function startBatchWorker() {
       const tokens = Object.keys(batchQueues);
       if (tokens.length > 0) {
         for (const token of tokens) {
-          let payload = batchQueues[token];
-          if (!payload || payload.length === 0) continue;
+          let allPayloads = batchQueues[token] || [];
+          batchQueues[token] = []; // Clear main queue
           
-          // Extract and clear the queue for this token
-          batchQueues[token] = [];
-          if (payload.length > 500) { batchQueues[token] = payload.slice(500); payload = payload.slice(0, 500); }
+          if (allPayloads.length === 0) continue;
           const url = targetUrls[token];
 
-          console.log(`[AVL Chile] Flushing batch of ${payload.length} vehicles for token (masked: ${token.substring(0,4)}...)`);
-          
-          const headers = { 'Authorization': `AVLToken ${token}` };
-          try {
-            const res = await axios.post(url, payload, { headers, timeout: 15000 });
-            console.log(`[AVL Chile] Batch Success Response:`, JSON.stringify(res.data));
-          } catch (err) {
-            console.error(`[AVL Chile] Batch Forwarding failed:`, err.message);
-          }
+          while (allPayloads.length > 0) {
+            const chunk = allPayloads.slice(0, 500);
+            allPayloads = allPayloads.slice(500);
 
-          // Since rate limits are usually per-account, we leave a 1-second gap between different tokens
-          await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log(`[AVL Chile] Flushing batch chunk of ${chunk.length} vehicles for token (masked: ${token.substring(0,4)}...)`);
+            
+            const headers = { 'Authorization': `AVLToken ${token}` };
+            try {
+              const res = await axios.post(url, chunk, { headers, timeout: 15000 });
+              console.log(`[AVL Chile] Batch Success Response:`, JSON.stringify(res.data));
+            } catch (err) {
+              console.error(`[AVL Chile] Batch Forwarding failed:`, err.message);
+            }
+
+            // Since rate limits are usually per-account, we leave a 1-second gap between chunks
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
         }
       }
     } catch (err) {

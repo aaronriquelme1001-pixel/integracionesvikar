@@ -21,7 +21,7 @@ class BaseStrategy {
       try {
         return JSON.parse(params);
       } catch (err) {
-        // Fallback to standard pipe parsing on parse error
+        console.warn(`[BaseStrategy] Warning: Error parsing JSON params: ${err.message}. Falling back to pipe parser.`);
       }
     }
 
