@@ -1,0 +1,1000 @@
+[INFO] 2026-06-20T20:08:24.695Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.695Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.695Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.696Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.696Z - [B2B Dispatch] Device: MAXUS RPKR85 — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.696Z - [B2B Dispatch] Device: OPEL — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:08:24.696Z - [Traccar] Forwarding telemetry for 865413054330609 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054330609","lat":-39.818545,"lon":-73.233518,"speed":0,"bearing":0,"altitude":0,"timestamp":1781986098,"valid":"false"}
+[INFO] 2026-06-20T20:08:24.911Z - [Traccar] Success Response for 865413054330609: Status 200
+[INFO] 2026-06-20T20:08:24.911Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.912Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.912Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.912Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.912Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.912Z - [B2B Dispatch] Device: SELECCIONADORA KLEMANN — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.912Z - [B2B Dispatch] Device: VSTJ56 — Routing to: datalake
+[INFO] 2026-06-20T20:08:24.913Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:27.914Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:27.936Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:28.675Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:28.675Z - [B2B Dispatch] Device: PBVZ47 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.675Z - [Poller] 📡 Brecha de 1201s detectada para 865413053854195. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:08:28.675Z - [B2B Dispatch] Device: RWSH75 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.675Z - [Poller] 📡 Brecha de 1201s detectada para 865413053854435. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:08:28.675Z - [B2B Dispatch] Device: kia BGRL40 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.675Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053854534
+[INFO] 2026-06-20T20:08:28.676Z - [B2B Dispatch] Device: HD35  KGTY- 37 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.676Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.676Z - [Poller] 📡 Brecha de 1201s detectada para 865413054331318. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:08:28.676Z - [B2B Dispatch] Device: HPTY43 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.676Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: HWXP92 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.677Z - [B2B Dispatch] Device: VPVV96 — Routing to: datalake
+[INFO] 2026-06-20T20:08:28.678Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:31.156Z - [Backfiller] Iniciando recuperación de historial para 863719063979596. De: 2026-06-20 19:43:11 a 2026-06-20 20:03:14
+[INFO] 2026-06-20T20:08:31.525Z - [Backfiller] Iniciando recuperación de historial para 865413053800743. De: 2026-06-20 19:42:44 a 2026-06-20 20:02:46
+[INFO] 2026-06-20T20:08:31.678Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[INFO] 2026-06-20T20:08:31.714Z - [Backfiller] Iniciando recuperación de historial para 865413053854542. De: 2026-06-20 19:43:05 a 2026-06-20 20:03:07
+[ERROR] 2026-06-20T20:08:31.719Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:31.899Z - [Backfiller] Iniciando recuperación de historial para 865413053916754. De: 2026-06-20 19:43:41 a 2026-06-20 20:03:45
+[INFO] 2026-06-20T20:08:32.095Z - [Backfiller] Iniciando recuperación de historial para 865413054276430. De: 2026-06-20 19:42:43 a 2026-06-20 20:02:44
+[INFO] 2026-06-20T20:08:32.279Z - [Backfiller] Iniciando recuperación de historial para 865413054310007. De: 2026-06-20 19:43:37 a 2026-06-20 20:03:38
+[INFO] 2026-06-20T20:08:32.462Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:32.462Z - [B2B Dispatch] Device: FWKP69  — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.462Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.462Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.462Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.463Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.463Z - [B2B Dispatch] Device: LVGT66 — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.463Z - [B2B Dispatch] Device: MOVIL 3 — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.464Z - [B2B Dispatch] Device: HWPD44 — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.464Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.465Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 869671072759192
+[INFO] 2026-06-20T20:08:32.465Z - [B2B Dispatch] Device: RD2620 — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.465Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.465Z - [B2B Dispatch] Device: VSTJ56 — Routing to: datalake
+[INFO] 2026-06-20T20:08:32.465Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:32.467Z - [Backfiller] Iniciando recuperación de historial para 865413054359913. De: 2026-06-20 20:01:34 a 2026-06-20 20:05:09
+[INFO] 2026-06-20T20:08:32.651Z - [Backfiller] Iniciando recuperación de historial para 865413054369722. De: 2026-06-20 19:43:04 a 2026-06-20 20:03:06
+[INFO] 2026-06-20T20:08:32.835Z - [Backfiller] Iniciando recuperación de historial para 865413054384572. De: 2026-06-20 19:42:30 a 2026-06-20 20:02:31
+[INFO] 2026-06-20T20:08:33.019Z - [Backfiller] Iniciando recuperación de historial para 865413054400964. De: 2026-06-20 19:42:39 a 2026-06-20 20:02:41
+[INFO] 2026-06-20T20:08:33.203Z - [Backfiller] Iniciando recuperación de historial para 865413054401020. De: 2026-06-20 19:42:45 a 2026-06-20 20:02:48
+[INFO] 2026-06-20T20:08:33.387Z - [Backfiller] Iniciando recuperación de historial para 865413054403174. De: 2026-06-20 19:43:41 a 2026-06-20 20:03:58
+[INFO] 2026-06-20T20:08:33.571Z - [Backfiller] Iniciando recuperación de historial para 865413053854286. De: 2026-06-20 19:43:21 a 2026-06-20 20:03:38
+[INFO] 2026-06-20T20:08:33.755Z - [Backfiller] Iniciando recuperación de historial para 865413054322523. De: 2026-06-20 19:44:57 a 2026-06-20 20:05:00
+[INFO] 2026-06-20T20:08:35.467Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:35.493Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:36.061Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:36.061Z - [Poller] 📡 Brecha de 1226s detectada para 863719062598975. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:08:36.061Z - [B2B Dispatch] Device: 54 VERA JAIME — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.061Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.063Z - [B2B Dispatch] Device: PBYT41 CAMIÓN — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.064Z - [B2B Dispatch] Device: COLORADO 1 KKXX28 Arturo Viveros — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.064Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.064Z - [B2B Dispatch] Device: JYJS98 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:08:36.064Z - [Traccar] Forwarding telemetry for 865413054385702 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054385702","lat":-40.00678,"lon":-72.813228,"speed":0,"bearing":247,"altitude":99,"timestamp":1781986108,"valid":"true"}
+[INFO] 2026-06-20T20:08:36.467Z - [Traccar] Success Response for 865413054385702: Status 200
+[INFO] 2026-06-20T20:08:36.467Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.467Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.468Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.468Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:08:36.468Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:39.468Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:39.493Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:40.239Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:40.239Z - [B2B Dispatch] Device: LBCX20 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.239Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.239Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.240Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.240Z - [B2B Dispatch] Device: F2P_1 / RSWS15 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.240Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.241Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.241Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.241Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.242Z - [B2B Dispatch] Device: SFYF35 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.242Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.242Z - [B2B Dispatch] Device: VSTJ56 — Routing to: datalake
+[INFO] 2026-06-20T20:08:40.242Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:43.243Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:43.266Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:44.003Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:44.004Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.004Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.004Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.004Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053924774
+[INFO] 2026-06-20T20:08:44.004Z - [B2B Dispatch] Device: AXOR 4 PRTX17 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.005Z - [B2B Dispatch] Device: IVECO   TFZP97 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.005Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.005Z - [B2B Dispatch] Device: LVGT66 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.005Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.005Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.005Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.006Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.006Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.006Z - [B2B Dispatch] Device: SHAC-5  TVHS47 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.006Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.007Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.007Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.007Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:08:44.008Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:47.008Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:47.034Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:47.778Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:47.778Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: PLWV28  MAXUS — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: 53 MAURICIO MAECHEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053854401
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: DBVP81 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: IVECO   TFZP97 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: SLHW83 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.779Z - [B2B Dispatch] Device: VPGK45 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.780Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.780Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.780Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 869671073327015
+[INFO] 2026-06-20T20:08:47.780Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 2 — Routing to: datalake
+[INFO] 2026-06-20T20:08:47.781Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:50.781Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:50.806Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:51.542Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:51.542Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.542Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.542Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.543Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.544Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.544Z - [B2B Dispatch] Device: LVGT66 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.544Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.544Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.544Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.545Z - [B2B Dispatch] Device: HWXP92 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.545Z - [B2B Dispatch] Device: PLANTA MOVIL 1 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.545Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.545Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.546Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:08:51.546Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:54.546Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:54.571Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:55.319Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:55.320Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.320Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.320Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.320Z - [B2B Dispatch] Device: XX6002 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:08:55.320Z - [Traccar] Forwarding telemetry for 865413053833603 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053833603","lat":-39.791205,"lon":-73.191052,"speed":0,"bearing":164,"altitude":4,"timestamp":1781986127,"valid":"true"}
+[ERROR] 2026-06-20T20:08:55.684Z - [Traccar] Forwarding failed for 865413053833603: Request failed with status code 400
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: COLORADO 1 KKXX28 Arturo Viveros — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: MAXUS SFKK67 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: RAM - 4 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: Mustang RFXB34 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.685Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.686Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.686Z - [B2B Dispatch] Device: RD2620 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.686Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.687Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:08:55.687Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:08:58.687Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:08:58.709Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:08:59.450Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:08:59.450Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.450Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.450Z - [B2B Dispatch] Device: TWBP36 KIA — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.450Z - [B2B Dispatch] Device: LRZF93  — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.451Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.451Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053800966
+[INFO] 2026-06-20T20:08:59.451Z - [B2B Dispatch] Device: LLKV66 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.452Z - [Poller] 📡 Brecha de 1215s detectada para 865413053854401. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:08:59.452Z - [B2B Dispatch] Device: DBVP81 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.452Z - [B2B Dispatch] Device: MAXUS RJCG35 HOSPITAL — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.452Z - [B2B Dispatch] Device: KIA  PJPX63 PATIO Fredy — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.452Z - [B2B Dispatch] Device: Mitsubishi TKFZ26 Fredy — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.452Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.452Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.453Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 869671071052953
+[INFO] 2026-06-20T20:08:59.453Z - [B2B Dispatch] Device: RBRK90 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.453Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.453Z - [B2B Dispatch] Device: SCANIA NUEVO — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.453Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:08:59.454Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:09:01.156Z - [Backfiller] Iniciando recuperación de historial para 865413054321129. De: 2026-06-20 19:43:20 a 2026-06-20 20:03:22
+[INFO] 2026-06-20T20:09:01.523Z - [Backfiller] Iniciando recuperación de historial para 865413053797204. De: 2026-06-20 19:44:19 a 2026-06-20 20:04:37
+[INFO] 2026-06-20T20:09:01.707Z - [Backfiller] Iniciando recuperación de historial para 865413054277511. De: 2026-06-20 19:43:39 a 2026-06-20 20:03:41
+[INFO] 2026-06-20T20:09:01.891Z - [Backfiller] Iniciando recuperación de historial para 865413053797253. De: 2026-06-20 19:41:26 a 2026-06-20 20:01:43
+[INFO] 2026-06-20T20:09:02.076Z - [Backfiller] Iniciando recuperación de historial para 865413053769989. De: 2026-06-20 19:44:26 a 2026-06-20 20:04:29
+[INFO] 2026-06-20T20:09:02.455Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:09:02.479Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:09:03.059Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413054362321
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: Sprinter  PPXR53 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: EMP_2 / SHPV81 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.059Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.060Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.060Z - [B2B Dispatch] Device: TFJG18 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.061Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.061Z - [B2B Dispatch] Device: Toyota LKLH70 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.061Z - [B2B Dispatch] Device: VSTJ56 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.061Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.061Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-20T20:09:03.062Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:09:06.062Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:09:06.089Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:09:06.845Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:09:06.845Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053744636
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Device: ACTROS 3 GVZG55 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.846Z - [Poller] 📡 Brecha de 1202s detectada para 865413054362321. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Device: Sprinter  PPXR53 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.846Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.848Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.848Z - [B2B Dispatch] Device: PFBB14 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.848Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.848Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:09:06.848Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:09:09.849Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:09:09.876Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[ERROR] 2026-06-20T20:09:24.878Z - [GPS Server Poller] Error polling master key: timeout of 15000ms exceeded
+[INFO] 2026-06-20T20:09:24.878Z - [GPS Server Poller] Cycle complete: processed 0 devices across 738 mapped users.
+[INFO] 2026-06-20T20:09:27.879Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:09:27.905Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:09:31.156Z - [Backfiller] Iniciando recuperación de historial para 865413053722160. De: 2026-06-20 19:45:02 a 2026-06-20 20:05:04
+[ERROR] 2026-06-20T20:09:42.907Z - [GPS Server Poller] Error polling master key: timeout of 15000ms exceeded
+[INFO] 2026-06-20T20:09:42.907Z - [GPS Server Poller] Cycle complete: processed 0 devices across 738 mapped users.
+[INFO] 2026-06-20T20:09:45.907Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:09:45.942Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:09:50.169Z - [Backfiller] Iniciando recuperación de historial para 865413054361448. De: 2026-06-20 19:44:51 a 2026-06-20 20:04:53
+[ERROR] 2026-06-20T20:09:52.117Z - [Backfiller] Error recuperando historial para 865413054361448: socket hang up
+[ERROR] 2026-06-20T20:10:08.588Z - [GPS Server Poller] Error polling master key: aborted
+[INFO] 2026-06-20T20:10:08.588Z - [GPS Server Poller] Cycle complete: processed 0 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:11.588Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:11.612Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:16.836Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:16.837Z - [B2B Dispatch] Device: FWKP69  — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.837Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.837Z - [Poller] 📡 Brecha de 1203s detectada para 863719062598462. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.837Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.837Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.838Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.838Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.838Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.838Z - [B2B Dispatch] Device: TWBP36 KIA — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.838Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: MAXUS ARRIENDO TVPZ65 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: LRZF93  — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: PBVZ47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [Poller] 📡 Brecha de 1217s detectada para 865413053744636. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: ACTROS 3 GVZG55 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: SCANIA GDHX46 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [Poller] 📡 Brecha de 1215s detectada para 865413053745963. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: HTRC47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [Poller] 📡 Brecha de 1208s detectada para 865413053769823. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: 28 EMILIO QUEZADA — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.839Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [Poller] 📡 Brecha de 1203s detectada para 865413053790647. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: RGLV55 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: PLWV28  MAXUS — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [Poller] 📡 Brecha de 1203s detectada para 865413053800966. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: LLKV66 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [Poller] 📡 Brecha de 11199s detectada para 865413053801626. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:10:16.840Z - [B2B Dispatch] Device: XX6002 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:16.840Z - [Traccar] Forwarding telemetry for 865413053833603 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053833603","lat":-39.791205,"lon":-73.191052,"speed":0,"bearing":164,"altitude":4,"timestamp":1781986187,"valid":"true"}
+[ERROR] 2026-06-20T20:10:17.197Z - [Traccar] Forwarding failed for 865413053833603: Request failed with status code 400
+[INFO] 2026-06-20T20:10:17.197Z - [B2B Dispatch] Device: 53 MAURICIO MAECHEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [Poller] 📡 Brecha de 1204s detectada para 865413053854534. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: HD35  KGTY- 37 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053866884
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: JJDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: VE-9016 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: MAXUS RJCG35 HOSPITAL — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413054254486
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: 24 NISSAN NP300 KTLB14 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [Poller] 📡 Brecha de 1203s detectada para 865413054271407. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: LZRK98 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: DWCB62 — Routing to: avlchile, datalake
+[INFO] 2026-06-20T20:10:17.198Z - [AVL Chile] Added DWCB62 to batch queue for token (masked: UkjY...)
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: NAVARA 6 SFZH68 JUAN CARLOS CHACON — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: PBYT41 CAMIÓN — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.198Z - [B2B Dispatch] Device: KIA  PJPX63 PATIO Fredy — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: LVGT66 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [Poller] 📡 Brecha de 1202s detectada para 865413054318174. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: Mitsubishi  TRZC41 URALES — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: MAXUS RPKR85 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: F2P_1 / RSWS15 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: RJFC32 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: EXC VOLVO  3 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: COLORADO 1 KKXX28 Arturo Viveros — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.199Z - [Poller] 📡 Brecha de 1203s detectada para 865413054361000. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.199Z - [B2B Dispatch] Device: NISSAN DSRJ83 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413054361463
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [Poller] 📡 Brecha de 1202s detectada para 865413054362214. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: SVHT92 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.200Z - [B2B Dispatch] Device: HWXP92 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.201Z - [B2B Dispatch] Device: MAXUS SFKK67 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.201Z - [B2B Dispatch] Device: LBZV67 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.201Z - [B2B Dispatch] Device: JYJS98 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:17.201Z - [Traccar] Forwarding telemetry for 865413054385702 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054385702","lat":-40.00678,"lon":-72.813228,"speed":0,"bearing":247,"altitude":99,"timestamp":1781986168,"valid":"true"}
+[INFO] 2026-06-20T20:10:17.428Z - [Traccar] Success Response for 865413054385702: Status 200
+[INFO] 2026-06-20T20:10:17.428Z - [B2B Dispatch] Device: EMP_2 / SHPV81 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.428Z - [Poller] 📡 Brecha de 1203s detectada para 865413054400956. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.428Z - [B2B Dispatch] Device: RLJD55 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.428Z - [B2B Dispatch] Device: JFCG62 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:17.428Z - [Traccar] Forwarding telemetry for 865413054401046 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401046","lat":-39.531637,"lon":-72.837268,"speed":0,"bearing":238,"altitude":41,"timestamp":1781986199,"valid":"true"}
+[INFO] 2026-06-20T20:10:17.642Z - [Traccar] Success Response for 865413054401046: Status 200
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: TPWT10 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [Poller] 📡 Brecha de 270s detectada para 865413057201328. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: STLR12 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: SLHW83 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.642Z - [B2B Dispatch] Device: MOVIL 3 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: RETRO TRHH80 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: SHAC-5  TVHS47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: LLYD83 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: RBRK90 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: TYSG45 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: SCANIA NUEVO — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.643Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:17.644Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.526647,"lon":-72.83646,"speed":0,"bearing":156,"altitude":49,"timestamp":1781986157,"valid":"true"}
+[INFO] 2026-06-20T20:10:17.844Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: HWPD44 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: PFBB14 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: SWKB13 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.845Z - [B2B Dispatch] Device: SCANIA HCKF92 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: Renault Duster LCGG60 PATRICIO ZAPATA — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: FURGON — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: SELECCIONADORA KLEMANN — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: MERCEDES ATEGO — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: VSTJ56 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:10:17.846Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:20.847Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:20.877Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:22.919Z - [AVL Chile] Flushing batch of 1 vehicles for token (masked: UkjY...)
+[INFO] 2026-06-20T20:10:23.695Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:23.695Z - [Poller] 📡 Brecha de 1202s detectada para 863719062597324. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: 55 CAMION OPORTO CAMILO — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.695Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [Poller] 📡 Brecha de 1202s detectada para 865413053866884. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: JJDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: VE-9016 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: COLORADO 1 KKXX28 Arturo Viveros — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.696Z - [Poller] 📡 Brecha de 1203s detectada para 865413054361463. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:23.696Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.697Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.697Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.697Z - [B2B Dispatch] Device: TPWT10 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.698Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.698Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.698Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.698Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.698Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:10:23.698Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:23.698Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.526647,"lon":-72.83646,"speed":0,"bearing":156,"altitude":49,"timestamp":1781986217,"valid":"true"}
+[INFO] 2026-06-20T20:10:24.075Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-20T20:10:24.075Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:10:24.075Z - [B2B Dispatch] Device: SELECCIONADORA KLEMANN — Routing to: datalake
+[INFO] 2026-06-20T20:10:24.076Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:10:24.076Z - [B2B Dispatch] Device: MERCEDES ATEGO — Routing to: datalake
+[INFO] 2026-06-20T20:10:24.076Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:10:24.076Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:24.363Z - [AVL Chile] Batch Success Response: {"status":{"result":true,"total_count":1,"valid_count":1,"error_count":0,"error":[]}}
+[INFO] 2026-06-20T20:10:27.076Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:27.100Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:27.845Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:27.846Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:27.846Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:10:27.846Z - [B2B Dispatch] Device: MAXUS ARRIENDO TVPZ65 — Routing to: datalake
+[INFO] 2026-06-20T20:10:27.846Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[INFO] 2026-06-20T20:10:27.846Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:27.846Z - [B2B Dispatch] Device: OPEL — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:27.846Z - [Traccar] Forwarding telemetry for 865413054330609 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054330609","lat":-39.818545,"lon":-73.233518,"speed":0,"bearing":0,"altitude":0,"timestamp":1781986218,"valid":"false"}
+[INFO] 2026-06-20T20:10:28.136Z - [Traccar] Success Response for 865413054330609: Status 200
+[INFO] 2026-06-20T20:10:28.137Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:10:28.137Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:10:28.137Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:10:28.137Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-20T20:10:28.138Z - [B2B Dispatch] Device: Renault Duster LCGG60 PATRICIO ZAPATA — Routing to: datalake
+[INFO] 2026-06-20T20:10:28.138Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:31.138Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:31.158Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:31.896Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Device: FWKP69  — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Device: PBVZ47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053796909
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Device: MAXUS SJRF45 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.897Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.897Z - [Poller] 📡 Brecha de 1216s detectada para 865413054254486. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:31.898Z - [B2B Dispatch] Device: 24 NISSAN NP300 KTLB14 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.898Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.899Z - [Poller] 📡 Brecha de 1202s detectada para 865413054367650. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:31.899Z - [B2B Dispatch] Device: SWCG21 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.899Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.899Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.900Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.900Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.900Z - [B2B Dispatch] Device: HWPD44 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.900Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.900Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:10:31.900Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:34.901Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:34.926Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:35.663Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:35.663Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:35.663Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:35.664Z - [B2B Dispatch] Device: PBYT41 CAMIÓN — Routing to: datalake
+[INFO] 2026-06-20T20:10:35.664Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:10:35.665Z - [B2B Dispatch] Device: JYJS98 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:35.665Z - [Traccar] Forwarding telemetry for 865413054385702 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054385702","lat":-40.00678,"lon":-72.813228,"speed":0,"bearing":247,"altitude":99,"timestamp":1781986227,"valid":"true"}
+[INFO] 2026-06-20T20:10:36.087Z - [Traccar] Success Response for 865413054385702: Status 200
+[INFO] 2026-06-20T20:10:36.088Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-20T20:10:36.088Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:10:36.088Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:39.089Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:39.112Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:39.856Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:39.857Z - [B2B Dispatch] Device: LBCX20 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.857Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.857Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.857Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.857Z - [B2B Dispatch] Device: F2P_1 / RSWS15 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.858Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.858Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: ACTROS 4 KBGK36 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: SFYF35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:10:39.859Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:42.860Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:42.883Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:43.621Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:43.621Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.621Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.621Z - [Poller] 📡 Brecha de 1217s detectada para 865413053796909. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:43.621Z - [B2B Dispatch] Device: MAXUS SJRF45 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.622Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.622Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.622Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: SHAC-5  TVHS47 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 869671072674094
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: NP 300 2 KCFW91 JORGE FERNANDEZ — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.623Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:10:43.624Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:46.624Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:46.646Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:47.405Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:47.405Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.405Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.405Z - [B2B Dispatch] Device: PLWV28  MAXUS — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.405Z - [B2B Dispatch] Device: 53 MAURICIO MAECHEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.406Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.406Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.407Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.407Z - [B2B Dispatch] Device: SLHW83 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.407Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.407Z - [B2B Dispatch] Device: VPGK45 — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.407Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.407Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:10:47.408Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:50.407Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:50.431Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:51.188Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:51.189Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.189Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.189Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.189Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.191Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.191Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.191Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:10:51.191Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:54.192Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:54.217Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:54.954Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:54.954Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:54.954Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:10:54.954Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:10:54.954Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:10:54.954Z - [B2B Dispatch] Device: XX6002 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:10:54.954Z - [Traccar] Forwarding telemetry for 865413053833603 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053833603","lat":-39.791205,"lon":-73.191052,"speed":0,"bearing":164,"altitude":4,"timestamp":1781986247,"valid":"true"}
+[ERROR] 2026-06-20T20:10:55.301Z - [Traccar] Forwarding failed for 865413053833603: Request failed with status code 400
+[INFO] 2026-06-20T20:10:55.301Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053854443
+[INFO] 2026-06-20T20:10:55.301Z - [B2B Dispatch] Device: EXC CASE 5 — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.302Z - [B2B Dispatch] Device: IVECO   TFZP97 — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.302Z - [B2B Dispatch] Device: PLANTA MOVIL 1 — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.302Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.302Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.303Z - [B2B Dispatch] Device: NP 300 2 KCFW91 JORGE FERNANDEZ — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.303Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-20T20:10:55.304Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:10:58.304Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:10:58.326Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:10:59.064Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:10:59.064Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.064Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.065Z - [B2B Dispatch] Device: LRZF93  — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.065Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.065Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.065Z - [Poller] 📡 Brecha de 1217s detectada para 865413053924774. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:59.065Z - [B2B Dispatch] Device: AXOR 4 PRTX17 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.066Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.066Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.066Z - [B2B Dispatch] Device: Mitsubishi TKFZ26 Fredy — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.066Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.066Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.067Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.067Z - [B2B Dispatch] Device: MAXUS SFKK67 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.067Z - [Poller] 📡 Brecha de 1201s detectada para 865413054400873. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:10:59.067Z - [B2B Dispatch] Device: JTRD22 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.067Z - [B2B Dispatch] Device: RETRO TRHH80 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.067Z - [B2B Dispatch] Device: SCANIA NUEVO — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.068Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.068Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.068Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.068Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:10:59.069Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:00.760Z - [Billing Cron] Starting daily snapshot of odometers and driver grading...
+[INFO] 2026-06-20T20:11:01.156Z - [Backfiller] Iniciando recuperación de historial para 863719062620241. De: 2026-06-20 19:46:51 a 2026-06-20 20:06:54
+[INFO] 2026-06-20T20:11:01.515Z - [Backfiller] Iniciando recuperación de historial para 865413053790696. De: 2026-06-20 19:46:28 a 2026-06-20 20:06:30
+[INFO] 2026-06-20T20:11:01.701Z - [Backfiller] Iniciando recuperación de historial para 865413053877022. De: 2026-06-20 19:44:28 a 2026-06-20 20:04:45
+[INFO] 2026-06-20T20:11:01.885Z - [Backfiller] Iniciando recuperación de historial para 865413054271258. De: 2026-06-20 19:43:58 a 2026-06-20 20:04:16
+[INFO] 2026-06-20T20:11:02.068Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[INFO] 2026-06-20T20:11:02.069Z - [Backfiller] Iniciando recuperación de historial para 865413054274393. De: 2026-06-20 19:46:17 a 2026-06-20 20:06:35
+[ERROR] 2026-06-20T20:11:02.089Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:02.253Z - [Backfiller] Iniciando recuperación de historial para 865413054278444. De: 2026-06-20 19:46:26 a 2026-06-20 20:06:43
+[INFO] 2026-06-20T20:11:02.325Z - [Billing Cron] Auto-discovered 738 vehicle mappings from GPS Server.
+[INFO] 2026-06-20T20:11:02.442Z - [Backfiller] Iniciando recuperación de historial para 865413054357735. De: 2026-06-20 19:45:29 a 2026-06-20 20:05:30
+[INFO] 2026-06-20T20:11:02.626Z - [Backfiller] Iniciando recuperación de historial para 865413054383855. De: 2026-06-20 19:42:29 a 2026-06-20 20:02:45
+[INFO] 2026-06-20T20:11:02.810Z - [Backfiller] Iniciando recuperación de historial para 865413054388862. De: 2026-06-20 19:44:30 a 2026-06-20 20:04:32
+[INFO] 2026-06-20T20:11:02.831Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:02.832Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 863719062567962
+[INFO] 2026-06-20T20:11:02.832Z - [B2B Dispatch] Device: PEUGEOT TGHX13 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.832Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.832Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.832Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053822002
+[INFO] 2026-06-20T20:11:02.832Z - [B2B Dispatch] Device: ACTROS 8 GVZG56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413054357719
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: 39 LUENGO RICARDO — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: EMP_2 / SHPV81 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.833Z - [B2B Dispatch] Device: TFJG18 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.834Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.834Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.834Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.834Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.834Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-20T20:11:02.835Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:02.996Z - [Backfiller] Iniciando recuperación de historial para 865413054389001. De: 2026-06-20 19:45:39 a 2026-06-20 20:05:41
+[INFO] 2026-06-20T20:11:03.180Z - [Backfiller] Iniciando recuperación de historial para 865413054401061. De: 2026-06-20 19:45:41 a 2026-06-20 20:05:56
+[INFO] 2026-06-20T20:11:03.374Z - [Backfiller] Iniciando recuperación de historial para 865413054368955. De: 2026-06-20 19:46:22 a 2026-06-20 20:06:24
+[INFO] 2026-06-20T20:11:03.558Z - [Backfiller] Iniciando recuperación de historial para 865413054274773. De: 2026-06-20 19:46:14 a 2026-06-20 20:06:19
+[INFO] 2026-06-20T20:11:05.835Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:05.869Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:06.612Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [Poller] 📡 Brecha de 1215s detectada para 865413053854443. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: EXC CASE 5 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: DWCB62 — Routing to: avlchile, datalake
+[INFO] 2026-06-20T20:11:06.613Z - [AVL Chile] Added DWCB62 to batch queue for token (masked: UkjY...)
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: LVGT66 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: EXC VOLVO  3 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [Poller] 📡 Brecha de 1201s detectada para 865413054357719. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: 39 LUENGO RICARDO — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.613Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:11:06.614Z - [B2B Dispatch] Device: JFCG62 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:11:06.614Z - [Traccar] Forwarding telemetry for 865413054401046 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401046","lat":-39.531637,"lon":-72.837268,"speed":0,"bearing":238,"altitude":41,"timestamp":1781986260,"valid":"true"}
+[INFO] 2026-06-20T20:11:07.019Z - [Traccar] Success Response for 865413054401046: Status 200
+[INFO] 2026-06-20T20:11:07.019Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.019Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.019Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.019Z - [B2B Dispatch] Device: RDXY48 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:11:07.019Z - [Traccar] Forwarding telemetry for 869671072743121 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743121","lat":-39.945737,"lon":-72.699638,"speed":0,"bearing":0,"altitude":0,"timestamp":1781986233,"valid":"false"}
+[INFO] 2026-06-20T20:11:07.231Z - [Traccar] Success Response for 869671072743121: Status 200
+[INFO] 2026-06-20T20:11:07.231Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.231Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.231Z - [B2B Dispatch] Device: Toyota LKLH70 — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.231Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:11:07.232Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:07.486Z - [Billing Cron] Successfully took snapshot and graded 738 devices on 2026-06-20.
+[INFO] 2026-06-20T20:11:10.232Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:10.257Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:11.026Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:11.026Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.026Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.026Z - [B2B Dispatch] Device: RJFC32 — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.026Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.027Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.027Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.027Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.027Z - [B2B Dispatch] Device: FURGON — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.027Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:11.027Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:14.028Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:14.056Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:14.800Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:14.800Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.800Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.801Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.801Z - [Poller] 📡 Brecha de 1215s detectada para 865413053822002. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:14.801Z - [B2B Dispatch] Device: ACTROS 8 GVZG56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.801Z - [B2B Dispatch] Device: IVECO   TFZP97 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.802Z - [Poller] 📡 Brecha de 1203s detectada para 865413054403968. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:14.802Z - [B2B Dispatch] Device: CARGADOR  JHON DEER — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.802Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.802Z - [B2B Dispatch] Device: MOVIL 3 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.802Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.803Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.803Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.803Z - [B2B Dispatch] Device: VSTJ56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.803Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:11:14.803Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:15.363Z - [AVL Chile] Flushing batch of 1 vehicles for token (masked: UkjY...)
+[INFO] 2026-06-20T20:11:16.848Z - [AVL Chile] Batch Success Response: {"status":{"result":true,"total_count":1,"valid_count":1,"error_count":0,"error":[]}}
+[INFO] 2026-06-20T20:11:17.803Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:17.828Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:18.571Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:18.572Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.572Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.572Z - [Poller] 📡 Brecha de 1203s detectada para 865413053744164. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:18.572Z - [B2B Dispatch] Device: LYZC20 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.572Z - [Poller] 📡 Brecha de 1201s detectada para 865413053744834. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:18.572Z - [B2B Dispatch] Device: HYUNDAI  LYYV72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.573Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.573Z - [B2B Dispatch] Device: VE-9016 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.573Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.573Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.573Z - [B2B Dispatch] Device: COLORADO 1 KKXX28 Arturo Viveros — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.573Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.574Z - [B2B Dispatch] Device: TPWT10 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.574Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.574Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.574Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.574Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.575Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.575Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.575Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.575Z - [B2B Dispatch] Device: SELECCIONADORA KLEMANN — Routing to: datalake
+[INFO] 2026-06-20T20:11:18.575Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:21.576Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:21.602Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:22.346Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:22.346Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.346Z - [B2B Dispatch] Device: HTRC47 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.347Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.347Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.347Z - [Poller] 📡 Brecha de 1203s detectada para 865413054259014. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:22.347Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.348Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.348Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.348Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.348Z - [B2B Dispatch] Device: SHAC-5  TVHS47 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.348Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:11:22.348Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.526717,"lon":-72.836365,"speed":0,"bearing":153,"altitude":49,"timestamp":1781986277,"valid":"true"}
+[INFO] 2026-06-20T20:11:22.748Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-20T20:11:22.748Z - [B2B Dispatch] Device: MERCEDES ATEGO — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.748Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:11:22.748Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:25.749Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:25.773Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:26.516Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:26.516Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.516Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.516Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.517Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.517Z - [B2B Dispatch] Device: MAXUS RPKR85 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.517Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.517Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.518Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.518Z - [B2B Dispatch] Device: SLHW83 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.518Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.518Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.518Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.518Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.519Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:26.519Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:29.520Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:29.546Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:30.290Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:30.290Z - [Poller] 📡 Brecha de 1226s detectada para 863719062567962. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:30.290Z - [B2B Dispatch] Device: PEUGEOT TGHX13 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.291Z - [B2B Dispatch] Device: FWKP69  — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.291Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.291Z - [B2B Dispatch] Device: MAXUS ARRIENDO TVPZ65 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.291Z - [B2B Dispatch] Device: PBVZ47 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.291Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.292Z - [Poller] 📡 Brecha de 1203s detectada para 865413054268312. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:30.292Z - [B2B Dispatch] Device: HYUNDAI RKWC33 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.292Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.292Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.292Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.293Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.293Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.293Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.293Z - [B2B Dispatch] Device: SWKB13 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.293Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:11:30.293Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:31.156Z - [Backfiller] Iniciando recuperación de historial para 865413054330708. De: 2026-06-20 19:46:57 a 2026-06-20 20:07:13
+[INFO] 2026-06-20T20:11:31.342Z - [Backfiller] Iniciando recuperación de historial para 865413054364392. De: 2026-06-20 19:46:23 a 2026-06-20 20:06:25
+[INFO] 2026-06-20T20:11:31.561Z - [Backfiller] Iniciando recuperación de historial para 869671072680018. De: 2026-06-20 19:49:45 a 2026-06-20 20:08:05
+[INFO] 2026-06-20T20:11:31.746Z - [Backfiller] Iniciando recuperación de historial para 865413053854195. De: 2026-06-20 19:46:18 a 2026-06-20 20:06:19
+[INFO] 2026-06-20T20:11:31.931Z - [Backfiller] Iniciando recuperación de historial para 865413053854435. De: 2026-06-20 19:47:09 a 2026-06-20 20:07:10
+[INFO] 2026-06-20T20:11:32.121Z - [Backfiller] Iniciando recuperación de historial para 865413054331318. De: 2026-06-20 19:47:59 a 2026-06-20 20:08:00
+[INFO] 2026-06-20T20:11:33.294Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:33.319Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:33.886Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:33.886Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053731070
+[INFO] 2026-06-20T20:11:33.886Z - [B2B Dispatch] Device: W 1 JGRB88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:33.886Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413054320576
+[INFO] 2026-06-20T20:11:33.886Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-20T20:11:33.888Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-20T20:11:33.888Z - [B2B Dispatch] Device: HWPD44 — Routing to: datalake
+[INFO] 2026-06-20T20:11:33.888Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:36.889Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:36.915Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:37.659Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:37.660Z - [Poller] 📡 Brecha de 1201s detectada para 863719062583399. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: 58 RAUL ASENJO — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [Poller] 📡 Brecha de 1203s detectada para 865413053731070. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: W 1 JGRB88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: PBYT41 CAMIÓN — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.660Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.661Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:37.661Z - [B2B Dispatch] Device: JYJS98 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:11:37.661Z - [Traccar] Forwarding telemetry for 865413054385702 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054385702","lat":-40.00678,"lon":-72.813228,"speed":0,"bearing":247,"altitude":99,"timestamp":1781986288,"valid":"true"}
+[INFO] 2026-06-20T20:11:38.046Z - [Traccar] Success Response for 865413054385702: Status 200
+[INFO] 2026-06-20T20:11:38.047Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:11:38.047Z - [B2B Dispatch] Device: RETRO TRHH80 — Routing to: datalake
+[INFO] 2026-06-20T20:11:38.047Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:11:38.047Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:11:38.048Z - [B2B Dispatch] Device: SFYF35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:38.048Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:38.048Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:41.048Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:41.071Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:41.812Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:41.813Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.813Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.813Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413053797188
+[INFO] 2026-06-20T20:11:41.813Z - [B2B Dispatch] Device: GCRK89 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.813Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.813Z - [B2B Dispatch] Device: F2P_1 / RSWS15 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.814Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.814Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.815Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.815Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:11:41.815Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:11:41.815Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.526912,"lon":-72.83622,"speed":7,"bearing":180,"altitude":46,"timestamp":1781986291,"valid":"true"}
+[INFO] 2026-06-20T20:11:42.023Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-20T20:11:42.023Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:11:42.023Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:45.024Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:45.049Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:45.792Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:45.792Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.792Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.792Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.793Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.793Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.793Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.793Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.793Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.794Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.794Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.794Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.795Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:45.796Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:48.796Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:48.818Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:49.560Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:49.561Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.561Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.561Z - [B2B Dispatch] Device: PLWV28  MAXUS — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.561Z - [B2B Dispatch] Device: 53 MAURICIO MAECHEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.561Z - [Poller] 📡 Brecha de 1202s detectada para 865413054361091. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:49.561Z - [B2B Dispatch] Device: DRTZ42 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.561Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.562Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.562Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.562Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.562Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.562Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.563Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:11:49.563Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:52.563Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:52.590Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:53.327Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:53.327Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.327Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.327Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.327Z - [Poller] 📡 Brecha de 1202s detectada para 865413053797188. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:53.327Z - [B2B Dispatch] Device: GCRK89 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.328Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.328Z - [B2B Dispatch] Device: XX6002 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:11:53.328Z - [Traccar] Forwarding telemetry for 865413053833603 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053833603","lat":-39.791205,"lon":-73.191052,"speed":0,"bearing":164,"altitude":4,"timestamp":1781986308,"valid":"true"}
+[ERROR] 2026-06-20T20:11:53.667Z - [Traccar] Forwarding failed for 865413053833603: Request failed with status code 400
+[INFO] 2026-06-20T20:11:53.668Z - [Poller] 📡 Brecha de 1202s detectada para 865413054331854. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:11:53.668Z - [B2B Dispatch] Device: DZ VK 69 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.668Z - [B2B Dispatch] Device: RAM - 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.668Z - [B2B Dispatch] Device: MOVIL 3 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.668Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.669Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.669Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.669Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.669Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.670Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:53.670Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:11:56.671Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:11:56.701Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:11:57.443Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:11:57.444Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.444Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.444Z - [B2B Dispatch] Device: LRZF93  — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.444Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: KIA  PJPX63 PATIO Fredy — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: HWXP92 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: MAXUS SFKK67 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.445Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.446Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.446Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.446Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.446Z - [B2B Dispatch] Device: SCANIA NUEVO — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.446Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.446Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.447Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:11:57.447Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:12:00.447Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:12:00.472Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:12:01.156Z - [Backfiller] Iniciando recuperación de historial para 863719062598975. De: 2026-06-20 19:47:13 a 2026-06-20 20:07:39
+[INFO] 2026-06-20T20:12:01.216Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:12:01.216Z - [B2B Dispatch] Device: TWBP36 KIA — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.216Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.217Z - [B2B Dispatch] Device: MAXUS RJCG35 HOSPITAL — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.217Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.217Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.217Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.217Z - [B2B Dispatch] Device: EMP_2 / SHPV81 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.217Z - [B2B Dispatch] Device: SLKR60 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.218Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.218Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.218Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.219Z - [B2B Dispatch] Device: MAXUS SCCL84 ANDRES MORALES  — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.219Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-20T20:12:01.219Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:12:01.525Z - [Backfiller] Iniciando recuperación de historial para 865413053854401. De: 2026-06-20 19:46:44 a 2026-06-20 20:06:59
+[INFO] 2026-06-20T20:12:04.219Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:12:04.243Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:12:04.977Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:12:04.977Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:12:04.977Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-20T20:12:04.978Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-20T20:12:04.978Z - [B2B Dispatch] Device: MAZDA LCXK73 — Routing to: datalake
+[INFO] 2026-06-20T20:12:04.978Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-20T20:12:04.979Z - [B2B Dispatch] Device: JFCG62 — Routing to: traccar, datalake
+[INFO] 2026-06-20T20:12:04.979Z - [Traccar] Forwarding telemetry for 865413054401046 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401046","lat":-39.531637,"lon":-72.837268,"speed":0,"bearing":238,"altitude":41,"timestamp":1781986320,"valid":"true"}
+[INFO] 2026-06-20T20:12:05.369Z - [Traccar] Success Response for 865413054401046: Status 200
+[INFO] 2026-06-20T20:12:05.370Z - [B2B Dispatch] Device: SLHW83 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-20T20:12:05.370Z - [B2B Dispatch] Device: SHAC-5  TVHS47 — Routing to: datalake
+[INFO] 2026-06-20T20:12:05.370Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:12:05.370Z - [B2B Dispatch] Device: RAMPLA KDGL98 — Routing to: datalake
+[INFO] 2026-06-20T20:12:05.370Z - [B2B Dispatch] Device: KKWS91 — Routing to: datalake
+[INFO] 2026-06-20T20:12:05.371Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-20T20:12:05.371Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:12:08.370Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:12:08.398Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:12:09.144Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:12:09.144Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 863719063926753
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: LRZF93  — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: LWPP40 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [Poller] 📡 Brecha de 1202s detectada para 865413054359962. Programando recuperación en 3 mins para permitir que suba su historial...
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: SUBARU JJFJ69 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.145Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.146Z - [B2B Dispatch] Enviando latido de 20 minutos para estacionado: 865413054383616
+[INFO] 2026-06-20T20:12:09.146Z - [B2B Dispatch] Device: CAMIONETA BZRY88 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.146Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.147Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.147Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.147Z - [B2B Dispatch] Device: PFBB14 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.147Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.147Z - [B2B Dispatch] Device: LJSF86 — Routing to: datalake
+[INFO] 2026-06-20T20:12:09.147Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:12:12.148Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:12:12.171Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist
+[INFO] 2026-06-20T20:12:12.908Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-20T20:12:12.908Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-20T20:12:12.908Z - [B2B Dispatch] Device: SCANIA GDHX46 — Routing to: datalake
+[INFO] 2026-06-20T20:12:12.909Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-20T20:12:12.909Z - [B2B Dispatch] Device: VE-9016 — Routing to: datalake
+[INFO] 2026-06-20T20:12:12.910Z - [B2B Dispatch] Device: LLYD83 — Routing to: datalake
+[INFO] 2026-06-20T20:12:12.910Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-20T20:12:12.911Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-20T20:12:15.911Z - [GPS Server Poller] Hydrating state from Datalake to survive restarts...
+[ERROR] 2026-06-20T20:12:15.937Z - [GPS Server Poller] Failed to hydrate state: column "dt_server" does not exist

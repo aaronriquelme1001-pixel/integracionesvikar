@@ -126,7 +126,11 @@ async function runBillingSnapshot() {
 
   console.log('[Billing Cron] Starting daily snapshot of odometers and driver grading...');
   const deviceMappings = getDeviceMappings();
-  const snapshotDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  // Create Date and adjust for UTC-4 (Chile Standard Time) to prevent "tomorrow" jumps at night
+  const d = new Date();
+  d.setHours(d.getHours() - 4);
+  const snapshotDate = d.toISOString().split('T')[0]; // YYYY-MM-DD
   
   try {
     // 1. Fetch all telemetry from GPS Server (Master Key)

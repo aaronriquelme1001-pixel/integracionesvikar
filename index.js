@@ -191,7 +191,9 @@ app.listen(PORT, () => {
   setInterval(() => {
     const now = new Date();
     if (now.getMinutes() % 20 === 0) {
-      runBillingSnapshot();
+      runBillingSnapshot().catch(err => {
+        console.error('[System] ❌ Error in background billing snapshot:', err.message);
+      });
     }
   }, 60000); // Check every minute
 });

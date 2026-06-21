@@ -9,15 +9,18 @@ const pool = new Pool({
 async function run() {
   try {
     const res = await pool.query(`
-      SELECT client_source, count(*) as points
-      FROM global_telemetry_traffic
-      WHERE received_at >= NOW() - INTERVAL '5 minutes'
-      GROUP BY client_source
-      ORDER BY points DESC
-      LIMIT 10;
+      SELECT client_id, count(*) as c 
+      FROM billing_snapshots 
+      GROUP BY client_id;
     `);
-    console.log("=== DATALAKE: PUNTOS RECIBIDOS EN LOS ÚLTIMOS 5 MINUTOS ===");
+    console.log("=== CLIENTS IN BILLING_SNAPSHOTS ===");
     console.table(res.rows);
+    
+    const transklettCount = await pool.query(`
+      SELECT COUNT(*) FROM billing_snapshots WHERE client_id = 'transklett';
+    `);
+    console.log("Transklett rows:", transklettCount.rows[0].count);
+    
   } catch (err) {
     console.error(err);
   } finally {
