@@ -87,11 +87,23 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      const getEpoch = (ds) => ds ? new Date(ds.replace(' ', 'T') + tz).getTime() : NaN;
      const startEpoch = getEpoch(dt_old);
      const endEpoch = getEpoch(dt_new);
-     const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
+     const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
      const apiTarget = isMaster ? 'server' : 'user';
      
-     if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > TWELVE_HOURS_MS) {
-       console.log(`[Backfiller] 📦 Rango gigante detectado. Paginando historial para ${imei}...`);
+     async function fetchWithRetry(url, config, retries = 3) {
+         for (let i = 0; i < retries; i++) {
+            try {
+               return await axios.get(url, config);
+            } catch (err) {
+               if (i === retries - 1) throw err;
+               console.warn(`[Backfiller] Request failed for ${imei} (${err.message}). Retry ${i+1}/${retries}...`);
+               await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+            }
+         }
+     }
+
+     if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > FOUR_HOURS_MS) {
+       console.log(`[Backfiller] 📦 Rango grande detectado. Paginando historial para ${imei}...`);
        
        const sign = tz[0] === '+' ? 1 : -1;
        const hours = parseInt(tz.substring(1, 3), 10);
@@ -100,7 +112,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
        
        let currentStart = startEpoch;
        while (currentStart < endEpoch) {
-         let currentEnd = currentStart + TWELVE_HOURS_MS;
+         let currentEnd = currentStart + FOUR_HOURS_MS;
          if (currentEnd > endEpoch) currentEnd = endEpoch;
          
          const pad = n => n.toString().padStart(2, '0');
@@ -112,7 +124,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          const chunkStart = fmt(currentStart);
          const chunkEnd = fmt(currentEnd);
          
-         const response = await axios.get(GPSSERVER_API_URL, {
+         const response = await fetchWithRetry(GPSSERVER_API_URL, {
             params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
             timeout: 30000
          });
@@ -124,7 +136,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          await new Promise(r => setTimeout(r, 500));
        }
      } else {
-       const response = await axios.get(GPSSERVER_API_URL, {
+       const response = await fetchWithRetry(GPSSERVER_API_URL, {
           params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
           timeout: 30000
        });
