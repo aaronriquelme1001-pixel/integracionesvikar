@@ -18,13 +18,8 @@ let lastTracksolidPollStatus = 'Waiting to start...';
 let isTracksolidPolling = false;
 
 function getTracksolidTimestamp() {
-  const d = new Date();
-  return d.getUTCFullYear() + '-' + 
-         String(d.getUTCMonth()+1).padStart(2,'0') + '-' + 
-         String(d.getUTCDate()).padStart(2,'0') + ' ' + 
-         String(d.getUTCHours()).padStart(2,'0') + ':' + 
-         String(d.getUTCMinutes()).padStart(2,'0') + ':' + 
-         String(d.getUTCSeconds()).padStart(2,'0');
+  // Tracksolid API accepts UNIX timestamp in seconds
+  return Math.floor(Date.now() / 1000).toString();
 }
 
 /**
