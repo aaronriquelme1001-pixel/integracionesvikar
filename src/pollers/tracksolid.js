@@ -17,6 +17,16 @@ let lastTracksolidPollTime = null;
 let lastTracksolidPollStatus = 'Waiting to start...';
 let isTracksolidPolling = false;
 
+function getTracksolidTimestamp() {
+  const d = new Date();
+  return d.getUTCFullYear() + '-' + 
+         String(d.getUTCMonth()+1).padStart(2,'0') + '-' + 
+         String(d.getUTCDate()).padStart(2,'0') + ' ' + 
+         String(d.getUTCHours()).padStart(2,'0') + ':' + 
+         String(d.getUTCMinutes()).padStart(2,'0') + ':' + 
+         String(d.getUTCSeconds()).padStart(2,'0');
+}
+
 /**
  * Authenticates with Tracksolid Pro API and sets the global tracksolidAccessToken
  */
@@ -26,7 +36,7 @@ async function loginToTracksolid() {
     return false;
   }
 
-  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const timestamp = getTracksolidTimestamp();
   const params = {
     method: 'jimi.oauth.token.get',
     timestamp: timestamp,
@@ -77,9 +87,9 @@ async function pollTracksolid() {
     }
   }
 
-  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const timestamp = getTracksolidTimestamp();
   const params = {
-    method: 'jimi.device.location.list',
+    method: 'jimi.user.device.location.list',
     timestamp: timestamp,
     app_key: TRACKSOLID_APP_KEY,
     sign_method: 'md5',
