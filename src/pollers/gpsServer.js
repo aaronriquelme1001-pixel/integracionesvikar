@@ -394,9 +394,20 @@ setInterval(async () => {
    if (readyTasks.length > 0) {
       pendingBackfills.splice(0, pendingBackfills.length, ...pendingBackfills.filter(t => now < t.executeAt));
       for (const task of readyTasks) {
-         // Se asume que las tareas pendientes usarán sus keys antiguas (si eran locales),
-         // pero si usamos Master Key a partir de ahora, todo el tráfico nuevo usará Master Key.
-         await recoverHistory(task.imei, task.dt_old, task.dt_new, task.client, task.apiKey);
+         // Fix: Pass true as the 6th argument because task.apiKey is a Master Key
+         const recoveredCount = await recoverHistory(task.imei, task.dt_old, task.dt_new, task.client, task.apiKey, true);
+         
+         // Retry logic: If no points were recovered, give the physical tracker more time to upload
+         if (recoveredCount === 0) {
+             task.retries = (task.retries || 0) + 1;
+             if (task.retries <= 3) {
+                 task.executeAt = Date.now() + (5 * 60 * 1000); // Try again in 5 minutes
+                 console.log(`[Backfiller] Reintentando (${task.retries}/3) para ${task.imei} en 5 minutos...`);
+                 pendingBackfills.push(task);
+             } else {
+                 console.warn(`[Backfiller] Se rindió con ${task.imei} tras ${task.retries} intentos. El GPS no subió la data.`);
+             }
+         }
       }
    }
 }, 30000);
