@@ -89,6 +89,21 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      const endEpoch = getEpoch(dt_new);
      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
      const apiTarget = isMaster ? 'server' : 'user';
+
+     // Helpers to format epoch back to local string for the API query
+     const sign = tz[0] === '+' ? 1 : -1;
+     const hours = parseInt(tz.substring(1, 3), 10);
+     const mins = parseInt(tz.substring(4, 6), 10);
+     const offsetMs = sign * ((hours * 60) + mins) * 60 * 1000;
+     const pad = n => n.toString().padStart(2, '0');
+     const fmt = epoch => {
+        const d = new Date(epoch + offsetMs);
+        return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+     };
+
+     // Widen API query window because GPS Server API filters by dt_server (arrival time), not dt_tracker.
+     const q_old = !isNaN(startEpoch) ? fmt(startEpoch - 1 * 60 * 60 * 1000) : dt_old;
+     const q_new = !isNaN(endEpoch) ? fmt(endEpoch + 3 * 60 * 60 * 1000) : dt_new;
      
      async function fetchWithRetry(url, config, retries = 3) {
          for (let i = 0; i < retries; i++) {
@@ -105,21 +120,12 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > FOUR_HOURS_MS) {
        console.log(`[Backfiller] 📦 Rango grande detectado. Paginando historial para ${imei}...`);
        
-       const sign = tz[0] === '+' ? 1 : -1;
-       const hours = parseInt(tz.substring(1, 3), 10);
-       const mins = parseInt(tz.substring(4, 6), 10);
-       const offsetMs = sign * ((hours * 60) + mins) * 60 * 1000;
+       let currentStart = startEpoch - 1 * 60 * 60 * 1000;
+       const finalEnd = endEpoch + 3 * 60 * 60 * 1000;
        
-       let currentStart = startEpoch;
-       while (currentStart < endEpoch) {
+       while (currentStart < finalEnd) {
          let currentEnd = currentStart + FOUR_HOURS_MS;
-         if (currentEnd > endEpoch) currentEnd = endEpoch;
-         
-         const pad = n => n.toString().padStart(2, '0');
-         const fmt = epoch => {
-            const d = new Date(epoch + offsetMs);
-            return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
-         };
+         if (currentEnd > finalEnd) currentEnd = finalEnd;
          
          const chunkStart = fmt(currentStart);
          const chunkEnd = fmt(currentEnd);
@@ -137,7 +143,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
        }
      } else {
        const response = await fetchWithRetry(GPSSERVER_API_URL, {
-          params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${dt_old},${dt_new}` },
+          params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${q_old},${q_new}` },
           timeout: 30000
        });
        let resData = response.data;
@@ -400,9 +406,9 @@ setInterval(async () => {
          // Retry logic: If no points were recovered, give the physical tracker more time to upload
          if (recoveredCount === 0) {
              task.retries = (task.retries || 0) + 1;
-             if (task.retries <= 3) {
+             if (task.retries <= 6) {
                  task.executeAt = Date.now() + (5 * 60 * 1000); // Try again in 5 minutes
-                 console.log(`[Backfiller] Reintentando (${task.retries}/3) para ${task.imei} en 5 minutos...`);
+                 console.log(`[Backfiller] Reintentando (${task.retries}/6) para ${task.imei} en 5 minutos...`);
                  pendingBackfills.push(task);
              } else {
                  console.warn(`[Backfiller] Se rindió con ${task.imei} tras ${task.retries} intentos. El GPS no subió la data.`);
