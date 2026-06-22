@@ -4,7 +4,7 @@ const { computeSignature } = require('../utils/signature');
 
 const TRACKSOLID_API_URL = process.env.TRACKSOLID_API_URL || 'https://us-open.tracksolidpro.com/route/rest';
 const TRACKSOLID_USER_ID = process.env.TRACKSOLID_USER_ID;
-const TRACKSOLID_USER_PWD = process.env.TRACKSOLID_USER_PWD || process.env.TRACKSOLID_PASSWORD;
+const TRACKSOLID_USER_PWD = process.env.TRACKSOLID_USER_PWD_MD5 || process.env.TRACKSOLID_USER_PWD || process.env.TRACKSOLID_PASSWORD;
 const TRACKSOLID_APP_KEY = process.env.TRACKSOLID_APP_KEY;
 const TRACKSOLID_APP_SECRET = process.env.TRACKSOLID_APP_SECRET || process.env.TRACKSOLID_SECRET;
 
@@ -18,8 +18,13 @@ let lastTracksolidPollStatus = 'Waiting to start...';
 let isTracksolidPolling = false;
 
 function getTracksolidTimestamp() {
-  // Tracksolid API accepts UNIX timestamp in seconds
-  return Math.floor(Date.now() / 1000).toString();
+  const d = new Date();
+  return d.getUTCFullYear() + '-' + 
+         String(d.getUTCMonth()+1).padStart(2,'0') + '-' + 
+         String(d.getUTCDate()).padStart(2,'0') + ' ' + 
+         String(d.getUTCHours()).padStart(2,'0') + ':' + 
+         String(d.getUTCMinutes()).padStart(2,'0') + ':' + 
+         String(d.getUTCSeconds()).padStart(2,'0');
 }
 
 /**
