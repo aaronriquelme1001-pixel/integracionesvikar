@@ -4,9 +4,9 @@ const { computeSignature } = require('../utils/signature');
 
 const TRACKSOLID_API_URL = process.env.TRACKSOLID_API_URL || 'https://us-open.tracksolidpro.com/route/rest';
 const TRACKSOLID_USER_ID = process.env.TRACKSOLID_USER_ID;
-const TRACKSOLID_USER_PWD = process.env.TRACKSOLID_USER_PWD;
+const TRACKSOLID_USER_PWD = process.env.TRACKSOLID_USER_PWD || process.env.TRACKSOLID_PASSWORD;
 const TRACKSOLID_APP_KEY = process.env.TRACKSOLID_APP_KEY;
-const TRACKSOLID_APP_SECRET = process.env.TRACKSOLID_APP_SECRET;
+const TRACKSOLID_APP_SECRET = process.env.TRACKSOLID_APP_SECRET || process.env.TRACKSOLID_SECRET;
 
 // Poll interval from environment or default to 10000ms (10s)
 const TRACKSOLID_POLL_INTERVAL = parseInt(process.env.TRACKSOLID_POLL_INTERVAL, 10) || 10000;
