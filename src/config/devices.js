@@ -88,6 +88,9 @@ function getDynamicIntegrationConfig(target, clientName) {
     const suffix = clientUpper ? `_${clientUpper}` : '';
     config.idType = process.env[`TRACCAR_ID_TYPE${suffix}`] || process.env.TRACCAR_ID_TYPE;
   }
+  else if (target === 'gpsserver') {
+    config.endpoint = process.env[`GPS_SERVER_URL_${clientUpper}`] || process.env.GPS_SERVER_URL || 'http://gsh7.net/id39/api/api_loc.php';
+  }
   return config;
 }
 
