@@ -18,6 +18,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const { systemStats, deviceAntiSpamState, lastDeviceTimestamps, retryQueue } = require('./src/core/state');
 const { handleGpsServerWebhook } = require('./src/webhooks/gpsServer');
+const { handleIncomingGps } = require('./src/webhooks/incoming');
 const { pollGpsServerLocations, getStatus: getGpsPollerStatus } = require('./src/pollers/gpsServer');
 const { pollTracksolid, getStatus: getTracksolidStatus } = require('./src/pollers/tracksolid');
 
@@ -111,10 +112,10 @@ app.get('/api/datalake-facts', async (req, res) => {
  * Security Middleware for Webhooks
  */
 const requireWebhookAuth = (req, res, next) => {
-  const secret = process.env.WEBHOOK_SECRET_KEY;
+  const secret = process.env.WEBHOOK_SECRET_KEY || process.env.INCOMING_API_KEY;
   if (!secret) return next(); // Permisivo si no se configura secreto en ENV
   
-  const provided = req.query.secret || req.headers['x-webhook-secret'];
+  const provided = req.query.secret || req.headers['x-webhook-secret'] || req.headers['x-api-key'];
   if (provided !== secret) {
     console.warn(`[Security] Intento de acceso a webhook bloqueado (IP: ${req.ip})`);
     return res.status(401).send('Unauthorized');
@@ -127,6 +128,11 @@ const requireWebhookAuth = (req, res, next) => {
  */
 app.get('/webhook/gps-server', requireWebhookAuth, handleGpsServerWebhook);
 app.post('/webhook/gps-server', requireWebhookAuth, handleGpsServerWebhook);
+
+/**
+ * Generic Inbound GPS Webhook
+ */
+app.post('/webhook/incoming-gps', requireWebhookAuth, handleIncomingGps);
 
 /**
  * Forensic Report API
