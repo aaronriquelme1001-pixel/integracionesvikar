@@ -71,17 +71,21 @@ router.get('/', async (req, res) => {
       SELECT 
         bs.imei,
         ROUND(AVG(bs.daily_grade), 1) as grade,
-        MAX(gt.plate) as plate
+        MAX(gt.plate) as plate,
+        MAX(gt.speed) as max_speed,
+        COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn', 'fatigue', 'tired') THEN 1 END) as harsh_events
       FROM billing_snapshots bs
-      LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei
+      LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei AND gt.dt_tracker >= date_trunc('month', current_date)
       WHERE LOWER(bs.client_id) LIKE LOWER('%' || $1 || '%')
       GROUP BY bs.imei
-      ORDER BY grade DESC
+      ORDER BY grade ASC
     `;
     const rankingResult = await pool.query(rankingQuery, [clientId]);
     const driverRanking = rankingResult.rows.map(row => ({
       plate: row.plate || row.imei || 'Desconocido',
-      grade: parseFloat(row.grade) || 7.0
+      grade: parseFloat(row.grade) || 7.0,
+      max_speed: Math.round(row.max_speed || 0),
+      harsh_events: parseInt(row.harsh_events || 0)
     }));
 
     // Construct the UI-ready response
@@ -101,8 +105,8 @@ router.get('/', async (req, res) => {
         desc2: `${activeVehicles} vehículos registrados en el historial.`,
         title3: "Prevención de Riesgos",
         desc3: `Velocidad Máxima histórica detectada: ${Math.round(maxSpeed)} km/h.`,
-        title4: "Top Conductores Histórico",
-        desc4: `Basado en análisis acumulado de telemetría y comportamiento.`
+        title4: "Ranking de Conductores (Atención Requerida)",
+        desc4: `Lista completa de la flota. Ordenados desde los peores evaluados hacia los mejores, basado en su telemetría.`
       }
     });
 
