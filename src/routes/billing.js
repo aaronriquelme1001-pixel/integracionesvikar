@@ -77,7 +77,6 @@ router.get('/', async (req, res) => {
       WHERE LOWER(bs.client_id) LIKE LOWER('%' || $1 || '%')
       GROUP BY bs.imei
       ORDER BY grade DESC
-      LIMIT 10
     `;
     const rankingResult = await pool.query(rankingQuery, [clientId]);
     const driverRanking = rankingResult.rows.map(row => ({
