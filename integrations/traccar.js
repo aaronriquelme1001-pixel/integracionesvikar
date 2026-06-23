@@ -19,8 +19,7 @@ class TraccarStrategy extends BaseStrategy {
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
     if (dateStr.includes(' ')) {
-      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-      parsedDate = new Date(dateStr.replace(' ', 'T') + tz);
+      parsedDate = new Date(dateStr.replace(' ', 'T') + 'Z');
     } else {
       parsedDate = new Date(dateStr);
     }
