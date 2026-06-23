@@ -73,7 +73,10 @@ router.get('/', async (req, res) => {
         ROUND(AVG(bs.daily_grade), 1) as grade,
         MAX(gt.plate) as plate,
         MAX(gt.speed) as max_speed,
-        COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn', 'fatigue', 'tired') THEN 1 END) as harsh_events
+        COUNT(CASE WHEN gt.speed > 110 THEN 1 END) as extreme_speeding,
+        COUNT(CASE WHEN gt.speed > 90 AND gt.speed <= 110 THEN 1 END) as moderate_speeding,
+        COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn') THEN 1 END) as harsh_maneuvers,
+        COUNT(CASE WHEN gt.event IN ('fatigue', 'tired') THEN 1 END) as fatigue_alerts
       FROM billing_snapshots bs
       LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei AND gt.dt_tracker >= date_trunc('month', current_date)
       WHERE LOWER(bs.client_id) LIKE LOWER('%' || $1 || '%')
@@ -81,12 +84,27 @@ router.get('/', async (req, res) => {
       ORDER BY grade ASC
     `;
     const rankingResult = await pool.query(rankingQuery, [clientId]);
-    const driverRanking = rankingResult.rows.map(row => ({
-      plate: row.plate || row.imei || 'Desconocido',
-      grade: parseFloat(row.grade) || 7.0,
-      max_speed: Math.round(row.max_speed || 0),
-      harsh_events: parseInt(row.harsh_events || 0)
-    }));
+    const driverRanking = rankingResult.rows.map(row => {
+      const grade = parseFloat(row.grade) || 7.0;
+      
+      let recommendation = "Conductor Seguro. Mantener comportamiento.";
+      if (grade < 4.0) recommendation = "ALERTA CRÍTICA: Requiere intervención inmediata y re-capacitación.";
+      else if (grade < 5.0) recommendation = "Precaución: Frecuentes violaciones de seguridad. Agendar feedback.";
+      else if (grade < 6.0) recommendation = "Regular: Oportunidad de mejora en ciertas conductas de conducción.";
+
+      return {
+        plate: row.plate || row.imei || 'Desconocido',
+        grade: grade,
+        analysis: {
+          max_speed: Math.round(row.max_speed || 0),
+          extreme_speeding_events: parseInt(row.extreme_speeding || 0),
+          moderate_speeding_events: parseInt(row.moderate_speeding || 0),
+          harsh_maneuvers: parseInt(row.harsh_maneuvers || 0),
+          fatigue_alerts: parseInt(row.fatigue_alerts || 0),
+          recommendation: recommendation
+        }
+      };
+    });
 
     // Construct the UI-ready response
     return res.json({
