@@ -406,9 +406,9 @@ setInterval(async () => {
          // Retry logic: If no points were recovered, give the physical tracker more time to upload
          if (recoveredCount === 0) {
              task.retries = (task.retries || 0) + 1;
-             if (task.retries <= 6) {
+             if (task.retries <= 11) {
                  task.executeAt = Date.now() + (5 * 60 * 1000); // Try again in 5 minutes
-                 console.log(`[Backfiller] Reintentando (${task.retries}/6) para ${task.imei} en 5 minutos...`);
+                 console.log(`[Backfiller] Reintentando (${task.retries}/11) para ${task.imei} en 5 minutos...`);
                  pendingBackfills.push(task);
              } else {
                  console.warn(`[Backfiller] Se rindió con ${task.imei} tras ${task.retries} intentos. El GPS no subió la data.`);
