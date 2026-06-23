@@ -345,16 +345,16 @@ async function pollGpsServerLocations() {
                    
                    if (gapSeconds > gapThreshold && gapSeconds < 259200) {
                      systemStats.backfillerTriggers++;
-                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 3 mins para permitir que suba su historial...`);
+                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 6 mins para permitir que suba su historial...`);
                      
-                     // Queue the backfill to run in 3 minutes, giving the tracker time to upload over GPRS
+                     // Queue the backfill to run in 6 minutes, giving the tracker time to upload over GPRS
                      pendingBackfills.push({
                        imei: imei,
                        dt_old: lastPollerState.dt_tracker,
                        dt_new: device.dt_tracker,
                        client: client,
                        apiKey: masterKey,
-                       executeAt: Date.now() + (3 * 60 * 1000)
+                       executeAt: Date.now() + (6 * 60 * 1000)
                      });
                    }
                  }
