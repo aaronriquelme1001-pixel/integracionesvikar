@@ -33,23 +33,39 @@ router.get('/history', async (req, res) => {
     `;
     const params = [imei];
     
+    // Helper to normalize dates
+    const normalizeDate = (d) => {
+      if (!d) return null;
+      // If it's DD-MM-YYYY, convert to YYYY-MM-DD
+      const parts = d.split('-');
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return d;
+    };
+
+    const normStart = normalizeDate(start_date);
+    const normEnd = normalizeDate(end_date);
+    
     // Parse start date
     query += ` AND dt_tracker >= $2::timestamp`;
-    params.push(start_date);
+    params.push(normStart);
     
-    // Parse end date (if not provided, assume end of the start_date day)
-    let finalEndDate = end_date;
+    // Parse end date
+    let finalEndDate = normEnd;
     if (!finalEndDate) {
-      if (start_date.includes('T')) {
-        // Just add 24 hours if they sent an ISO but no end date
-        finalEndDate = start_date; // Not ideal, but let's assume they want the rest of the day
+      if (normStart.includes('T')) {
+        finalEndDate = normStart; 
       } else {
-        // YYYY-MM-DD format
-        finalEndDate = `${start_date}T23:59:59`;
+        finalEndDate = `${normStart}T23:59:59`;
       }
     }
     
     if (finalEndDate) {
+      // If finalEndDate is just a date like YYYY-MM-DD and doesn't have time, make sure it covers the day
+      if (finalEndDate.length === 10) {
+        finalEndDate = `${finalEndDate}T23:59:59`;
+      }
       query += ` AND dt_tracker <= $3::timestamp`;
       params.push(finalEndDate);
     }
