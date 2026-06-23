@@ -147,6 +147,12 @@ const billingRoute = require('./src/routes/billing');
 app.use('/api/billing-stats', billingRoute);
 
 /**
+ * Fleet API
+ */
+const fleetRoute = require('./src/routes/fleet');
+app.use('/api/fleet', fleetRoute);
+
+/**
  * Manual Trigger for Billing Snapshot
  */
   app.get('/api/trigger-billing', async (req, res) => {

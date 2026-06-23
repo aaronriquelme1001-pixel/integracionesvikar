@@ -38,23 +38,44 @@ function getPointColor(speed) {
 }
 
 router.get('/', async (req, res) => {
-  if (!pool) return res.status(500).send('Data Lake no configurado.');
+  if (!pool) {
+    if (req.query.format === 'json') return res.status(500).json({ error: 'Data Lake no configurado.' });
+    return res.status(500).send('Data Lake no configurado.');
+  }
   
-  const { plate, time, window, secret } = req.query;
+  const { plate, imei, time, window, secret, format } = req.query;
   
-  if (secret !== 'vikar2026') return res.status(403).send('No autorizado.');
-  if (!plate) return res.status(400).send('Debes proveer el parámetro plate.');
+  if (secret !== 'vikar2026') {
+    if (format === 'json') return res.status(403).json({ error: 'No autorizado.' });
+    return res.status(403).send('No autorizado.');
+  }
+  if (!plate && !imei) {
+    if (format === 'json') return res.status(400).json({ error: 'Debes proveer el parámetro plate o imei.' });
+    return res.status(400).send('Debes proveer el parámetro plate o imei.');
+  }
 
   try {
     // 1. Telemetry Query
-    let query = `SELECT lat, lng, speed, dt_tracker, client_source FROM global_telemetry_traffic WHERE REPLACE(LOWER(plate), '-', '') = REPLACE(LOWER($1), '-', '')`;
-    const params = [plate];
+    let query = `SELECT lat, lng, speed, dt_tracker, client_source FROM global_telemetry_traffic WHERE 1=1 `;
+    const params = [];
+    let paramIndex = 1;
+
+    if (imei) {
+      query += ` AND imei = $${paramIndex}`;
+      params.push(imei);
+      paramIndex++;
+    } else {
+      query += ` AND REPLACE(LOWER(plate), '-', '') = REPLACE(LOWER($${paramIndex}), '-', '')`;
+      params.push(plate);
+      paramIndex++;
+    }
 
     if (time) {
       const windowMinutes = parseInt(window) || 5;
-      query += ` AND dt_tracker >= $2::timestamp - interval '${windowMinutes} minutes'`;
-      query += ` AND dt_tracker <= $2::timestamp + interval '${windowMinutes} minutes'`;
+      query += ` AND dt_tracker >= $${paramIndex}::timestamp - interval '${windowMinutes} minutes'`;
+      query += ` AND dt_tracker <= $${paramIndex}::timestamp + interval '${windowMinutes} minutes'`;
       params.push(time);
+      paramIndex++;
     }
     
     query += ` ORDER BY dt_tracker ASC LIMIT 500`;
@@ -215,6 +236,47 @@ router.get('/', async (req, res) => {
       alertMessage = 'El vehículo superó los límites de seguridad (>90km/h).';
     }
 
+    if (format === 'json') {
+      return res.json({
+        report_id: 'FR-' + Date.now().toString().substring(5),
+        generation_date: new Date().toISOString(),
+        vehicle: {
+          plate: (plate || '').toUpperCase(),
+          imei: imei || null,
+          client_source: rows[0].client_source.toUpperCase()
+        },
+        analysis: {
+          total_records: rows.length,
+          max_speed: maxSpeed,
+          avg_speed: avgSpeed,
+          time_window: time ? `+/- ${window || 5} min desde ${time}` : 'Últimos registros',
+          location: locationName
+        },
+        weather: {
+          condition: weatherCondition,
+          temp: temp,
+          rain: rain
+        },
+        fatigue_hours: fatigueHours,
+        verdict: {
+          title: verdictTitle,
+          body: verdictBody,
+          severity_class: verdictClass
+        },
+        alert: {
+          title: alertTitle,
+          message: alertMessage,
+          severity_class: alertClass
+        },
+        map_data: mapData,
+        chart_data: {
+          labels: chartLabels,
+          speeds: chartSpeeds,
+          pointColors: chartColors
+        }
+      });
+    }
+
     // 7. Render Template
     let template = forensicTemplate;
 
@@ -226,7 +288,7 @@ router.get('/', async (req, res) => {
       .replace(/{{ALERT_CLASS}}/g, alertClass)
       .replace(/{{ALERT_TITLE}}/g, alertTitle)
       .replace(/{{ALERT_MESSAGE}}/g, alertMessage)
-      .replace(/{{PLATE}}/g, plate.toUpperCase())
+      .replace(/{{PLATE}}/g, (plate || '').toUpperCase())
       .replace(/{{CLIENT_SOURCE}}/g, clientSource.toUpperCase())
       .replace(/{{TOTAL_RECORDS}}/g, rows.length)
       .replace(/{{MAX_SPEED}}/g, maxSpeed)
@@ -251,6 +313,7 @@ router.get('/', async (req, res) => {
 
   } catch (err) {
     console.error('Forensic Endpoint Error:', err);
+    if (req.query.format === 'json') return res.status(500).json({ error: 'Error interno generando el reporte.' });
     res.status(500).send('Error interno generando el reporte.');
   }
 });

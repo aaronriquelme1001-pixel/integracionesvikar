@@ -1,0 +1,1000 @@
+[INFO] 2026-06-23T16:43:52.095Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.099Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:43:52.099Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.554248,"lon":-72.90681,"speed":83,"bearing":63,"altitude":18,"timestamp":1782233025,"valid":"true"}
+[INFO] 2026-06-23T16:43:52.100Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.100Z - [B2B Dispatch] Device: Retro JBDZ38 — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.100Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.271Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:43:52.272Z - [B2B Dispatch] Device: TRACTOR 1 MF 7724 S — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.272Z - [B2B Dispatch] Device: RETRO CASE 1 — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.277Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:43:52.281Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:43:56.030Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:43:56.031Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.031Z - [B2B Dispatch] Device: PEUGEOT TGHX13 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.031Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.031Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.032Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.032Z - [B2B Dispatch] Device: MAXUS ARRIENDO TVPZ65 — Routing to: datalake
+[ERROR] 2026-06-23T16:43:56.035Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:43:56.037Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.037Z - [B2B Dispatch] Device: RWSJ65 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.042Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.042Z - [B2B Dispatch] Device: DFKT91 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:43:56.042Z - [Traccar] Forwarding telemetry for 865413053854286 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053854286","lat":-41.871775,"lon":-73.775132,"speed":6,"bearing":89,"altitude":19,"timestamp":1782233029,"valid":"true"}
+[INFO] 2026-06-23T16:43:56.042Z - [B2B Dispatch] Device: HD35  KGTY- 37 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.219Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:43:56.331Z - [Traccar] Success Response for 865413053854286: Status 200
+[INFO] 2026-06-23T16:43:56.332Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.335Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.339Z - [B2B Dispatch] Device: Mitsubishi  TRZC46 URALES — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.339Z - [B2B Dispatch] Device: LWBZ87 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.339Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.344Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.345Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[WARN] 2026-06-23T16:43:56.348Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:43:56.349Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.349Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.349Z - [B2B Dispatch] Device: HZRX80 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.349Z - [B2B Dispatch] Device: LWPT73 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.354Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.354Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.354Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.358Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.358Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.358Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.359Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 2 — Routing to: datalake
+[INFO] 2026-06-23T16:43:56.363Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:00.102Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:00.102Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.102Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.102Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.102Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.102Z - [B2B Dispatch] Device: 55 CAMION OPORTO CAMILO — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.103Z - [B2B Dispatch] Device: 30 FURGON SIN ASIGNACION — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.103Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[ERROR] 2026-06-23T16:44:00.106Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:00.131Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.135Z - [B2B Dispatch] Device: MERCEDES HDWL47 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.135Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.135Z - [B2B Dispatch] Device: PZPT56 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.140Z - [B2B Dispatch] Device: MANITOU — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.140Z - [B2B Dispatch] Device: TLBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.140Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.140Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.144Z - [B2B Dispatch] Device: AXOR 2 LLKH68 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.148Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.148Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.152Z - [B2B Dispatch] Device: GPLD51 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.152Z - [B2B Dispatch] Device: LCTF35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:00.152Z - [Traccar] Forwarding telemetry for 865413054401137 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401137","lat":-39.661782,"lon":-72.940085,"speed":34,"bearing":152,"altitude":22,"timestamp":1782233035,"valid":"true"}
+[INFO] 2026-06-23T16:44:00.325Z - [Traccar] Success Response for 865413054401137: Status 200
+[INFO] 2026-06-23T16:44:00.325Z - [B2B Dispatch] Device: STKH22 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.329Z - [B2B Dispatch] Device: MOVIL 6 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.329Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[WARN] 2026-06-23T16:44:00.329Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:00.335Z - [B2B Dispatch] Device: LLKR53 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.341Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.341Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.341Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.346Z - [B2B Dispatch] Device: CAMION TKZV75 — Routing to: datalake
+[INFO] 2026-06-23T16:44:00.349Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:04.092Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:04.092Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.092Z - [B2B Dispatch] Device: 49 VELASQUEZ CESAR — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.092Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.092Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.092Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.092Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:04.095Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:04.097Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.097Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.098Z - [B2B Dispatch] Device: RWSJ65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.102Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.102Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.102Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.107Z - [B2B Dispatch] Device: FOTON-2 SSVJ76 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.107Z - [B2B Dispatch] Device: FOTON-8 VSGT47 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.107Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.107Z - [B2B Dispatch] Device: RETRO CAT HHHV34 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.107Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.112Z - [B2B Dispatch] Device: CWRP59 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:04.112Z - [Traccar] Forwarding telemetry for 865413054271142 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054271142","lat":-36.957958,"lon":-73.158858,"speed":0,"bearing":341,"altitude":15,"timestamp":1782233040,"valid":"true"}
+[INFO] 2026-06-23T16:44:04.113Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[ERROR] 2026-06-23T16:44:04.284Z - [Traccar] Forwarding failed for 865413054271142: Request failed with status code 400
+[INFO] 2026-06-23T16:44:04.284Z - [B2B Dispatch] Device: LWBZ87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.284Z - [B2B Dispatch] Device: Mitsubishi TKFZ26 Fredy — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.284Z - [B2B Dispatch] Device: EXC VOLVO  3 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.284Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.289Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.289Z - [B2B Dispatch] Device: 29 GARRIDO OSVALDO — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.294Z - [B2B Dispatch] Device: TJLT70 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.294Z - [B2B Dispatch] Device: FREI 1 RSWZ74 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.294Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.300Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.300Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.300Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.300Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.301Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:04.301Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:04.305Z - [B2B Dispatch] Device: TDZB19 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.306Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.306Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.311Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:04.311Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.553118,"lon":-72.903892,"speed":86,"bearing":62,"altitude":12,"timestamp":1782233037,"valid":"true"}
+[INFO] 2026-06-23T16:44:04.311Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.311Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.312Z - [B2B Dispatch] Device: LWPT73 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.483Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:44:04.483Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.487Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:44:04.491Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:06.515Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:44:08.232Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:08.232Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.233Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.233Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:08.235Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:08.239Z - [B2B Dispatch] Device: ACTROS 9 HHDJ66 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.240Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.244Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.244Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.244Z - [B2B Dispatch] Device: MOTO CASE 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.249Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.253Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.253Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.260Z - [B2B Dispatch] Device: AXOR 2 LLKH68 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.261Z - [B2B Dispatch] Device: DL BC75 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.261Z - [B2B Dispatch] Device: CARGADOR LIUGONG 6 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.261Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.265Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.266Z - [B2B Dispatch] Device: VOLVO SFRZ54  MAURICIO — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.270Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.270Z - [B2B Dispatch] Device: FOTON-7 VSGW77 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.275Z - [B2B Dispatch] Device: CARGADOR  JHON DEER — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.275Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.279Z - [B2B Dispatch] Device: RETRO TRHH80 — Routing to: datalake
+[WARN] 2026-06-23T16:44:08.279Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:08.283Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.287Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.290Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.290Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.290Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.290Z - [B2B Dispatch] Device: SELECCIONADORA KLEMANN — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.295Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:08.298Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:12.039Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: 30 FURGON SIN ASIGNACION — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.039Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:12.042Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:12.070Z - [B2B Dispatch] Device: MAXUS RPKR82  — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.075Z - [B2B Dispatch] Device: CARGADOR LIUGONG 5 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.075Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.079Z - [Poller] 📡 Brecha de 1203s detectada para 865413054256564. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:44:12.080Z - [B2B Dispatch] Device: S. LEIVA-MOVIL1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.080Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.080Z - [B2B Dispatch] Device: TRACTO VOLVO ZU6177 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.086Z - [B2B Dispatch] Device: SCANIA GDHW98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.086Z - [B2B Dispatch] Device: VITO JHBF65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.086Z - [B2B Dispatch] Device: BT50 1 PSGV20 ALEXIS VELASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.090Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.091Z - [B2B Dispatch] Device: PZ 1450 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.091Z - [B2B Dispatch] Device: SWCG50 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.091Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.091Z - [B2B Dispatch] Device: MAXUS  SDVB44  RENTAL BLANCA — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.097Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.097Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.101Z - [B2B Dispatch] Device: FREI 1 RSWZ74 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.101Z - [B2B Dispatch] Device: SHAC-3 LXHH71 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.106Z - [B2B Dispatch] Device: BASTIAN- Movil 5 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.106Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.111Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.111Z - [B2B Dispatch] Device: MOVIL 3 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.111Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[WARN] 2026-06-23T16:44:12.111Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:12.116Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:12.116Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.552108,"lon":-72.901122,"speed":89,"bearing":64,"altitude":18,"timestamp":1782233048,"valid":"true"}
+[INFO] 2026-06-23T16:44:12.117Z - [B2B Dispatch] Device: VRPG99 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.117Z - [B2B Dispatch] Device: SPGS55 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.117Z - [B2B Dispatch] Device: VGWT55 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.117Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.523Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:44:12.523Z - [B2B Dispatch] Device: EXC. HITACHI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:12.527Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:16.269Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:16.269Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.269Z - [B2B Dispatch] Device: 49 VELASQUEZ CESAR — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.269Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.270Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:16.272Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:16.275Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.275Z - [B2B Dispatch] Device: R 2 LLKH60 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.276Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.281Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.281Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.281Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.281Z - [Poller] 📡 Brecha de 1202s detectada para 865413053855473. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:44:16.281Z - [B2B Dispatch] Device: FORD TPVL36 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.287Z - [B2B Dispatch] Device: YW4881 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:16.287Z - [Traccar] Forwarding telemetry for 865413053932884 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053932884","lat":-39.790667,"lon":-73.19125,"speed":0,"bearing":32,"altitude":21,"timestamp":1782233049,"valid":"true"}
+[INFO] 2026-06-23T16:44:16.288Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.288Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.288Z - [B2B Dispatch] Device: L3P_2 / THZF16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.504Z - [Traccar] Success Response for 865413053932884: Status 200
+[INFO] 2026-06-23T16:44:16.505Z - [B2B Dispatch] Device: KIA  PJPX63 PATIO Fredy — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.505Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.510Z - [Poller] 📡 Brecha de 278s detectada para 865413054330740. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:44:16.510Z - [B2B Dispatch] Device: PZ 1450 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.510Z - [B2B Dispatch] Device: DJ RW58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.510Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.519Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.519Z - [B2B Dispatch] Device: FHBS28 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.519Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.524Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.524Z - [B2B Dispatch] Device: Hyundai LYYZ75 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.524Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.524Z - [B2B Dispatch] Device: LCTF35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:16.524Z - [Traccar] Forwarding telemetry for 865413054401137 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401137","lat":-39.662823,"lon":-72.939457,"speed":33,"bearing":154,"altitude":20,"timestamp":1782233047,"valid":"true"}
+[INFO] 2026-06-23T16:44:16.525Z - [B2B Dispatch] Device: RETRO TEREX 4 (GLO) — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.736Z - [Traccar] Success Response for 865413054401137: Status 200
+[INFO] 2026-06-23T16:44:16.737Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[WARN] 2026-06-23T16:44:16.740Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:16.741Z - [B2B Dispatch] Device: INTER FSPH67 PABLO GODOY — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.741Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.746Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.746Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.750Z - [B2B Dispatch] Device: TERRANO YN5456 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.750Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.750Z - [B2B Dispatch] Device: FURGON — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.751Z - [B2B Dispatch] Device: FORD CARGO BZZT22 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.751Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.757Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.757Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:16.762Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:16.807Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:44:17.087Z - [Backfiller] Iniciando recuperación de historial para 865413054384572. De: 2026-06-23 16:17:13 a 2026-06-23 16:37:14
+[INFO] 2026-06-23T16:44:17.274Z - [Backfiller] Reintentando (1/11) para 865413054384572 en 5 minutos...
+[INFO] 2026-06-23T16:44:17.274Z - [Backfiller] Iniciando recuperación de historial para 869671072814732. De: 2026-06-23 16:32:17 a 2026-06-23 16:36:07
+[INFO] 2026-06-23T16:44:17.460Z - [Backfiller] Reintentando (1/11) para 869671072814732 en 5 minutos...
+[INFO] 2026-06-23T16:44:17.460Z - [Backfiller] Iniciando recuperación de historial para 865413054331284. De: 2026-06-23 16:32:28 a 2026-06-23 16:37:00
+[INFO] 2026-06-23T16:44:17.647Z - [Backfiller] Reintentando (1/11) para 865413054331284 en 5 minutos...
+[INFO] 2026-06-23T16:44:17.647Z - [Backfiller] Iniciando recuperación de historial para 865413054400873. De: 2026-06-23 16:15:49 a 2026-06-23 16:35:51
+[INFO] 2026-06-23T16:44:17.833Z - [Backfiller] Reintentando (1/11) para 865413054400873 en 5 minutos...
+[INFO] 2026-06-23T16:44:17.833Z - [Backfiller] Iniciando recuperación de historial para 865413054353031. De: 2026-06-23 16:11:35 a 2026-06-23 16:31:52
+[INFO] 2026-06-23T16:44:18.020Z - [Backfiller] Reintentando (2/11) para 865413054353031 en 5 minutos...
+[INFO] 2026-06-23T16:44:20.327Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:20.327Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.327Z - [B2B Dispatch] Device: 58 RAUL ASENJO — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.327Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.327Z - [B2B Dispatch] Device: TLVJ72 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.327Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[ERROR] 2026-06-23T16:44:20.330Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:20.332Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.332Z - [B2B Dispatch] Device: RWSJ65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.336Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.337Z - [B2B Dispatch] Device: MOTO CASE 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.342Z - [B2B Dispatch] Device: TRACTO VOLVO ZU6177 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.342Z - [B2B Dispatch] Device: PZPT56 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.346Z - [B2B Dispatch] Device: RPCV16 MAXUS — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.347Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.351Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.351Z - [B2B Dispatch] Device: 39 LUENGO RICARDO — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.356Z - [B2B Dispatch] Device:    SFRZ47 ALFREDO — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.356Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.356Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.363Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.363Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.363Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:20.363Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:20.368Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.368Z - [B2B Dispatch] Device: CARGADOR LIUGONG 9 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.372Z - [B2B Dispatch] Device: LLKR53 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.372Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.376Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.376Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.376Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.377Z - [B2B Dispatch] Device: PLANTA MOVIL 3 — Routing to: datalake
+[INFO] 2026-06-23T16:44:20.382Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:24.126Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:24.126Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.126Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.126Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.126Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.126Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.126Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:24.129Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:24.154Z - [B2B Dispatch] Device: AROCS 1 PTPD71 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.158Z - [B2B Dispatch] Device: MIXER 24 - DCVH95 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.158Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.162Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.162Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.167Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.167Z - [B2B Dispatch] Device: BT50 1 PSGV20 ALEXIS VELASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.171Z - [B2B Dispatch] Device: LWBZ87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.171Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.176Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.180Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.180Z - [B2B Dispatch] Device: EMP_2 / SHPV81 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.184Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.184Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.184Z - [B2B Dispatch] Device: TFJG18 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.185Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:24.185Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:24.189Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:24.189Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.551167,"lon":-72.898315,"speed":86,"bearing":66,"altitude":20,"timestamp":1782233059,"valid":"true"}
+[INFO] 2026-06-23T16:44:24.190Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.190Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.577Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:44:24.577Z - [B2B Dispatch] Device: EXC. VOLVO 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.581Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.581Z - [B2B Dispatch] Device: CARGADOR LIUGONG 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.581Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.581Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:24.586Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:27.127Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:44:28.325Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:28.325Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.326Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.326Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:28.329Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:28.330Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.330Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.335Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.335Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.340Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.343Z - [B2B Dispatch] Device: FJ SL54 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.343Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.348Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.348Z - [B2B Dispatch] Device: HPTY43 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.348Z - [B2B Dispatch] Device: JGRC49 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.348Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.353Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.353Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.353Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.358Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.358Z - [B2B Dispatch] Device: EXC LIUGONG 3 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.363Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.366Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.366Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.366Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.366Z - [B2B Dispatch] Device: CARGADOR LIUGONG 10 — Routing to: datalake
+[WARN] 2026-06-23T16:44:28.366Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:28.372Z - [B2B Dispatch] Device: CARGADOR SEM 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.372Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.377Z - [B2B Dispatch] Device: ACTROS 4 P. COMBUSTIBLE — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.377Z - [B2B Dispatch] Device: INTER 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.377Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.377Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.382Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.382Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.382Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.386Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:28.390Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:32.135Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:32.135Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.136Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.136Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.136Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:32.138Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:32.141Z - [B2B Dispatch] Device: 28 EMILIO QUEZADA — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.145Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.148Z - [B2B Dispatch] Device: EXC CASE 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.148Z - [B2B Dispatch] Device: PZPT56 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.153Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.156Z - [B2B Dispatch] Device: LWBZ87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.156Z - [B2B Dispatch] Device: PD 3294 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.156Z - [B2B Dispatch] Device: TGXL-88 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.156Z - [B2B Dispatch] Device: Mitsubishi TKFZ26 Fredy — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.156Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.185Z - [B2B Dispatch] Device: LCTF35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:32.185Z - [Traccar] Forwarding telemetry for 865413054401137 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401137","lat":-39.663778,"lon":-72.938857,"speed":22,"bearing":140,"altitude":20,"timestamp":1782233061,"valid":"true"}
+[INFO] 2026-06-23T16:44:32.186Z - [B2B Dispatch] Device: RETRO TEREX 4 (GLO) — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.567Z - [Traccar] Success Response for 865413054401137: Status 200
+[INFO] 2026-06-23T16:44:32.568Z - [B2B Dispatch] Device: CAM. FORD BRBD42 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.568Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.573Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:32.573Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:32.576Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.580Z - [B2B Dispatch] Device: VOLVO CFSY39 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.580Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.580Z - [B2B Dispatch] Device: LWPT73 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.580Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.584Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.585Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.585Z - [B2B Dispatch] Device: Mitsubishi TRZC45 URALES — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.589Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:32.592Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:36.337Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:36.337Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.337Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[ERROR] 2026-06-23T16:44:36.339Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:36.341Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.345Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.348Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.348Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.353Z - [B2B Dispatch] Device: LZRK98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.353Z - [B2B Dispatch] Device: LVGT66 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.358Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.358Z - [Poller] 📡 Brecha de 183s detectada para 865413054322879. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:44:36.358Z - [B2B Dispatch] Device: SHAC-6 TVHS94 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.362Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.362Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.362Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.367Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.367Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.367Z - [B2B Dispatch] Device: LCTF35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:36.367Z - [Traccar] Forwarding telemetry for 865413054401137 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401137","lat":-39.6638,"lon":-72.938502,"speed":5,"bearing":86,"altitude":21,"timestamp":1782233069,"valid":"true"}
+[INFO] 2026-06-23T16:44:36.535Z - [Traccar] Success Response for 865413054401137: Status 200
+[INFO] 2026-06-23T16:44:36.535Z - [B2B Dispatch] Device: PLANTA MOVIL 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.535Z - [B2B Dispatch] Device: RODILLO HAMM 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.535Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.540Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[WARN] 2026-06-23T16:44:36.540Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:36.544Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.545Z - [B2B Dispatch] Device: VPGK45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.549Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:36.549Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.550037,"lon":-72.895605,"speed":86,"bearing":59,"altitude":18,"timestamp":1782233070,"valid":"true"}
+[INFO] 2026-06-23T16:44:36.550Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.550Z - [B2B Dispatch] Device: LLKR53 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.758Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:44:36.759Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.759Z - [B2B Dispatch] Device: NISSAN KCHX54 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.759Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.764Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:36.767Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:37.436Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:44:40.506Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:40.506Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.506Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.506Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.506Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.506Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.507Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:40.509Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:40.532Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.532Z - [B2B Dispatch] Device: FURGON SVYS48  — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.532Z - [B2B Dispatch] Device: RWSJ65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.537Z - [B2B Dispatch] Device: MAXUS SJRF45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.537Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.537Z - [B2B Dispatch] Device: KYYZ82 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.541Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.545Z - [B2B Dispatch] Device: INTER 4 HKXV66 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.545Z - [B2B Dispatch] Device: Sanyong  KRVG25 CRISTIAN MEDINA — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.545Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.545Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.550Z - [B2B Dispatch] Device: AXOR 2 LLKH68 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.550Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.554Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.554Z - [B2B Dispatch] Device: SCHAFF- MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.554Z - [B2B Dispatch] Device: TPHK51 JAC — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.559Z - [B2B Dispatch] Device: AXOR 1 JLJK15 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.559Z - [B2B Dispatch] Device: JYJS98 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:40.559Z - [Traccar] Forwarding telemetry for 865413054385702 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054385702","lat":-39.5623,"lon":-72.89227,"speed":0,"bearing":174,"altitude":38,"timestamp":1782233072,"valid":"true"}
+[INFO] 2026-06-23T16:44:40.774Z - [Traccar] Success Response for 865413054385702: Status 200
+[INFO] 2026-06-23T16:44:40.774Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.774Z - [B2B Dispatch] Device: TDDX11 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.774Z - [B2B Dispatch] Device: RETRO JCB — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.779Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.779Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.779Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:40.779Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:40.784Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.787Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.787Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.787Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.788Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.792Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.792Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.792Z - [B2B Dispatch] Device: TRACTOR 1 MF 7724 S — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.792Z - [B2B Dispatch] Device: CARGADOR HUAYA 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.797Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.797Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.797Z - [B2B Dispatch] Device: PBXV46 — Routing to: datalake
+[INFO] 2026-06-23T16:44:40.802Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:44.539Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:44.539Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.539Z - [B2B Dispatch] Device: GFTS14 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.539Z - [B2B Dispatch] Device: 36 FURGON SIN ASIGNACION — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.540Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.540Z - [B2B Dispatch] Device: TWBP36 KIA — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.540Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:44.543Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:44.573Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.574Z - [B2B Dispatch] Device: POE TGXK62 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.578Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.578Z - [B2B Dispatch] Device: DF 7 HRCC65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.582Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.582Z - [B2B Dispatch] Device: HYUNDAI RKWC33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.587Z - [B2B Dispatch] Device: Mitsubishi  TRZC41 URALES — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.587Z - [Poller] 📡 Brecha de 1202s detectada para 865413054321129. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:44:44.587Z - [B2B Dispatch] Device: RSRK25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.587Z - [B2B Dispatch] Device: BT50 1 PSGV20 ALEXIS VELASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.591Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.591Z - [B2B Dispatch] Device: LCXP35 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.591Z - [B2B Dispatch] Device: SHAC-6 TVHS94 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.592Z - [B2B Dispatch] Device: LWBZ87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.592Z - [B2B Dispatch] Device: H4P_1 / SDJD52 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.592Z - [B2B Dispatch] Device: DF 8 KPVT33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.592Z - [B2B Dispatch] Device: RJFC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.592Z - [B2B Dispatch] Device: MAXUS  SDVB43 CRISTIAN — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.617Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.617Z - [B2B Dispatch] Device: JFCG49 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.617Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.617Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.617Z - [B2B Dispatch] Device: KXFC 16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.621Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.622Z - [B2B Dispatch] Device: EXC. CAT 3 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.622Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.622Z - [B2B Dispatch] Device: JFCG62 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:44.622Z - [Traccar] Forwarding telemetry for 865413054401046 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401046","lat":-39.519415,"lon":-72.829028,"speed":0,"bearing":79,"altitude":64,"timestamp":1782233077,"valid":"true"}
+[INFO] 2026-06-23T16:44:44.836Z - [Traccar] Success Response for 865413054401046: Status 200
+[INFO] 2026-06-23T16:44:44.836Z - [B2B Dispatch] Device: TRACTOR MF 5460 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.840Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.840Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[WARN] 2026-06-23T16:44:44.840Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:44.844Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.845Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.845Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.845Z - [B2B Dispatch] Device: FOTON SZJD89 PAULO FUENTES — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.845Z - [B2B Dispatch] Device: FORD CARGO BZZT22 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.845Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.849Z - [B2B Dispatch] Device: MERCEDES ATEGO — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.850Z - [B2B Dispatch] Device: DF 1 HLYT88 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.850Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.850Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.854Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:44.858Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:47.088Z - [Backfiller] Iniciando recuperación de historial para 863719063926381. De: 2026-06-23 16:17:29 a 2026-06-23 16:37:44
+[INFO] 2026-06-23T16:44:47.452Z - [Backfiller] Reintentando (1/11) para 863719063926381 en 5 minutos...
+[INFO] 2026-06-23T16:44:47.452Z - [Backfiller] Iniciando recuperación de historial para 863719063926829. De: 2026-06-23 16:15:51 a 2026-06-23 16:36:19
+[INFO] 2026-06-23T16:44:47.637Z - [Backfiller] Reintentando (1/11) para 863719063926829 en 5 minutos...
+[INFO] 2026-06-23T16:44:47.637Z - [Backfiller] Iniciando recuperación de historial para 865413053744834. De: 2026-06-23 16:17:26 a 2026-06-23 16:37:28
+[INFO] 2026-06-23T16:44:47.750Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:44:47.823Z - [Backfiller] Reintentando (1/11) para 865413053744834 en 5 minutos...
+[INFO] 2026-06-23T16:44:47.823Z - [Backfiller] Iniciando recuperación de historial para 865413053731070. De: 2026-06-23 16:17:54 a 2026-06-23 16:37:56
+[INFO] 2026-06-23T16:44:48.008Z - [Backfiller] Reintentando (1/11) para 865413053731070 en 5 minutos...
+[INFO] 2026-06-23T16:44:48.008Z - [Backfiller] Iniciando recuperación de historial para 865413054331854. De: 2026-06-23 16:12:28 a 2026-06-23 16:32:30
+[INFO] 2026-06-23T16:44:48.193Z - [Backfiller] Reintentando (2/11) para 865413054331854 en 5 minutos...
+[INFO] 2026-06-23T16:44:48.193Z - [Backfiller] Iniciando recuperación de historial para 869671072794439. De: 2026-06-23 15:56:56 a 2026-06-23 16:04:07
+[INFO] 2026-06-23T16:44:48.378Z - [Backfiller] Reintentando (2/11) para 869671072794439 en 5 minutos...
+[INFO] 2026-06-23T16:44:48.378Z - [Backfiller] Iniciando recuperación de historial para 869671072794439. De: 2026-06-23 16:04:07 a 2026-06-23 16:24:40
+[INFO] 2026-06-23T16:44:48.564Z - [Backfiller] Reintentando (2/11) para 869671072794439 en 5 minutos...
+[INFO] 2026-06-23T16:44:48.564Z - [Backfiller] Iniciando recuperación de historial para 869671072794439. De: 2026-06-23 16:24:40 a 2026-06-23 16:28:41
+[INFO] 2026-06-23T16:44:48.604Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:48.604Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.604Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.604Z - [B2B Dispatch] Device: ACTROS FTZP42 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:48.607Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:48.609Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.609Z - [Poller] 📡 Brecha de 1216s detectada para 865413053745989. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:44:48.609Z - [B2B Dispatch] Device: DLZW55 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.609Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.609Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.609Z - [B2B Dispatch] Device: PRDY76 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.615Z - [B2B Dispatch] Device: KXDX63 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.615Z - [B2B Dispatch] Device: 53 MAURICIO MAECHEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.619Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.622Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.623Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.626Z - [B2B Dispatch] Device: Carlos puente — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.627Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.631Z - [B2B Dispatch] Device: NISSAN DSRJ83 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.631Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.631Z - [B2B Dispatch] Device: Camioneta MAXUS LYYY82 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.636Z - [B2B Dispatch] Device: RETRO JD 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.636Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.640Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[WARN] 2026-06-23T16:44:48.640Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:48.643Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.647Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.647Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.647Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.647Z - [B2B Dispatch] Device: PGZT95 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.651Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.651Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.651Z - [B2B Dispatch] Device: RETRO CASE 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.656Z - [B2B Dispatch] Device: DF 1 HLYT88 — Routing to: datalake
+[INFO] 2026-06-23T16:44:48.659Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:48.749Z - [Backfiller] Reintentando (2/11) para 869671072794439 en 5 minutos...
+[INFO] 2026-06-23T16:44:52.395Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:52.395Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.395Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.396Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.396Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.396Z - [B2B Dispatch] Device: 54 VERA JAIME — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.396Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.396Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:52.398Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:52.402Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.402Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.402Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.403Z - [B2B Dispatch] Device: MOTO CASE 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.407Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.407Z - [B2B Dispatch] Device: PZPT56 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.411Z - [B2B Dispatch] Device: TLBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.415Z - [B2B Dispatch] Device: SHAC-6 TVHS94 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.415Z - [B2B Dispatch] Device: DF 8 KPVT33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.415Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.419Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.419Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.419Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.423Z - [B2B Dispatch] Device: FOTON-7 VSGW77 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.427Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.430Z - [B2B Dispatch] Device: MOVIL 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.430Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:52.430Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:52.435Z - [B2B Dispatch] Device: NAVARA 7 RSHS96 VICTOR CALISTRO — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.435Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.435Z - [B2B Dispatch] Device: EXC. HITACHI 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.440Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:52.440Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.548868,"lon":-72.892678,"speed":87,"bearing":64,"altitude":13,"timestamp":1782233082,"valid":"true"}
+[INFO] 2026-06-23T16:44:52.441Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.441Z - [B2B Dispatch] Device: LWPT73 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.812Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:44:52.812Z - [B2B Dispatch] Device: MIXER 26 - VCLS44 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.812Z - [B2B Dispatch] Device: SCANIA HCKF92 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.812Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.812Z - [B2B Dispatch] Device: Renault Duster LCGG60 PATRICIO ZAPATA — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.812Z - [B2B Dispatch] Device: AXOR 3 LLKH69 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.812Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.818Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 2 — Routing to: datalake
+[INFO] 2026-06-23T16:44:52.821Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:56.568Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:44:56.568Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.568Z - [B2B Dispatch] Device: MAXUS ARRIENDO TVPZ65 — Routing to: datalake
+[ERROR] 2026-06-23T16:44:56.570Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:44:56.572Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.572Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.572Z - [B2B Dispatch] Device: AROCS 1 PTPD71 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.572Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.572Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.577Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.577Z - [B2B Dispatch] Device: DFKT91 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:44:56.577Z - [Traccar] Forwarding telemetry for 865413053854286 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053854286","lat":-41.871367,"lon":-73.775617,"speed":0,"bearing":324,"altitude":36,"timestamp":1782233089,"valid":"true"}
+[INFO] 2026-06-23T16:44:56.578Z - [B2B Dispatch] Device: HD35  KGTY- 37 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.788Z - [Traccar] Success Response for 865413053854286: Status 200
+[INFO] 2026-06-23T16:44:56.788Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.788Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.792Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.795Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.799Z - [B2B Dispatch] Device: IVAN - MOVIL 3  — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.799Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.803Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.804Z - [B2B Dispatch] Device: RAM - 4 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.804Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.808Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.808Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:44:56.808Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:44:56.813Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.813Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.813Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.818Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.821Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.821Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.825Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-23T16:44:56.828Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:44:58.044Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:45:00.564Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:00.564Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.564Z - [B2B Dispatch] Device: PEUGEOT TGHX13 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.565Z - [B2B Dispatch] Device: FWKP69  — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.565Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.565Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.565Z - [B2B Dispatch] Device: 55 CAMION OPORTO CAMILO — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.565Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[ERROR] 2026-06-23T16:45:00.567Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:00.592Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.595Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.598Z - [B2B Dispatch] Device: NAVARA 5 PGZZ37 ANDRES SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.598Z - [B2B Dispatch] Device: BT50 1 PSGV20 ALEXIS VELASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.598Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.603Z - [B2B Dispatch] Device: AXOR 2 LLKH68 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.603Z - [B2B Dispatch] Device: DF 8 KPVT33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.603Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.608Z - [B2B Dispatch] Device: Alejandro- MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.608Z - [B2B Dispatch] Device: 29 GARRIDO OSVALDO — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.612Z - [B2B Dispatch] Device: FOTON-7 VSGW77 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.612Z - [B2B Dispatch] Device: GPLD51 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.617Z - [Poller] 📡 Brecha de 1218s detectada para 865413054403646. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:45:00.617Z - [B2B Dispatch] Device: RETRO LIUGONG 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.620Z - [B2B Dispatch] Device: 20 Vitara SVKV14 — Routing to: datalake
+[WARN] 2026-06-23T16:45:00.620Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:00.624Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.627Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:00.627Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.547868,"lon":-72.889945,"speed":86,"bearing":64,"altitude":14,"timestamp":1782233093,"valid":"true"}
+[INFO] 2026-06-23T16:45:00.628Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.628Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.628Z - [B2B Dispatch] Device: LLKR53 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.794Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:45:00.795Z - [B2B Dispatch] Device: Toyota LKLH70 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.795Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.800Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.800Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.800Z - [B2B Dispatch] Device: CAMION TKZV75 — Routing to: datalake
+[INFO] 2026-06-23T16:45:00.805Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:45:04.543Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:04.543Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.543Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.543Z - [B2B Dispatch] Device: 43 RIQUELME ALEJANDRO — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.543Z - [B2B Dispatch] Device: RAMPLA JK7182 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.543Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:45:04.546Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:04.550Z - [B2B Dispatch] Device: ACTROS 9 HHDJ66 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.550Z - [B2B Dispatch] Device: FPKL47 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.550Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.556Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.556Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.561Z - [B2B Dispatch] Device: FOTON-8 VSGT47 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.561Z - [B2B Dispatch] Device: LWBZ79 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.561Z - [B2B Dispatch] Device: RETRO CAT HHHV34 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.561Z - [B2B Dispatch] Device: PZPT56 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.566Z - [B2B Dispatch] Device: CWRP59 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:04.566Z - [Traccar] Forwarding telemetry for 865413054271142 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054271142","lat":-36.957958,"lon":-73.158858,"speed":0,"bearing":341,"altitude":15,"timestamp":1782233099,"valid":"true"}
+[INFO] 2026-06-23T16:45:04.567Z - [B2B Dispatch] Device: LZRK98 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.567Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.567Z - [B2B Dispatch] Device: Sanyong  TSZS48 mantencion — Routing to: datalake
+[ERROR] 2026-06-23T16:45:04.764Z - [Traccar] Forwarding failed for 865413054271142: Request failed with status code 400
+[INFO] 2026-06-23T16:45:04.764Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.764Z - [B2B Dispatch] Device: SHAC-6 TVHS94 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.764Z - [B2B Dispatch] Device: DL BC75 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.764Z - [B2B Dispatch] Device: RJFC32 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.764Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.769Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.769Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.769Z - [B2B Dispatch] Device: KLGG40 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.769Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.774Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.774Z - [B2B Dispatch] Device: TJLT70 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.774Z - [B2B Dispatch] Device: CAMIONETA BZRY88 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.779Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.782Z - [B2B Dispatch] Device: MOVIL 7 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.782Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[WARN] 2026-06-23T16:45:04.782Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:04.787Z - [B2B Dispatch] Device: TDZB19 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.787Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.791Z - [B2B Dispatch] Device: ACTROS 7 CKHK59 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.791Z - [B2B Dispatch] Device: INTER 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.791Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.791Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.791Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.796Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.797Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.797Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.801Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.801Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.801Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.806Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:04.809Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:45:08.385Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:45:08.570Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:08.570Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.570Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.570Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.571Z - [B2B Dispatch] Device: 52 PINUER ARMIN — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.571Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[ERROR] 2026-06-23T16:45:08.574Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:08.576Z - [B2B Dispatch] Device: PRUEBA 592   AROCS 2  — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.576Z - [B2B Dispatch] Device: VGRT-54 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.576Z - [B2B Dispatch] Device: SHAC.-12 PRFH41 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.576Z - [B2B Dispatch] Device: AROCS 1 PTPD71 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.576Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.603Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.603Z - [B2B Dispatch] Device: DFKT91 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:08.603Z - [Traccar] Forwarding telemetry for 865413053854286 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053854286","lat":-41.871278,"lon":-73.775887,"speed":6,"bearing":268,"altitude":36,"timestamp":1782233102,"valid":"true"}
+[INFO] 2026-06-23T16:45:08.769Z - [Traccar] Success Response for 865413053854286: Status 200
+[INFO] 2026-06-23T16:45:08.770Z - [B2B Dispatch] Device: BT50 1 PSGV20 ALEXIS VELASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.774Z - [B2B Dispatch] Device: AXOR 2 LLKH68 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.774Z - [B2B Dispatch] Device: DF 8 KPVT33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.774Z - [B2B Dispatch] Device: CARGADOR LIUGONG 6 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.774Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.779Z - [B2B Dispatch] Device: KLGG39 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.779Z - [B2B Dispatch] Device: HYUNDAI 3/4   RRVW28 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.783Z - [B2B Dispatch] Device: FOTON-7 VSGW77 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.783Z - [B2B Dispatch] Device: EXC. CAT 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.784Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.784Z - [B2B Dispatch] Device: SHAC-3 LXHH71 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.788Z - [B2B Dispatch] Device: CARGADOR  JHON DEER — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.792Z - [B2B Dispatch] Device: IVECO  SWVD98 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.792Z - [B2B Dispatch] Device: SLHW83 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.792Z - [B2B Dispatch] Device: PLXB35 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.792Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[WARN] 2026-06-23T16:45:08.792Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:08.798Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.801Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:08.801Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.546778,"lon":-72.887023,"speed":82,"bearing":62,"altitude":18,"timestamp":1782233105,"valid":"true"}
+[INFO] 2026-06-23T16:45:08.802Z - [B2B Dispatch] Device: MIXER 30 - VJRV12 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.802Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.802Z - [B2B Dispatch] Device: LWPT73 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.967Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:45:08.967Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.968Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.968Z - [B2B Dispatch] Device: EXC. HITACHI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.972Z - [B2B Dispatch] Device: CARGADOR LIUGONG 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.972Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:08.977Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:45:12.720Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:12.721Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.721Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.721Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.721Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.721Z - [B2B Dispatch] Device: 30 FURGON SIN ASIGNACION — Routing to: datalake
+[ERROR] 2026-06-23T16:45:12.724Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:12.726Z - [B2B Dispatch] Device: LYZC20 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.726Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.727Z - [B2B Dispatch] Device: GGKP25 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.731Z - [B2B Dispatch] Device: CARGADOR LIUGONG 5 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.731Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.735Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.735Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.739Z - [B2B Dispatch] Device: KIA  PJPX63 PATIO Fredy — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.740Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.740Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.744Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.744Z - [B2B Dispatch] Device: SWCG50 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.749Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.749Z - [B2B Dispatch] Device: VITO JZWB87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.752Z - [B2B Dispatch] Device: LCTF35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:12.752Z - [Traccar] Forwarding telemetry for 865413054401137 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413054401137","lat":-39.663795,"lon":-72.938465,"speed":6,"bearing":76,"altitude":22,"timestamp":1782233104,"valid":"true"}
+[INFO] 2026-06-23T16:45:12.946Z - [Traccar] Success Response for 865413054401137: Status 200
+[INFO] 2026-06-23T16:45:12.946Z - [B2B Dispatch] Device: AROCS 2 TBWK50 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.950Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.950Z - [B2B Dispatch] Device: SHAC-5  TVHS47 — Routing to: datalake
+[WARN] 2026-06-23T16:45:12.950Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:12.955Z - [B2B Dispatch] Device: CARGADOR LIUGONG 9 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.958Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.958Z - [B2B Dispatch] Device: VRPG99 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.958Z - [B2B Dispatch] Device: SPGS55 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.958Z - [B2B Dispatch] Device: VGWT55 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.963Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.963Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.963Z - [B2B Dispatch] Device: MIXER 27 - TGXV13 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.963Z - [B2B Dispatch] Device: KXHJ42 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.968Z - [B2B Dispatch] Device: DF 1 HLYT88 — Routing to: datalake
+[INFO] 2026-06-23T16:45:12.972Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:45:16.724Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:16.724Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.725Z - [B2B Dispatch] Device: RAMPLA  GRCS98 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.725Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.725Z - [B2B Dispatch] Device: GVYZ26 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.726Z - [B2B Dispatch] Device: 57 JIMENEZ MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.726Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.726Z - [B2B Dispatch] Device: RGYT72 — Routing to: datalake
+[ERROR] 2026-06-23T16:45:16.728Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:16.753Z - [B2B Dispatch] Device: ACTROS 9 HHDJ66 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.756Z - [B2B Dispatch] Device: FOTON-6 VSTK19 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.756Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.757Z - [B2B Dispatch] Device: LSTZ22 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.762Z - [B2B Dispatch] Device: YW4881 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:16.762Z - [Traccar] Forwarding telemetry for 865413053932884 to http://demo3.traccar.org:5055/... Parameters: {"id":"865413053932884","lat":-39.790667,"lon":-73.19125,"speed":0,"bearing":32,"altitude":21,"timestamp":1782233109,"valid":"true"}
+[INFO] 2026-06-23T16:45:16.763Z - [B2B Dispatch] Device: PZPT56 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.763Z - [B2B Dispatch] Device: L3P_2 / THZF16 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.974Z - [Traccar] Success Response for 865413053932884: Status 200
+[INFO] 2026-06-23T16:45:16.974Z - [B2B Dispatch] Device: BT50 1 PSGV20 ALEXIS VELASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.978Z - [B2B Dispatch] Device: CARGADOR LIUGONG 6 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.978Z - [B2B Dispatch] Device: PYLW45 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.983Z - [B2B Dispatch] Device: PETROLEO 2 RWFB13 (ALEX AZUA) — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.983Z - [B2B Dispatch] Device: FHBS28 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.988Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.991Z - [B2B Dispatch] Device: ACTROS10  KVDS22 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.995Z - [B2B Dispatch] Device: VRSG33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.995Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:45:16.995Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:16.999Z - [B2B Dispatch] Device: LBTV20 — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.999Z - [B2B Dispatch] Device: INTER FSPH67 PABLO GODOY — Routing to: datalake
+[INFO] 2026-06-23T16:45:16.999Z - [B2B Dispatch] Device: DAF HWBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.004Z - [B2B Dispatch] Device: ACTROS 4 KBGK36 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.004Z - [B2B Dispatch] Device: TZRB41 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.004Z - [B2B Dispatch] Device: VPVV93 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.004Z - [B2B Dispatch] Device: 50 HUGO SEPULVEDA — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.004Z - [B2B Dispatch] Device: LPXY56 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.004Z - [B2B Dispatch] Device: LLKR53 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.005Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.028Z - [B2B Dispatch] Device: TERRANO YN5456 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.028Z - [B2B Dispatch] Device: CARGADOR HUAYA 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.028Z - [B2B Dispatch] Device: SHAC.-15 VDYH16 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.028Z - [B2B Dispatch] Device: MOVIL 4 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.033Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.033Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.033Z - [B2B Dispatch] Device: CARGADOR LIUGONG 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.033Z - [B2B Dispatch] Device: TGXT78 — Routing to: datalake
+[INFO] 2026-06-23T16:45:17.038Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:45:17.089Z - [Backfiller] Iniciando recuperación de historial para 865413053876446. De: 2026-06-23 16:17:22 a 2026-06-23 16:37:40
+[INFO] 2026-06-23T16:45:17.276Z - [Backfiller] Reintentando (1/11) para 865413053876446 en 5 minutos...
+[INFO] 2026-06-23T16:45:17.276Z - [Backfiller] Iniciando recuperación de historial para 863719062567822. De: 2026-06-23 16:17:48 a 2026-06-23 16:38:14
+[INFO] 2026-06-23T16:45:17.466Z - [Backfiller] Reintentando (1/11) para 863719062567822 en 5 minutos...
+[INFO] 2026-06-23T16:45:17.466Z - [Backfiller] Iniciando recuperación de historial para 865413054268288. De: 2026-06-23 16:18:34 a 2026-06-23 16:38:40
+[INFO] 2026-06-23T16:45:17.652Z - [Backfiller] Reintentando (1/11) para 865413054268288 en 5 minutos...
+[INFO] 2026-06-23T16:45:17.652Z - [Backfiller] Iniciando recuperación de historial para 865413054361489. De: 2026-06-23 16:17:01 a 2026-06-23 16:29:34
+[INFO] 2026-06-23T16:45:17.839Z - [Backfiller] Reintentando (2/11) para 865413054361489 en 5 minutos...
+[INFO] 2026-06-23T16:45:17.839Z - [Backfiller] Iniciando recuperación de historial para 865413054400956. De: 2026-06-23 16:11:54 a 2026-06-23 16:31:57
+[INFO] 2026-06-23T16:45:18.025Z - [Backfiller] Reintentando (2/11) para 865413054400956 en 5 minutos...
+[INFO] 2026-06-23T16:45:18.025Z - [Backfiller] Iniciando recuperación de historial para 865413053854195. De: 2026-06-23 16:12:52 a 2026-06-23 16:32:54
+[INFO] 2026-06-23T16:45:18.211Z - [Backfiller] Reintentando (2/11) para 865413053854195 en 5 minutos...
+[INFO] 2026-06-23T16:45:18.211Z - [Backfiller] Iniciando recuperación de historial para 865413054322192. De: 2026-06-23 15:36:48 a 2026-06-23 15:45:11
+[INFO] 2026-06-23T16:45:18.399Z - [Backfiller] Reintentando (2/11) para 865413054322192 en 5 minutos...
+[INFO] 2026-06-23T16:45:18.399Z - [Backfiller] Iniciando recuperación de historial para 865413054322192. De: 2026-06-23 15:45:11 a 2026-06-23 15:49:44
+[INFO] 2026-06-23T16:45:18.585Z - [Backfiller] Reintentando (2/11) para 865413054322192 en 5 minutos...
+[INFO] 2026-06-23T16:45:18.585Z - [Backfiller] Iniciando recuperación de historial para 865413054365324. De: 2026-06-23 16:12:20 a 2026-06-23 16:32:37
+[INFO] 2026-06-23T16:45:18.720Z - [Tracksolid] Poller fetched 1 devices.
+[INFO] 2026-06-23T16:45:18.772Z - [Backfiller] Reintentando (2/11) para 865413054365324 en 5 minutos...
+[INFO] 2026-06-23T16:45:18.772Z - [Backfiller] Iniciando recuperación de historial para 865413054322192. De: 2026-06-23 15:49:44 a 2026-06-23 16:00:03
+[INFO] 2026-06-23T16:45:18.959Z - [Backfiller] Reintentando (2/11) para 865413054322192 en 5 minutos...
+[INFO] 2026-06-23T16:45:20.602Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:20.602Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.602Z - [B2B Dispatch] Device: 58 RAUL ASENJO — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.602Z - [B2B Dispatch] Device: 51 TORO DANIEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.602Z - [B2B Dispatch] Device: 47 CAMION HYUNDAI / SIN ASIGNACION — Routing to: datalake
+[ERROR] 2026-06-23T16:45:20.606Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:20.608Z - [B2B Dispatch] Device: SPRINTER HKFD84 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.608Z - [B2B Dispatch] Device: AROCS 1 PTPD71 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.608Z - [B2B Dispatch] Device: LVGT65 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.612Z - [B2B Dispatch] Device: CARGADOR LIUGONG 5 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.612Z - [B2B Dispatch] Device: INTER 1 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.612Z - [B2B Dispatch] Device: LLKV66 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.617Z - [B2B Dispatch] Device: HYUNDAI  HFVK33   — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.620Z - [B2B Dispatch] Device: TLBC32 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.620Z - [B2B Dispatch] Device: MERCEDES  — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.625Z - [B2B Dispatch] Device: SHAC-4 RCJF57 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.625Z - [B2B Dispatch] Device: SHAC-6 TVHS94 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.625Z - [B2B Dispatch] Device: AXOR 2 LLKH68 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.625Z - [B2B Dispatch] Device: RJFC32 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.625Z - [B2B Dispatch] Device: 39 LUENGO RICARDO — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.625Z - [B2B Dispatch] Device: Maxus RPJX25 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.630Z - [B2B Dispatch] Device:    SFRZ47 ALFREDO — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.630Z - [B2B Dispatch] Device: TJGF48 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.630Z - [B2B Dispatch] Device: L3P_1 / TGXL-87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.634Z - [B2B Dispatch] Device: FOTON-7 VSGW77 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.638Z - [B2B Dispatch] Device: ACTROS 2 KYZL33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.641Z - [B2B Dispatch] Device: RAM Vicente  RVPH35 — Routing to: datalake
+[WARN] 2026-06-23T16:45:20.641Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:20.645Z - [B2B Dispatch] Device: PYWB35 — Routing to: traccar, datalake
+[INFO] 2026-06-23T16:45:20.645Z - [Traccar] Forwarding telemetry for 869671072743006 to http://demo3.traccar.org:5055/... Parameters: {"id":"869671072743006","lat":-39.545747,"lon":-72.884257,"speed":85,"bearing":63,"altitude":20,"timestamp":1782233116,"valid":"true"}
+[INFO] 2026-06-23T16:45:20.645Z - [B2B Dispatch] Device: LLKR53 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.645Z - [B2B Dispatch] Device: SFYF35 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.812Z - [Traccar] Success Response for 869671072743006: Status 200
+[INFO] 2026-06-23T16:45:20.812Z - [B2B Dispatch] Device: EXC. VOLVO 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.812Z - [B2B Dispatch] Device: VPVV96 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.813Z - [B2B Dispatch] Device: FORD CARGO BZZT22 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.817Z - [B2B Dispatch] Device: FOTON-5 VSGR40 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.818Z - [B2B Dispatch] Device: CARGADOR HYUNDAI 2 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.821Z - [B2B Dispatch] Device: JTCF33 — Routing to: datalake
+[INFO] 2026-06-23T16:45:20.824Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
+[INFO] 2026-06-23T16:45:24.575Z - [GPS Server Poller] Master Key returned 738 devices.
+[INFO] 2026-06-23T16:45:24.575Z - [B2B Dispatch] Device: VL-802 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.576Z - [B2B Dispatch] Device: 49 VELASQUEZ CESAR — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.576Z - [B2B Dispatch] Device: 41 RAIHUANQUE MIGUEL — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.576Z - [B2B Dispatch] Device: HLGT44 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.576Z - [B2B Dispatch] Device: 59 — Routing to: datalake
+[ERROR] 2026-06-23T16:45:24.579Z - [Data Lake] ❌ Error insertando punto en datalake: date/time field value out of range: "0000-00-00 00:00:00"
+[INFO] 2026-06-23T16:45:24.581Z - [B2B Dispatch] Device: ACTROS 9 HHDJ66 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.584Z - [B2B Dispatch] Device: MIXER 18 - FHTD63 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.584Z - [B2B Dispatch] Device: MIXER 24 - DCVH95 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.584Z - [B2B Dispatch] Device: ACTROS 5  KBGK37 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.588Z - [B2B Dispatch] Device: GCKK32 freightliner — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.591Z - [B2B Dispatch] Device: Sanyong  TSZS47  Alex pto Montt  — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.595Z - [B2B Dispatch] Device: F2P_1 / RSWS15 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.595Z - [Poller] 📡 Brecha de 1201s detectada para 865413054333710. Programando recuperación en 6 mins para permitir que suba su historial...
+[INFO] 2026-06-23T16:45:24.595Z - [B2B Dispatch] Device: F2P_4 / SHTW19 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.596Z - [B2B Dispatch] Device: CARGADOR LIUGONG 6 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.601Z - [B2B Dispatch] Device: SVHT92 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.604Z - [B2B Dispatch] Device: GPWX29 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.604Z - [B2B Dispatch] Device: CARGADOR LIUGONG 7 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.605Z - [B2B Dispatch] Device: INTER 5 HKXV58 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.605Z - [B2B Dispatch] Device: EMP_2 / SHPV81 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.609Z - [B2B Dispatch] Device: CAMION HINO — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.612Z - [B2B Dispatch] Device: ACTROS 1 RTCF28 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.612Z - [B2B Dispatch] Device: FORD VJCP82 — Routing to: datalake
+[WARN] 2026-06-23T16:45:24.612Z - [Filtro Anti-Drift] 🚨 Rebote LBS bloqueado para 869671071061707. Vehículo detenido pero saltó 212m a 30.5 km/h.
+[INFO] 2026-06-23T16:45:24.616Z - [B2B Dispatch] Device: LWPS57 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.620Z - [B2B Dispatch] Device: HWPD44 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.620Z - [B2B Dispatch] Device: TWRT61 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.624Z - [B2B Dispatch] Device: Maxus TDDT97 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.624Z - [B2B Dispatch] Device: HINO VJYR51 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.628Z - [B2B Dispatch] Device: MIXER 29 - VRZR87 — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.629Z - [B2B Dispatch] Device: MAXUS VSCK89 ROBERTO VASQUEZ — Routing to: datalake
+[INFO] 2026-06-23T16:45:24.633Z - [GPS Server Poller] Cycle complete: processed 738 devices across 738 mapped users.
