@@ -18,8 +18,11 @@ class TraccarStrategy extends BaseStrategy {
     // Parse date and convert to UNIX timestamp (seconds)
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
-    if (dateStr.includes(' ')) {
-      parsedDate = new Date(dateStr.replace(' ', 'T') + 'Z');
+    if (dateStr.includes('T') && dateStr.includes('Z')) {
+      parsedDate = new Date(dateStr);
+    } else if (dateStr.includes(' ')) {
+      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
+      parsedDate = new Date(dateStr.replace(' ', 'T') + tz);
     } else {
       parsedDate = new Date(dateStr);
     }
