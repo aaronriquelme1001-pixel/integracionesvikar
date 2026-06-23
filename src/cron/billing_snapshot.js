@@ -52,7 +52,7 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
       const dt = new Date(row.dt_tracker).getTime();
       
       // 1. Penalizaciones por Velocidad
-      if (speed > 110) {
+      if (speed > 120) {
         penalty += 0.2;
       } else if (speed > 90) {
         penalty += 0.05;

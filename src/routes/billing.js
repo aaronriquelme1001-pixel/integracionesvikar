@@ -75,8 +75,8 @@ router.get('/', async (req, res) => {
         ROUND(AVG(bs.daily_grade), 1) as grade,
         MAX(gt.plate) as plate,
         MAX(gt.speed) as max_speed,
-        COUNT(CASE WHEN gt.speed > 110 THEN 1 END) as extreme_speeding,
-        COUNT(CASE WHEN gt.speed > 90 AND gt.speed <= 110 THEN 1 END) as moderate_speeding,
+        COUNT(CASE WHEN gt.speed > 120 THEN 1 END) as extreme_speeding,
+        COUNT(CASE WHEN gt.speed > 90 AND gt.speed <= 120 THEN 1 END) as moderate_speeding,
         COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn') THEN 1 END) as harsh_maneuvers,
         COUNT(CASE WHEN gt.event IN ('fatigue', 'tired') THEN 1 END) as fatigue_alerts
       FROM billing_snapshots bs
@@ -97,6 +97,7 @@ router.get('/', async (req, res) => {
       else if (grade < 6.0) recommendation = "Regular: Oportunidad de mejora en ciertas conductas de conducción.";
 
       return {
+        imei: row.imei,
         plate: row.plate || row.imei || 'Desconocido',
         grade: grade,
         analysis: {
@@ -139,6 +140,65 @@ router.get('/', async (req, res) => {
 
   } catch (error) {
     console.error('[Billing API] Error calculating stats:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+/**
+ * GET /api/billing-stats/driver-events
+ * Fetch detailed events for a specific driver and category in the current month.
+ */
+router.get('/driver-events', async (req, res) => {
+  const { imei, type, secret } = req.query;
+
+  if (!secret || secret !== (process.env.API_SECRET || 'vikar2026')) {
+    return res.status(403).json({ error: 'Forbidden. Invalid secret.' });
+  }
+
+  if (!imei || !type) {
+    return res.status(400).json({ error: 'Missing imei or type parameter.' });
+  }
+
+  if (!pool) return res.status(500).json({ error: 'Data Lake is not configured.' });
+
+  try {
+    const now = new Date();
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
+    let typeCondition = '';
+    if (type === 'extreme_speeding') typeCondition = 'speed > 120';
+    else if (type === 'moderate_speeding') typeCondition = 'speed > 90 AND speed <= 120';
+    else if (type === 'harsh_maneuvers') typeCondition = "event IN ('haccel', 'hbrake', 'hcorn')";
+    else if (type === 'fatigue_alerts') typeCondition = "event IN ('fatigue', 'tired')";
+    else return res.status(400).json({ error: 'Invalid type parameter.' });
+
+    const query = `
+      SELECT dt_tracker, speed, lat, lng, event
+      FROM global_telemetry_traffic
+      WHERE imei = $1
+      AND dt_tracker >= $2::timestamp AND dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
+      AND ${typeCondition}
+      ORDER BY dt_tracker DESC
+      LIMIT 100
+    `;
+    
+    const result = await pool.query(query, [imei, startOfCurrentMonth, endOfCurrentMonth]);
+    
+    return res.json({
+      imei,
+      type,
+      count: result.rows.length,
+      events: result.rows.map(r => ({
+        timestamp: r.dt_tracker,
+        speed: Math.round(r.speed),
+        lat: r.lat,
+        lng: r.lng,
+        event: r.event
+      }))
+    });
+  } catch (err) {
+    console.error('[Billing API] Error fetching driver events:', err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
