@@ -34,20 +34,21 @@ router.get('/', async (req, res) => {
 
   try {
     const now = new Date();
-    // Start of the current month (e.g. 2026-06-01)
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    // Calculate the start and end of the PREVIOUS month
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
 
-    // Metric 1: Total KM (Lifetime)
+    // Metric 1: Total KM (Last Month)
     const deltaQuery = `
       SELECT 
         imei, 
         MAX(odometer) - MIN(odometer) as km_driven
       FROM billing_snapshots
       WHERE LOWER(client_id) LIKE LOWER('%' || $1 || '%')
+      AND snapshot_date >= $2 AND snapshot_date <= $3
       GROUP BY imei
     `;
-    const deltaResult = await pool.query(deltaQuery, [clientId]);
+    const deltaResult = await pool.query(deltaQuery, [clientId, startOfLastMonth, endOfLastMonth]);
     
     let totalKm = 0;
     deltaResult.rows.forEach(row => {
@@ -62,8 +63,9 @@ router.get('/', async (req, res) => {
       SELECT MAX(speed) as max_speed
       FROM global_telemetry_traffic
       WHERE LOWER(client_source) LIKE LOWER('%' || $1 || '%')
+      AND dt_tracker >= $2::timestamp AND dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
     `;
-    const speedResult = await pool.query(speedQuery, [clientId]);
+    const speedResult = await pool.query(speedQuery, [clientId, startOfLastMonth, endOfLastMonth]);
     const maxSpeed = speedResult.rows[0]?.max_speed || 0;
 
     // Metric 4: Driver Ranking (Top Conductores)
@@ -78,12 +80,14 @@ router.get('/', async (req, res) => {
         COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn') THEN 1 END) as harsh_maneuvers,
         COUNT(CASE WHEN gt.event IN ('fatigue', 'tired') THEN 1 END) as fatigue_alerts
       FROM billing_snapshots bs
-      LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei AND gt.dt_tracker >= date_trunc('month', current_date)
+      LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei 
+           AND gt.dt_tracker >= $2::timestamp AND gt.dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
       WHERE LOWER(bs.client_id) LIKE LOWER('%' || $1 || '%')
+      AND bs.snapshot_date >= $2 AND bs.snapshot_date <= $3
       GROUP BY bs.imei
       ORDER BY grade ASC
     `;
-    const rankingResult = await pool.query(rankingQuery, [clientId]);
+    const rankingResult = await pool.query(rankingQuery, [clientId, startOfLastMonth, endOfLastMonth]);
     const driverRanking = rankingResult.rows.map(row => {
       const grade = parseFloat(row.grade) || 7.0;
       
@@ -106,9 +110,14 @@ router.get('/', async (req, res) => {
       };
     });
 
+    // Month formatting for UI (e.g. "mayo de 2026")
+    const dateObj = new Date(startOfLastMonth);
+    const formatter = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    const lastMonthText = formatter.format(dateObj); // "junio de 2026"
+
     // Construct the UI-ready response
     return res.json({
-      period: "Histórico",
+      period: `Último Mes (${lastMonthText})`,
       client: clientId,
       metrics: {
         total_kilometers: Math.round(totalKm),
@@ -117,14 +126,14 @@ router.get('/', async (req, res) => {
         driver_ranking: driverRanking
       },
       ui_texts: {
-        title1: "Kilometraje Histórico",
-        desc1: `Tus vehículos recorrieron ${Math.round(totalKm).toLocaleString()} km en total bajo nuestra supervisión.`,
+        title1: "Kilometraje Mensual",
+        desc1: `Tus vehículos recorrieron ${Math.round(totalKm).toLocaleString()} km en total durante el mes pasado (${lastMonthText}).`,
         title2: "Activos Protegidos",
-        desc2: `${activeVehicles} vehículos registrados en el historial.`,
+        desc2: `${activeVehicles} vehículos registrados activos en el último mes.`,
         title3: "Prevención de Riesgos",
-        desc3: `Velocidad Máxima histórica detectada: ${Math.round(maxSpeed)} km/h.`,
-        title4: "Ranking de Conductores (Atención Requerida)",
-        desc4: `Lista completa de la flota. Ordenados desde los peores evaluados hacia los mejores, basado en su telemetría.`
+        desc3: `Velocidad Máxima detectada durante el mes pasado: ${Math.round(maxSpeed)} km/h.`,
+        title4: "Ranking de Conductores (Mes Pasado)",
+        desc4: `Lista completa de la flota. Ordenados desde los peores evaluados hacia los mejores, basado en su telemetría de ${lastMonthText}.`
       }
     });
 
