@@ -40,6 +40,17 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
     
     let penalty = 0.0;
     
+    // Contadores de infracciones agrupadas
+    let extremeCount = 0;
+    let moderateCount = 0;
+    let harshCount = 0;
+    let fatigueCount = 0;
+
+    // Cooldown variables (5 minutos)
+    let lastExtremeSpeedingTime = 0;
+    let lastModerateSpeedingTime = 0;
+    let lastHarshManeuverTime = 0;
+    
     // Variables para algoritmo de Fatiga (Matemático)
     let continuousDrivingMs = 0;
     let lastMovingTime = null;
@@ -51,20 +62,36 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
       const event = row.event ? row.event.toLowerCase() : null;
       const dt = new Date(row.dt_tracker).getTime();
       
-      // 1. Penalizaciones por Velocidad
+      // 1. Penalizaciones por Velocidad con Clustering (Cooldown 5 mins = 300,000 ms)
       if (speed > 120) {
-        penalty += 0.2;
+        if (!lastExtremeSpeedingTime || (dt - lastExtremeSpeedingTime) > 300000) {
+          penalty += 0.2;
+          extremeCount++;
+          lastExtremeSpeedingTime = dt;
+        }
       } else if (speed > 90) {
-        penalty += 0.05;
+        if (!lastModerateSpeedingTime || (dt - lastModerateSpeedingTime) > 300000) {
+          penalty += 0.05;
+          moderateCount++;
+          lastModerateSpeedingTime = dt;
+        }
       }
       
-      // 2. Penalizaciones por Eventos Bruscos Nativos
-      if (event === 'haccel') penalty += 0.3; // Aceleración brusca
-      if (event === 'hbrake') penalty += 0.3; // Frenada brusca
-      if (event === 'hcorn') penalty += 0.3;  // Giro brusco
+      // 2. Penalizaciones por Eventos Bruscos Nativos con Clustering
+      if (event === 'haccel' || event === 'hbrake' || event === 'hcorn') {
+        if (!lastHarshManeuverTime || (dt - lastHarshManeuverTime) > 300000) {
+          penalty += 0.3;
+          harshCount++;
+          lastHarshManeuverTime = dt;
+        }
+      }
+
       if (event === 'fatigue' || event === 'tired') {
-        penalty += 0.5;
-        fatiguePenalized = true; // Ya penalizado por evento nativo
+        if (!fatiguePenalized) {
+          penalty += 0.5;
+          fatigueCount++;
+          fatiguePenalized = true; // Ya penalizado por evento nativo
+        }
       }
       
       // 3. Algoritmo de Fatiga (Conducción Continua > 5 hrs)
@@ -89,6 +116,7 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
           // 5 horas = 5 * 60 * 60 * 1000 = 18,000,000 ms
           if (continuousDrivingMs > 18000000) {
             penalty += 0.5; // Falta Grave por conducir +5 horas seguidas
+            fatigueCount++;
             fatiguePenalized = true; // Penalizar solo 1 vez al día para no hundir la nota a 1.0 por el mismo viaje
           }
         } else {
@@ -106,10 +134,16 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
     if (finalGrade < 1.0) finalGrade = 1.0;
     
     // Redondear a 1 decimal
-    return Math.round(finalGrade * 10) / 10;
+    return {
+      grade: Math.round(finalGrade * 10) / 10,
+      extremeCount,
+      moderateCount,
+      harshCount,
+      fatigueCount
+    };
   } catch (err) {
     console.error(`[Billing Cron] Error calculating grade for ${imei}:`, err.message);
-    return 7.0;
+    return { grade: 7.0, extremeCount: 0, moderateCount: 0, harshCount: 0, fatigueCount: 0 };
   }
 }
 
@@ -218,20 +252,30 @@ async function runBillingSnapshot() {
       if (!clientId || clientId === 'unknown') continue; // We only care about mapped clients
 
       // Calculate driving score for today (Speed, Harsh Events, Fatigue)
-      const dailyGrade = await calculateDailyGrade(imei, snapshotDate);
+      const stats = await calculateDailyGrade(imei, snapshotDate);
 
       // Insert or Update the snapshot for today
       const query = `
-        INSERT INTO billing_snapshots (client_id, imei, snapshot_date, odometer, engine_hours, daily_grade)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO billing_snapshots (
+          client_id, imei, snapshot_date, odometer, engine_hours, daily_grade,
+          extreme_speeding_count, moderate_speeding_count, harsh_maneuvers_count, fatigue_alerts_count
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         ON CONFLICT (imei, snapshot_date) DO UPDATE SET 
           client_id = EXCLUDED.client_id,
           odometer = EXCLUDED.odometer, 
           engine_hours = EXCLUDED.engine_hours,
-          daily_grade = EXCLUDED.daily_grade;
+          daily_grade = EXCLUDED.daily_grade,
+          extreme_speeding_count = EXCLUDED.extreme_speeding_count,
+          moderate_speeding_count = EXCLUDED.moderate_speeding_count,
+          harsh_maneuvers_count = EXCLUDED.harsh_maneuvers_count,
+          fatigue_alerts_count = EXCLUDED.fatigue_alerts_count;
       `;
       
-      await pool.query(query, [clientId, imei, snapshotDate, odometer, engineHours, dailyGrade]);
+      await pool.query(query, [
+        clientId, imei, snapshotDate, odometer, engineHours, stats.grade,
+        stats.extremeCount, stats.moderateCount, stats.harshCount, stats.fatigueCount
+      ]);
       insertedCount++;
     }
     
@@ -257,4 +301,4 @@ if (require.main === module) {
   runBillingSnapshot().then(() => pool && pool.end());
 }
 
-module.exports = { runBillingSnapshot };
+module.exports = { runBillingSnapshot, calculateDailyGrade };

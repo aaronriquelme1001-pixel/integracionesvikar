@@ -149,17 +149,66 @@ app.use('/api/billing-stats', billingRoute);
 /**
  * Manual Trigger for Billing Snapshot
  */
-app.get('/api/trigger-billing', async (req, res) => {
-  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
-  const { runBillingSnapshot } = require('./src/cron/billing_snapshot');
-  
-  try {
-    const result = await runBillingSnapshot();
-    res.json({ message: 'Billing snapshot completed', result });
-  } catch (err) {
-    res.status(500).json({ error: err.message, stack: err.stack });
-  }
-});
+  app.get('/api/trigger-billing', async (req, res) => {
+    if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+    const { runBillingSnapshot } = require('./src/cron/billing_snapshot');
+    
+    try {
+      const result = await runBillingSnapshot();
+      res.json({ message: 'Billing snapshot completed', result });
+    } catch (err) {
+      res.status(500).json({ error: err.message, stack: err.stack });
+    }
+  });
+
+  /**
+   * Manual Trigger for Billing Snapshot Backfill (Recalculate clusters for past days)
+   */
+  app.get('/api/trigger-backfill', async (req, res) => {
+    if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+    const { calculateDailyGrade } = require('./src/cron/billing_snapshot');
+    const { start_date, end_date } = req.query; // YYYY-MM-DD
+    
+    if (!start_date || !end_date) return res.status(400).json({ error: 'Missing start_date or end_date' });
+
+    try {
+      const { Pool } = require('pg');
+      const tempPool = new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } });
+      
+      // Get all distinct IMEIs that had a snapshot in this range
+      const clientsResult = await tempPool.query(`SELECT DISTINCT imei, client_id FROM billing_snapshots WHERE snapshot_date >= $1 AND snapshot_date <= $2`, [start_date, end_date]);
+      
+      const start = new Date(start_date);
+      const end = new Date(end_date);
+      let updatedCount = 0;
+
+      for (const row of clientsResult.rows) {
+        const imei = row.imei;
+        const clientId = row.client_id;
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const snapshotDate = d.toISOString().split('T')[0];
+          
+          // Call the updated calculateDailyGrade which does the 5-min clustering
+          const stats = await calculateDailyGrade(imei, snapshotDate);
+          
+          if (stats.extremeCount > 0 || stats.moderateCount > 0 || stats.harshCount > 0 || stats.fatigueCount > 0 || stats.grade !== 7.0) {
+            await tempPool.query(`
+              UPDATE billing_snapshots
+              SET daily_grade = $1, extreme_speeding_count = $2, moderate_speeding_count = $3, harsh_maneuvers_count = $4, fatigue_alerts_count = $5
+              WHERE imei = $6 AND snapshot_date = $7
+            `, [stats.grade, stats.extremeCount, stats.moderateCount, stats.harshCount, stats.fatigueCount, imei, snapshotDate]);
+            updatedCount++;
+          }
+        }
+      }
+      tempPool.end();
+      res.json({ message: 'Backfill completed', updatedSnapshots: updatedCount });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message, stack: err.stack });
+    }
+  });
 
 app.get('/api/debug-users-objects', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
@@ -184,8 +233,33 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`[System] B2B Orchestrator listening on port ${PORT}`);
+  
+  // --- Auto Migration ---
+  if (process.env.DATALAKE_URL) {
+    const { Pool } = require('pg');
+    const tempPool = new Pool({
+      connectionString: process.env.DATALAKE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+    try {
+      await tempPool.query(`
+        ALTER TABLE billing_snapshots 
+        ADD COLUMN IF NOT EXISTS extreme_speeding_count INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS moderate_speeding_count INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS harsh_maneuvers_count INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS fatigue_alerts_count INTEGER DEFAULT 0;
+      `);
+      console.log('[System] DB Migration applied successfully.');
+    } catch (err) {
+      console.error('[System] Error applying DB migration:', err);
+    } finally {
+      tempPool.end();
+    }
+  }
+  // ----------------------
+
   console.log(`[System] Starting Pollers...`);
 
   if (process.env.TRACKSOLID_POLL_ENABLED === 'true') {

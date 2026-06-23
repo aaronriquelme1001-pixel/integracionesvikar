@@ -75,10 +75,14 @@ router.get('/', async (req, res) => {
         ROUND(AVG(bs.daily_grade), 1) as grade,
         MAX(gt.plate) as plate,
         MAX(gt.speed) as max_speed,
-        COUNT(CASE WHEN gt.speed > 120 THEN 1 END) as extreme_speeding,
-        COUNT(CASE WHEN gt.speed > 90 AND gt.speed <= 120 THEN 1 END) as moderate_speeding,
-        COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn') THEN 1 END) as harsh_maneuvers,
-        COUNT(CASE WHEN gt.event IN ('fatigue', 'tired') THEN 1 END) as fatigue_alerts
+        COUNT(CASE WHEN gt.speed > 120 THEN 1 END) as extreme_speeding_legacy,
+        COUNT(CASE WHEN gt.speed > 90 AND gt.speed <= 120 THEN 1 END) as moderate_speeding_legacy,
+        COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn') THEN 1 END) as harsh_maneuvers_legacy,
+        COUNT(CASE WHEN gt.event IN ('fatigue', 'tired') THEN 1 END) as fatigue_alerts_legacy,
+        SUM(bs.extreme_speeding_count) as extreme_speeding_clustered,
+        SUM(bs.moderate_speeding_count) as moderate_speeding_clustered,
+        SUM(bs.harsh_maneuvers_count) as harsh_maneuvers_clustered,
+        SUM(bs.fatigue_alerts_count) as fatigue_alerts_clustered
       FROM billing_snapshots bs
       LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei 
            AND gt.dt_tracker >= $2::timestamp AND gt.dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
@@ -102,10 +106,10 @@ router.get('/', async (req, res) => {
         grade: grade,
         analysis: {
           max_speed: Math.round(row.max_speed || 0),
-          extreme_speeding_events: parseInt(row.extreme_speeding || 0),
-          moderate_speeding_events: parseInt(row.moderate_speeding || 0),
-          harsh_maneuvers: parseInt(row.harsh_maneuvers || 0),
-          fatigue_alerts: parseInt(row.fatigue_alerts || 0),
+          extreme_speeding_events: parseInt(row.extreme_speeding_clustered || row.extreme_speeding_legacy || 0),
+          moderate_speeding_events: parseInt(row.moderate_speeding_clustered || row.moderate_speeding_legacy || 0),
+          harsh_maneuvers: parseInt(row.harsh_maneuvers_clustered || row.harsh_maneuvers_legacy || 0),
+          fatigue_alerts: parseInt(row.fatigue_alerts_clustered || row.fatigue_alerts_legacy || 0),
           recommendation: recommendation
         }
       };
@@ -185,17 +189,33 @@ router.get('/driver-events', async (req, res) => {
     
     const result = await pool.query(query, [imei, startOfCurrentMonth, endOfCurrentMonth]);
     
+    // Agrupación de eventos (Clustering) con un cooldown de 5 minutos (300,000 ms)
+    const rawEvents = result.rows.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
+    const clusteredEvents = [];
+    let lastTime = 0;
+    
+    for (const row of rawEvents) {
+      const dt = new Date(row.dt_tracker).getTime();
+      if (!lastTime || (dt - lastTime) > 300000) {
+        clusteredEvents.push({
+          timestamp: row.dt_tracker,
+          speed: Math.round(row.speed),
+          lat: row.lat,
+          lng: row.lng,
+          event: row.event
+        });
+        lastTime = dt;
+      }
+    }
+    
+    // Ordenar de más reciente a más antiguo
+    clusteredEvents.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
     return res.json({
       imei,
       type,
-      count: result.rows.length,
-      events: result.rows.map(r => ({
-        timestamp: r.dt_tracker,
-        speed: Math.round(r.speed),
-        lat: r.lat,
-        lng: r.lng,
-        event: r.event
-      }))
+      count: clusteredEvents.length,
+      events: clusteredEvents
     });
   } catch (err) {
     console.error('[Billing API] Error fetching driver events:', err);
