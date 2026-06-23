@@ -190,30 +190,30 @@ router.get('/', async (req, res) => {
       console.warn('[Forensics] Fatigue Calculation Error:', e.message);
     }
 
-    // 6. Deterministic Verdict Engine
+    // 6. Deterministic Verdict Engine (Route Analysis - No accident assumption)
     let verdictTitle = '';
     let verdictBody = '';
     let verdictClass = ''; // Used for CSS styling
 
     if (hasSpeeding && hasHardBraking && weatherCondition.includes('Lluvioso')) {
-      verdictTitle = 'RESPONSABILIDAD DEL CONDUCTOR (Agravada)';
-      verdictBody = 'El conductor excedió los límites de seguridad en condiciones de pavimento mojado y visibilidad reducida, desencadenando una maniobra evasiva (frenado brusco) incontrolable debido a la inercia.';
+      verdictTitle = 'CONDUCCIÓN TEMERARIA (Riesgo Agravado por Clima)';
+      verdictBody = 'El conductor excedió los límites de velocidad bajo condiciones climáticas adversas (lluvia) y registró eventos de frenado brusco, lo que representa un alto riesgo operativo y desgaste excesivo bajo baja adherencia.';
       verdictClass = 'verdict-danger';
     } else if (hasSpeeding && hasHardBraking) {
-      verdictTitle = 'RESPONSABILIDAD DEL CONDUCTOR (Negligencia Inercial)';
-      verdictBody = 'El análisis determina que el conductor superó el límite de velocidad y aplicó un frenado crítico de emergencia. Bajo condiciones de clima seco, la pérdida de control se atribuye puramente al factor humano y exceso de fuerza G longitudinal.';
+      verdictTitle = 'CONDUCCIÓN AGRESIVA (Mala Gestión de Inercia)';
+      verdictBody = 'El análisis de la ruta detecta continuos excesos de velocidad combinados con frenadas bruscas. Este patrón de manejo es ineficiente, desgasta prematuramente el vehículo y aumenta sustancialmente las probabilidades de colisión por alcance.';
       verdictClass = 'verdict-danger';
     } else if (!hasSpeeding && hasHardBraking && weatherCondition.includes('Lluvioso')) {
-      verdictTitle = 'INCIDENTE DE FUERZA MAYOR (Condiciones Climáticas)';
-      verdictBody = 'El vehículo transitaba dentro del límite legal de velocidad. La pérdida de control o accidente se atribuye al pavimento resbaladizo y pérdida de coeficiente de roce debido a la lluvia reportada en el sector.';
+      verdictTitle = 'FRENADO DE PRECAUCIÓN (Condiciones Climáticas)';
+      verdictBody = 'El vehículo operó dentro del límite de velocidad. Se detectaron eventos de frenado brusco que se atribuyen a maniobras evasivas preventivas dadas las condiciones de lluvia y pavimento resbaladizo en la ruta.';
       verdictClass = 'verdict-warning';
     } else if (!hasSpeeding && timeStopped > 120) {
-      verdictTitle = 'INCIDENTE VIAL EXTERNO (Atasco / Control)';
-      verdictBody = 'El vehículo no superó la velocidad máxima y registra una detención prolongada (superior a 2 minutos). Esto coincide con patrones de tráfico denso externo, accidentes de terceros en la ruta o controles policiales.';
+      verdictTitle = 'CONGESTIÓN O DETENCIÓN EN RUTA';
+      verdictBody = 'El vehículo respetó las velocidades máximas y registró detenciones prolongadas. Esto coincide con patrones de tráfico denso, detenciones logísticas operativas o controles en ruta.';
       verdictClass = 'verdict-info';
     } else {
-      verdictTitle = 'CONDUCCIÓN NORMAL (Sin Hallazgos Graves)';
-      verdictBody = 'La telemetría indica que el vehículo se mantuvo dentro de los parámetros esperados de operación logística regular, sin frenadas de emergencia ni excesos de velocidad sostenidos.';
+      verdictTitle = 'CONDUCCIÓN EFICIENTE Y SEGURA';
+      verdictBody = 'La telemetría indica que la ruta se completó de manera impecable, operando dentro de los parámetros esperados de seguridad, sin frenadas de emergencia ni excesos de velocidad. Excelente perfil de conducción.';
       verdictClass = 'verdict-success';
     }
 
