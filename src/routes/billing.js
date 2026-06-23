@@ -74,18 +74,18 @@ router.get('/', async (req, res) => {
         bs.imei,
         ROUND(AVG(bs.daily_grade), 1) as grade,
         MAX(gt.plate) as plate,
-        MAX(gt.speed) as max_speed,
-        COUNT(CASE WHEN gt.speed > 120 THEN 1 END) as extreme_speeding_legacy,
-        COUNT(CASE WHEN gt.speed > 90 AND gt.speed <= 120 THEN 1 END) as moderate_speeding_legacy,
-        COUNT(CASE WHEN gt.event IN ('haccel', 'hbrake', 'hcorn') THEN 1 END) as harsh_maneuvers_legacy,
-        COUNT(CASE WHEN gt.event IN ('fatigue', 'tired') THEN 1 END) as fatigue_alerts_legacy,
+        MAX(gt.max_speed) as max_speed,
         SUM(bs.extreme_speeding_count) as extreme_speeding_clustered,
         SUM(bs.moderate_speeding_count) as moderate_speeding_clustered,
         SUM(bs.harsh_maneuvers_count) as harsh_maneuvers_clustered,
         SUM(bs.fatigue_alerts_count) as fatigue_alerts_clustered
       FROM billing_snapshots bs
-      LEFT JOIN global_telemetry_traffic gt ON bs.imei = gt.imei 
-           AND gt.dt_tracker >= $2::timestamp AND gt.dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
+      LEFT JOIN (
+          SELECT imei, MAX(plate) as plate, MAX(speed) as max_speed 
+          FROM global_telemetry_traffic 
+          WHERE dt_tracker >= $2::timestamp AND dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
+          GROUP BY imei
+      ) gt ON bs.imei = gt.imei 
       WHERE LOWER(bs.client_id) LIKE LOWER('%' || $1 || '%')
       AND bs.snapshot_date >= $2 AND bs.snapshot_date <= $3
       GROUP BY bs.imei
@@ -106,10 +106,10 @@ router.get('/', async (req, res) => {
         grade: grade,
         analysis: {
           max_speed: Math.round(row.max_speed || 0),
-          extreme_speeding_events: parseInt(row.extreme_speeding_clustered || row.extreme_speeding_legacy || 0),
-          moderate_speeding_events: parseInt(row.moderate_speeding_clustered || row.moderate_speeding_legacy || 0),
-          harsh_maneuvers: parseInt(row.harsh_maneuvers_clustered || row.harsh_maneuvers_legacy || 0),
-          fatigue_alerts: parseInt(row.fatigue_alerts_clustered || row.fatigue_alerts_legacy || 0),
+          extreme_speeding_events: parseInt(row.extreme_speeding_clustered || 0),
+          moderate_speeding_events: parseInt(row.moderate_speeding_clustered || 0),
+          harsh_maneuvers: parseInt(row.harsh_maneuvers_clustered || 0),
+          fatigue_alerts: parseInt(row.fatigue_alerts_clustered || 0),
           recommendation: recommendation
         }
       };
