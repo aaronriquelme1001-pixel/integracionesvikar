@@ -51,6 +51,13 @@ class DatalakeStrategy {
     if (!initialized || !pool) return;
 
     try {
+      // Validate dt_tracker before inserting — reject clearly invalid dates like "0000-00-00 00:00:00"
+      const dtRaw = telemetry.dt_tracker;
+      if (!dtRaw || String(dtRaw).startsWith('0000') || String(dtRaw).trim() === '') {
+        console.warn(`[Data Lake] ⚠️ Fecha inválida ignorada para IMEI ${telemetry.imei} (${deviceConfig.plate || 'SIN PLACA'}): "${dtRaw}"`);
+        return;
+      }
+
       const query = `
         INSERT INTO global_telemetry_traffic (imei, plate, lat, lng, speed, dt_tracker, client_source)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -69,9 +76,10 @@ class DatalakeStrategy {
       // Await to ensure we don't flood the pg pool queue
       await pool.query(query, values);
     } catch (error) {
-      console.error('[Data Lake] ❌ Error insertando punto en datalake:', error.message);
+      console.error(`[Data Lake] ❌ Error insertando punto para IMEI ${telemetry.imei} (${deviceConfig.plate || telemetry.plate_number || 'SIN PLACA'}): ${error.message}`);
     }
   }
+
 }
 
 module.exports = DatalakeStrategy;
