@@ -84,7 +84,13 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      let allMessages = [];
      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-     const getEpoch = (ds) => ds ? new Date(ds.replace(' ', 'T') + tz).getTime() : NaN;
+     // FIX #1: Use a robust epoch parser that handles both 'YYYY-MM-DD HH:mm:ss' and ISO formats
+     const getEpoch = (ds) => {
+       if (!ds) return NaN;
+       if (ds.includes('T') && (ds.includes('Z') || ds.includes('+'))) return new Date(ds).getTime();
+       // Assume local time (GPS Server returns local time), append timezone offset
+       return new Date(ds.replace(' ', 'T') + tz).getTime();
+     };
      const startEpoch = getEpoch(dt_old);
      const endEpoch = getEpoch(dt_new);
      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
@@ -179,15 +185,23 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
         });
         
         messages.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
-        
-        const oldEpoch = getEpoch(dt_old);
-        const newEpoch = getEpoch(dt_new);
-        
-        messages = messages.filter(m => {
-           if (!m.dt_tracker) return false;
-           const mEpoch = getEpoch(m.dt_tracker);
-           return mEpoch > oldEpoch && mEpoch < newEpoch;
-        });
+
+         // FIX #2: The previous filter applied timezone offset to messages that may already be in local time,
+         // causing valid recovered points to be discarded as "out of range".
+         // We already widened the API query window above (±1h to +3h), so we trust the GPS Server's response.
+         // Instead of a strict epoch filter, we only remove obviously invalid points (no coords, no timestamp).
+         const oldEpochForFilter = getEpoch(dt_old);
+         const newEpochForFilter = getEpoch(dt_new);
+         const TOLERANCE_MS = 4 * 60 * 60 * 1000; // 4h tolerance for timezone ambiguity
+
+         messages = messages.filter(m => {
+            if (!m.dt_tracker) return false;
+            if (isNaN(parseFloat(m.lat)) || isNaN(parseFloat(m.lng))) return false;
+            const mEpoch = getEpoch(m.dt_tracker);
+            if (isNaN(mEpoch)) return false;
+            // Accept point if it falls within the gap window + tolerance on both sides
+            return mEpoch > (oldEpochForFilter - TOLERANCE_MS) && mEpoch < (newEpochForFilter + TOLERANCE_MS);
+         });
         
         if (messages.length > 0) {
           systemStats.backfillerRecoveredPoints += messages.length;
@@ -319,8 +333,20 @@ async function pollGpsServerLocations() {
             // --- BACKFILLER IA LOGIC ---
             const lastPollerState = lastDeviceTimestamps[imei];
             if (lastPollerState && lastPollerState.dt_tracker) {
-               if (device.dt_tracker && device.dt_tracker > lastPollerState.dt_tracker) {
-                 const timeDiffMs = new Date(device.dt_tracker) - new Date(lastPollerState.dt_tracker);
+               // FIX #3: Convert both timestamps to numeric epoch before comparing.
+               // Comparing date strings directly (> operator) is fragile and fails with
+               // inconsistent zero-padding (e.g. "2026-6-4 9:00:00" vs "2026-06-04 09:00:00").
+               const tz = process.env.TIMEZONE_OFFSET || '-04:00';
+               const parseLocalEpoch = (ds) => {
+                 if (!ds) return NaN;
+                 if (ds.includes('T') && (ds.includes('Z') || ds.match(/[+-]\d{2}:\d{2}$/))) return new Date(ds).getTime();
+                 return new Date(ds.replace(' ', 'T') + tz).getTime();
+               };
+               const deviceEpoch = parseLocalEpoch(device.dt_tracker);
+               const lastEpoch = parseLocalEpoch(lastPollerState.dt_tracker);
+
+               if (device.dt_tracker && !isNaN(deviceEpoch) && !isNaN(lastEpoch) && deviceEpoch > lastEpoch) {
+                 const timeDiffMs = deviceEpoch - lastEpoch;
                  const gapSeconds = Math.floor(timeDiffMs / 1000);
                  
                  if (!isNaN(gapSeconds)) {
@@ -345,7 +371,7 @@ async function pollGpsServerLocations() {
                    
                    if (gapSeconds > gapThreshold && gapSeconds < 259200) {
                      systemStats.backfillerTriggers++;
-                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Programando recuperación en 6 mins para permitir que suba su historial...`);
+                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei} (${gapSeconds}s). Programando recuperación en 6 mins...`);
                      
                      // Queue the backfill to run in 6 minutes, giving the tracker time to upload over GPRS
                      pendingBackfills.push({
