@@ -136,6 +136,24 @@ app.get('/api/audit', async (req, res) => {
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
+const { backfillHistory } = require('./src/pollers/gpsServer');
+app.get('/api/force-backfill', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  try {
+    const imei = req.query.imei;
+    const client = req.query.client || 'luisherrera';
+    // Necesitamos exportar backfillHistory de gpsServer.js para que esto funcione
+    if (typeof backfillHistory === 'function') {
+      const start = req.query.start;
+      const end = req.query.end;
+      const count = await backfillHistory(imei, start, end, client);
+      res.json({ success: true, count, message: `Se reinyectaron ${count} puntos con la hora corregida.` });
+    } else {
+      res.status(500).send('backfillHistory no exportado');
+    }
+  } catch(e) { res.status(500).json({error: e.message}); }
+});
+
 /**
  * Security Middleware for Webhooks
  */
