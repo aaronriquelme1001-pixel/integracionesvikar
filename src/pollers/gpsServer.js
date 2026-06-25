@@ -354,10 +354,9 @@ async function pollGpsServerLocations() {
 
             // --- BACKFILLER IA LOGIC ---
             const lastPollerState = lastDeviceTimestamps[imei];
+            let sentAllIntermediatePoints = false;
+
             if (lastPollerState && lastPollerState.dt_tracker) {
-               // FIX #3: Convert both timestamps to numeric epoch before comparing.
-               // Comparing date strings directly (> operator) is fragile and fails with
-               // inconsistent zero-padding (e.g. "2026-6-4 9:00:00" vs "2026-06-04 09:00:00").
                const tz = process.env.TIMEZONE_OFFSET || '-04:00';
                const parseLocalEpoch = (ds) => {
                  if (!ds) return NaN;
@@ -370,50 +369,84 @@ async function pollGpsServerLocations() {
                if (device.dt_tracker && !isNaN(deviceEpoch) && !isNaN(lastEpoch) && deviceEpoch > lastEpoch) {
                  const timeDiffMs = deviceEpoch - lastEpoch;
                  const gapSeconds = Math.floor(timeDiffMs / 1000);
-                 
-                 if (!isNaN(gapSeconds)) {
-                   let distanceMeters = 0;
-                   if (lastPollerState.lat && lastPollerState.lng && device.lat && device.lng) {
-                     const R = 6371e3;
-                     const lat1 = parseFloat(lastPollerState.lat) * Math.PI/180;
-                     const lat2 = parseFloat(device.lat) * Math.PI/180;
-                     const dLat = (parseFloat(device.lat) - parseFloat(lastPollerState.lat)) * Math.PI/180;
-                     const dLng = (parseFloat(device.lng) - parseFloat(lastPollerState.lng)) * Math.PI/180;
-                     const rawA = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) * Math.sin(dLng/2);
-                     const a = Math.min(1, Math.max(0, rawA));
-                     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                     distanceMeters = R * c;
-                   }
+                 const isMoving = parseFloat(device.speed || 0) > 0;
 
-                   // Was it moving at the end of the trip, OR did it travel > 5km/h on average during the gap?
-                   const isMoving = parseFloat(device.speed || 0) > 0 || (gapSeconds > 0 && (distanceMeters / gapSeconds) > 1.38);
-                   
-                   // Thresholds: 30 seconds if moving, 20 mins if parked (ajustado para alta velocidad)
-                   const gapThreshold = isMoving ? 30 : 1200;
-                   
-                   if (gapSeconds > gapThreshold && gapSeconds < 259200) {
-                     systemStats.backfillerTriggers++;
-                     
-                     // OBJECT_GET_MESSAGES ONLY works with api=user (api=server always returns empty).
-                     // Use GPSSERVER_USER_API_KEY (a user-level key from GPS Server settings).
-                     // Per-client keys as fallback, then last resort is masterKey (may not work).
+                 // IMMEDIATE RECOVERY: If vehicle is moving and we missed intermediate points (gap > 15s),
+                 // query GPS Server for ALL points in that window right now — don't wait 6 minutes.
+                 // This makes Traccar receive every 10-second point, matching GPS Server's native view.
+                 if (isMoving && gapSeconds > 15 && gapSeconds < 259200) {
+                   try {
                      const clientUpper = (client || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
                      const userApiKey = process.env.GPSSERVER_USER_API_KEY
-                       || process.env[`GPSSERVER_API_KEY_${clientUpper}`]
-                       || masterKey; // last resort — may not work if server≠user key
+                       || process.env[`GPSSERVER_API_KEY_${clientUpper}`];
                      
-                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Usando clave: ${userApiKey === process.env.GPSSERVER_USER_API_KEY ? 'GPSSERVER_USER_API_KEY' : 'Alternative Key'}. Programando recuperación en 6 mins...`);
-
-                     // Queue the backfill to run in 6 minutes, giving the tracker time to upload over GPRS
-                     pendingBackfills.push({
-                       imei: imei,
-                       dt_old: lastPollerState.dt_tracker,
-                       dt_new: device.dt_tracker,
-                       client: client,
-                       apiKey: userApiKey,
-                       executeAt: Date.now() + (6 * 60 * 1000)
-                     });
+                     if (userApiKey) {
+                       // Query all intermediate points from GPS Server (add 5s buffer each side)
+                       const fmt = (epochMs) => {
+                         const d = new Date(epochMs);
+                         const p = n => n.toString().padStart(2, '0');
+                         return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
+                       };
+                       const qStart = fmt(lastEpoch - 5000);
+                       const qEnd   = fmt(deviceEpoch + 5000);
+                       
+                       const msgResponse = await axios.get(GPSSERVER_API_URL, {
+                         params: { api: 'user', key: userApiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${qStart},${qEnd}` },
+                         timeout: 10000
+                       });
+                       
+                       let intermediatePoints = [];
+                       if (Array.isArray(msgResponse.data) && msgResponse.data.length > 1) {
+                         intermediatePoints = msgResponse.data;
+                       } else if (msgResponse.data && typeof msgResponse.data === 'object' && !Array.isArray(msgResponse.data)) {
+                         intermediatePoints = Object.values(msgResponse.data);
+                       }
+                       
+                       if (intermediatePoints.length > 1) {
+                         // Sort chronologically and dispatch each point
+                         const sorted = intermediatePoints
+                           .filter(m => Array.isArray(m) && m[0])
+                           .sort((a, b) => new Date(a[0]) - new Date(b[0]));
+                         
+                         console.log(`[Poller] ⚡ Recuperando ${sorted.length} puntos intermedios para ${vehicleName} (gap ${gapSeconds}s)`);
+                         
+                         for (const m of sorted) {
+                           const paramsObj = m[6] || {};
+                           const sats = parseInt(paramsObj.gpslev || paramsObj.sat || 0, 10);
+                           let dtUtc = m[0];
+                           if (m[0] && m[0].includes(' ')) {
+                             dtUtc = new Date(m[0].replace(' ', 'T') + 'Z').toISOString();
+                           }
+                           const intermediatePoint = {
+                             imei, name: vehicleName, plate: vehicleName,
+                             dt_tracker: dtUtc, dt_server: dtUtc,
+                             lat: m[1], lng: m[2],
+                             altitude: m[3] || 0, angle: m[4] || 0, speed: m[5] || 0,
+                             params: paramsObj, loc_valid: sats > 0 ? 1 : 0
+                           };
+                           await dispatchToB2B(intermediatePoint, client);
+                         }
+                         sentAllIntermediatePoints = true;
+                         systemStats.backfillerTriggers++;
+                       }
+                     }
+                   } catch (msgErr) {
+                     // If intermediate recovery fails, fall through to send just current point
+                     console.warn(`[Poller] No se pudieron recuperar puntos intermedios para ${imei}: ${msgErr.message}`);
                    }
+                 }
+
+                 // Large offline gaps (> 10 min): schedule delayed backfill as before
+                 if (gapSeconds > 600 && gapSeconds < 259200) {
+                   const clientUpper = (client || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+                   const userApiKey = process.env.GPSSERVER_USER_API_KEY
+                     || process.env[`GPSSERVER_API_KEY_${clientUpper}`]
+                     || masterKey;
+                   pendingBackfills.push({
+                     imei, dt_old: lastPollerState.dt_tracker, dt_new: device.dt_tracker,
+                     client, apiKey: userApiKey, executeAt: Date.now() + (6 * 60 * 1000)
+                   });
+                   systemStats.backfillerTriggers++;
                  }
                }
             }
@@ -427,7 +460,10 @@ async function pollGpsServerLocations() {
             }
             // ---------------------------
 
-            await dispatchToB2B(telemetry, client);
+            // Only dispatch the current point if we didn't already send all intermediate ones
+            if (!sentAllIntermediatePoints) {
+              await dispatchToB2B(telemetry, client);
+            }
           } catch (imeiErr) {
             console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
           }
