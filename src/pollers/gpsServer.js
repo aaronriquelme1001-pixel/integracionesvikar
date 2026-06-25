@@ -370,8 +370,8 @@ async function pollGpsServerLocations() {
                    // Was it moving at the end of the trip, OR did it travel > 5km/h on average during the gap?
                    const isMoving = parseFloat(device.speed || 0) > 0 || (gapSeconds > 0 && (distanceMeters / gapSeconds) > 1.38);
                    
-                   // Thresholds: 45 seconds if moving, 20 mins if parked (ajustado para curvas rápidas)
-                   const gapThreshold = isMoving ? 45 : 1200;
+                   // Thresholds: 30 seconds if moving, 20 mins if parked (ajustado para alta velocidad)
+                   const gapThreshold = isMoving ? 30 : 1200;
                    
                    if (gapSeconds > gapThreshold && gapSeconds < 259200) {
                      systemStats.backfillerTriggers++;
