@@ -84,13 +84,26 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      let allMessages = [];
      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-     // FIX #1: Use a robust epoch parser that handles both 'YYYY-MM-DD HH:mm:ss' and ISO formats
-     const getEpoch = (ds) => {
-       if (!ds) return NaN;
-       if (ds.includes('T') && (ds.includes('Z') || ds.includes('+'))) return new Date(ds).getTime();
-       // Assume local time (GPS Server returns local time), append timezone offset
-       return new Date(ds.replace(' ', 'T') + tz).getTime();
-     };
+      // Robust epoch parser: handles ISO+Z (UTC), ISO+offset, 'YYYY-MM-DD HH:mm:ss' (local or UTC)
+      const getEpoch = (ds) => {
+        if (!ds) return NaN;
+        const s = String(ds).trim();
+        // Already has timezone info — parse directly
+        if (s.includes('T') && (s.endsWith('Z') || s.match(/[+-]\d{2}:\d{2}$/))) {
+          return new Date(s).getTime();
+        }
+        // 'YYYY-MM-DD HH:mm:ss' format — could be local (GPS Server) or UTC (Supabase)
+        // Supabase stores in UTC. GPS Server returns local (Chile UTC-4).
+        // Replace space with T and try parsing; if it looks like it came from Supabase hydration
+        // (stored as UTC), we parse as UTC. If from GPS Server (local), we add tz offset.
+        const normalized = s.replace(' ', 'T');
+        // Try with timezone offset (local GPS Server time)
+        const withTz = new Date(normalized + tz).getTime();
+        if (!isNaN(withTz)) return withTz;
+        // Fallback: try as UTC
+        const asUtc = new Date(normalized + 'Z').getTime();
+        return asUtc;
+      };
      const startEpoch = getEpoch(dt_old);
      const endEpoch = getEpoch(dt_new);
      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
@@ -112,7 +125,8 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      // Widen API query window because GPS Server API filters by dt_server (arrival time), not dt_tracker.
      const q_old = !isNaN(startEpoch) ? fmt(startEpoch - 1 * 60 * 60 * 1000) : dt_old;
      const q_new = !isNaN(endEpoch) ? fmt(endEpoch + 3 * 60 * 60 * 1000) : dt_new;
-     
+     console.log(`[Backfiller] Fechas parseadas para ${imei}: dt_old="${dt_old}" → q_old="${q_old}" | dt_new="${dt_new}" → q_new="${q_new}"`);
+
      async function fetchWithRetry(url, config, retries = 3) {
          for (let i = 0; i < retries; i++) {
             try {
