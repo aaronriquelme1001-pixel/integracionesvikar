@@ -82,50 +82,33 @@ async function refreshMappingCache(masterKey) {
 async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = false) {
   try {
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
-     let allMessages = [];
-     const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-      // Robust epoch parser: handles ISO+Z (UTC), ISO+offset, 'YYYY-MM-DD HH:mm:ss' (local or UTC)
-      const getEpoch = (ds) => {
-        if (!ds) return NaN;
-        const s = String(ds).trim();
-        // Already has timezone info — parse directly
-        if (s.includes('T') && (s.endsWith('Z') || s.match(/[+-]\d{2}:\d{2}$/))) {
-          return new Date(s).getTime();
-        }
-        // 'YYYY-MM-DD HH:mm:ss' format — could be local (GPS Server) or UTC (Supabase)
-        // Supabase stores in UTC. GPS Server returns local (Chile UTC-4).
-        // Replace space with T and try parsing; if it looks like it came from Supabase hydration
-        // (stored as UTC), we parse as UTC. If from GPS Server (local), we add tz offset.
-        const normalized = s.replace(' ', 'T');
-        // Try with timezone offset (local GPS Server time)
-        const withTz = new Date(normalized + tz).getTime();
-        if (!isNaN(withTz)) return withTz;
-        // Fallback: try as UTC
-        const asUtc = new Date(normalized + 'Z').getTime();
-        return asUtc;
-      };
-     const startEpoch = getEpoch(dt_old);
-     const endEpoch = getEpoch(dt_new);
-     const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
-     // CRITICAL: OBJECT_GET_MESSAGES only works with api=user.
-     // Using api=server (Master Key mode) always returns empty string.
-     const apiTarget = 'user';
-
-     // Helpers to format epoch back to local string for the API query
-     const tzMatch = tz.match(/([+-]?)(\d+)(?::(\d+))?/);
-     const sign = tzMatch && tzMatch[1] === '-' ? -1 : 1;
-     const hours = tzMatch ? parseInt(tzMatch[2], 10) : 4;
-     const mins = tzMatch && tzMatch[3] ? parseInt(tzMatch[3], 10) : 0;
-     const offsetMs = sign * ((hours * 60) + mins) * 60 * 1000;
+     
+     // Simple and robust local time math: 
+     // dt_old and dt_new are strings in Local Time (e.g. "2026-06-25 14:45:32").
+     // We parse them as UTC to easily add/subtract hours without timezone shifts, 
+     // then format them back to strings for the GPS Server query.
      const pad = n => n.toString().padStart(2, '0');
-     const fmt = epoch => {
-        const d = new Date(epoch + offsetMs);
+     const addHours = (dtStr, hoursOffset) => {
+        if (!dtStr) return NaN;
+        const s = String(dtStr).trim().replace(' ', 'T');
+        // Treat local time string as UTC for pure math
+        const epoch = new Date(s.includes('Z') || s.includes('+') || s.includes('-0') ? s : s + 'Z').getTime();
+        if (isNaN(epoch)) return NaN;
+        const d = new Date(epoch + (hoursOffset * 60 * 60 * 1000));
         return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
      };
 
+     const startEpoch = addHours(dt_old, 0) !== NaN ? new Date(String(dt_old).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
+     const endEpoch = addHours(dt_new, 0) !== NaN ? new Date(String(dt_new).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
+     const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
+     
+     // CRITICAL: OBJECT_GET_MESSAGES only works with api=user.
+     const apiTarget = 'user';
+
      // Widen API query window because GPS Server API filters by dt_server (arrival time), not dt_tracker.
-     const q_old = !isNaN(startEpoch) ? fmt(startEpoch - 1 * 60 * 60 * 1000) : dt_old;
-     const q_new = !isNaN(endEpoch) ? fmt(endEpoch + 3 * 60 * 60 * 1000) : dt_new;
+     const q_old = !isNaN(startEpoch) ? addHours(dt_old, -1) : dt_old;
+     const q_new = !isNaN(endEpoch) ? addHours(dt_new, 3) : dt_new;
+     
      console.log(`[Backfiller] Fechas parseadas para ${imei}: dt_old="${dt_old}" → q_old="${q_old}" | dt_new="${dt_new}" → q_new="${q_new}"`);
 
      async function fetchWithRetry(url, config, retries = 3) {
@@ -210,14 +193,15 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          // causing valid recovered points to be discarded as "out of range".
          // We already widened the API query window above (±1h to +3h), so we trust the GPS Server's response.
          // Instead of a strict epoch filter, we only remove obviously invalid points (no coords, no timestamp).
-         const oldEpochForFilter = getEpoch(dt_old);
-         const newEpochForFilter = getEpoch(dt_new);
+         const simpleEpoch = (ds) => new Date(String(ds).trim().replace(' ', 'T') + (String(ds).includes('Z') ? '' : 'Z')).getTime();
+         const oldEpochForFilter = simpleEpoch(dt_old);
+         const newEpochForFilter = simpleEpoch(dt_new);
          const TOLERANCE_MS = 4 * 60 * 60 * 1000; // 4h tolerance for timezone ambiguity
 
          messages = messages.filter(m => {
             if (!m.dt_tracker) return false;
             if (isNaN(parseFloat(m.lat)) || isNaN(parseFloat(m.lng))) return false;
-            const mEpoch = getEpoch(m.dt_tracker);
+            const mEpoch = simpleEpoch(m.dt_tracker);
             if (isNaN(mEpoch)) return false;
             // Accept point if it falls within the gap window + tolerance on both sides
             return mEpoch > (oldEpochForFilter - TOLERANCE_MS) && mEpoch < (newEpochForFilter + TOLERANCE_MS);
