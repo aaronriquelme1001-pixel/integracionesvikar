@@ -70,7 +70,7 @@ router.get('/history', async (req, res) => {
       params.push(finalEndDate);
     }
     
-    query += ` ORDER BY dt_tracker ASC LIMIT 5000`; // Limit to prevent massive payloads crashing the browser
+    query += ` ORDER BY dt_tracker ASC LIMIT 25000`; // Limit increased to allow full day at 10s intervals (8640/day)
 
     const result = await pool.query(query, params);
     
