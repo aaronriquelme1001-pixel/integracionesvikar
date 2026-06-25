@@ -20,7 +20,7 @@ let lastGpsServerPollStatus = 'Waiting to start...';
 let isGpsServerPolling = false;
 let isStateHydrated = false;
 
-// Global mapping cache
+// Global mapping cache: { imei -> { client, name } }
 let mappingCache = {};
 let lastMappingRefresh = 0;
 const MAPPING_REFRESH_INTERVAL = 20 * 60 * 1000; // 20 minutes
@@ -321,15 +321,24 @@ async function pollGpsServerLocations() {
             const device = devices[imei];
             if (!device) return;
 
-            // Resolve client from cache
-            const client = mappingCache[imei] || 'unknown';
+            // Resolve client and name from cache
+            const cached = mappingCache[imei];
+            const client = (cached && cached.client) ? cached.client : (typeof cached === 'string' ? cached : 'unknown');
+            const cachedName = (cached && cached.name) ? cached.name : null;
+
+            // Store the vehicle name in the mapping cache for future use by dispatcher
+            if (device.name && (!cached || typeof cached === 'string' || !cached.name)) {
+              mappingCache[imei] = { client, name: device.name };
+            }
 
             totalDevicesProcessed++;
             systemStats.totalPolledPoints++;
           
+            const vehicleName = device.name || cachedName || imei;
             const telemetry = {
               imei: imei,
-              name: device.name,
+              name: vehicleName,
+              plate: vehicleName, // Expose as plate so dispatcher can resolve it
               lat: device.lat,
               lng: device.lng,
               altitude: device.altitude || 0,
@@ -470,5 +479,10 @@ module.exports = {
   pollGpsServerLocations,
   getStatus: () => ({ lastGpsServerPollTime, lastGpsServerPollStatus }),
   recoverHistory,
-  getMappingCache: () => mappingCache
+  getMappingCache: () => mappingCache,
+  getClientForImei: (imei) => {
+    const c = mappingCache[imei];
+    if (!c) return null;
+    return typeof c === 'string' ? c : c.client;
+  }
 };

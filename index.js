@@ -155,7 +155,7 @@ app.get('/api/force-backfill', async (req, res) => {
 });
 
 const fs = require('fs');
-const { getMappingCache } = require('./src/pollers/gpsServer');
+const { getMappingCache, getClientForImei } = require('./src/pollers/gpsServer');
 
 app.get('/api/force-backfill-all', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');

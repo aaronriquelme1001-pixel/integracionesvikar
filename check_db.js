@@ -1,27 +1,6 @@
 require('dotenv').config();
 const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.DATALAKE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
-async function run() {
-  try {
-    const res = await pool.query(`
-      SELECT client_source, count(*) as points
-      FROM global_telemetry_traffic
-      WHERE received_at >= NOW() - INTERVAL '5 minutes'
-      GROUP BY client_source
-      ORDER BY points DESC
-      LIMIT 10;
-    `);
-    console.log("=== DATALAKE: PUNTOS RECIBIDOS EN LOS ÚLTIMOS 5 MINUTOS ===");
-    console.table(res.rows);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    await pool.end();
-  }
-}
-run();
+const pool = new Pool({ connectionString: process.env.DATALAKE_URL });
+pool.query("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'global_telemetry_traffic' AND column_name = 'dt_tracker'")
+  .then(res => { console.log(res.rows); pool.end(); })
+  .catch(err => { console.error(err); pool.end(); });
