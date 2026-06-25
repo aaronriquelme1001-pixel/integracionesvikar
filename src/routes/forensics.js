@@ -56,7 +56,7 @@ router.get('/', async (req, res) => {
 
   try {
     // 1. Telemetry Query
-    let query = `SELECT lat, lng, speed, dt_tracker, client_source FROM global_telemetry_traffic WHERE 1=1 `;
+    let query = `SELECT lat, lng, speed, dt_tracker, client_source, altitude, angle, params, loc_valid FROM global_telemetry_traffic WHERE 1=1 `;
     const params = [];
     let paramIndex = 1;
 
@@ -131,7 +131,11 @@ router.get('/', async (req, res) => {
         lng: row.lng,
         speed: speed,
         time: dateStr.substring(11),
-        isIncident: false // Will mark the highest delta as incident later if needed
+        isIncident: false, // Will mark the highest delta as incident later if needed
+        altitude: row.altitude,
+        angle: row.angle,
+        params: typeof row.params === 'string' ? JSON.parse(row.params) : row.params,
+        loc_valid: row.loc_valid
       });
     }
 

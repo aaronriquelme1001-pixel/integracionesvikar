@@ -27,7 +27,7 @@ router.get('/history', async (req, res) => {
 
   try {
     let query = `
-      SELECT lat, lng, speed, dt_tracker, event, plate
+      SELECT lat, lng, speed, dt_tracker, plate, altitude, angle, params, loc_valid
       FROM global_telemetry_traffic 
       WHERE imei = $1 
     `;
