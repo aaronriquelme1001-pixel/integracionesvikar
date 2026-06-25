@@ -146,12 +146,46 @@ app.get('/api/force-backfill', async (req, res) => {
     if (typeof recoverHistory === 'function') {
       const start = req.query.start;
       const end = req.query.end;
-      // Fetch the API key internally or pass it from env (we'll just use the default flow inside recoverHistory)
       const count = await recoverHistory(imei, start, end, client, null, false);
       res.json({ success: true, count, message: `Se reinyectaron ${count} puntos con la hora corregida.` });
     } else {
       res.status(500).send('recoverHistory no exportado');
     }
+  } catch(e) { res.status(500).json({error: e.message}); }
+});
+
+const fs = require('fs');
+app.get('/api/force-backfill-all', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  try {
+    const start = req.query.start;
+    const end = req.query.end;
+    let configPath = './config/devices.json';
+    if (!fs.existsSync(configPath) && fs.existsSync('./src/config/devices.json')) {
+      configPath = './src/config/devices.json';
+    }
+    const rawData = fs.readFileSync(configPath, 'utf8');
+    const devices = JSON.parse(rawData).devices || JSON.parse(rawData);
+    
+    let results = [];
+    const imeis = Object.keys(devices).filter(imei => devices[imei].client === 'luisherrera');
+    
+    // We start the processing in background so the request doesn't timeout
+    setTimeout(async () => {
+      for (const imei of imeis) {
+        try {
+          console.log(`[BackfillAll] Procesando ${imei}...`);
+          const count = await recoverHistory(imei, start, end, 'luisherrera', null, false);
+          results.push({ imei, count });
+          await new Promise(r => setTimeout(r, 2000)); // Pause between vehicles
+        } catch(e) {
+          results.push({ imei, error: e.message });
+        }
+      }
+      console.log(`[BackfillAll] Terminado:`, results);
+    }, 100);
+
+    res.json({ success: true, message: `Se inició el proceso en background para ${imeis.length} vehículos. Esto tomará varios minutos.` });
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
