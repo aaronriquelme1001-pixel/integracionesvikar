@@ -98,14 +98,42 @@ app.get('/api/datalake-facts', async (req, res) => {
     const { rows: countRows } = await pool.query('SELECT count(*) as total FROM billing_snapshots');
     const { rows: opelOldest } = await pool.query(`SELECT dt_tracker, lat, lng, speed FROM global_telemetry_traffic WHERE imei='865413054330609' ORDER BY dt_tracker ASC LIMIT 1`);
     const { rows: opelYesterday } = await pool.query(`SELECT dt_tracker, lat, lng, speed FROM global_telemetry_traffic WHERE imei='865413054330609' AND dt_tracker >= '2026-06-19 13:00:00' AND dt_tracker <= '2026-06-19 15:00:00' LIMIT 5`);
-    res.json({ 
-      total_snapshots: countRows[0].total, 
-      opel_oldest: opelOldest,
-      opel_yesterday: opelYesterday
+    
+    res.json({
+      success: true,
+      billingSnapshotsTotal: countRows[0].total,
+      opelOldestPoint: opelOldest.length ? opelOldest[0] : null,
+      opelYesterdaySample: opelYesterday
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.get('/api/audit', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  try {
+    const r = await pool.query(`
+      SELECT plate, COUNT(*) as c, MAX(dt_tracker) as last_point
+      FROM global_telemetry_traffic 
+      WHERE dt_tracker > NOW() - INTERVAL '2 hours' 
+      GROUP BY plate 
+      ORDER BY c DESC
+    `);
+    const outOfOrder = await pool.query(`
+      WITH numbered AS (
+          SELECT id, plate, dt_tracker, 
+                 LAG(dt_tracker) OVER (PARTITION BY plate ORDER BY id ASC) as prev_dt
+          FROM global_telemetry_traffic
+          WHERE dt_tracker > NOW() - INTERVAL '12 hours'
+      )
+      SELECT plate, dt_tracker, prev_dt 
+      FROM numbered 
+      WHERE dt_tracker < prev_dt 
+      LIMIT 100;
+    `);
+    res.json({ stats: r.rows, outOfOrder: outOfOrder.rows });
+  } catch(e) { res.status(500).json({error: e.message}); }
 });
 
 /**
