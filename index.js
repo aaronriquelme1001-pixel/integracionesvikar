@@ -160,8 +160,22 @@ const { getMappingCache, getClientForImei } = require('./src/pollers/gpsServer')
 app.get('/api/force-backfill-all', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
   try {
-    const start = req.query.start;
-    const end = req.query.end;
+    // Timezone offset: Chile is UTC-4. User provides local time, we must convert to UTC for GPS Server API.
+    const TZ_OFFSET_HOURS = parseInt(process.env.TZ_BACKFILL_OFFSET || '4', 10); // +4 to go from Chile->UTC
+    const toUtc = (localStr) => {
+      if (!localStr) return null;
+      const epoch = new Date(localStr.replace(' ', 'T') + ':00').getTime() + (TZ_OFFSET_HOURS * 3600000);
+      const d = new Date(epoch);
+      const p = n => n.toString().padStart(2, '0');
+      return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
+    };
+    
+    const startLocal = req.query.start; // e.g. "2026-06-25 14:00"
+    const endLocal = req.query.end;     // e.g. "2026-06-25 18:00"
+    const start = toUtc(startLocal) || startLocal;
+    const end   = toUtc(endLocal)   || endLocal;
+    
+    console.log(`[BackfillAll] Rango local: ${startLocal} → ${endLocal} | Convertido a UTC: ${start} → ${end}`);
     
     // Get all devices discovered dynamically from the API (Admin, Transklett, etc)
     const mappingCache = typeof getMappingCache === 'function' ? getMappingCache() : {};
@@ -177,8 +191,9 @@ app.get('/api/force-backfill-all', async (req, res) => {
     setTimeout(async () => {
       for (const imei of imeis) {
         try {
-          const client = mappingCache[imei];
-          console.log(`[BackfillAll] Procesando ${imei} del cliente ${client}...`);
+          const cached = mappingCache[imei];
+          const client = (cached && cached.client) ? cached.client : (typeof cached === 'string' ? cached : 'unknown');
+          console.log(`[BackfillAll] Procesando ${imei} del cliente ${client} | UTC: ${start} → ${end}`);
           const count = await recoverHistory(imei, start, end, client, null, false);
           results.push({ imei, count });
           await new Promise(r => setTimeout(r, 2000)); // Pause between vehicles
@@ -189,7 +204,7 @@ app.get('/api/force-backfill-all', async (req, res) => {
       console.log(`[BackfillAll] Terminado:`, results);
     }, 100);
 
-    res.json({ success: true, message: `Se inició el proceso en background para ${imeis.length} vehículos (clientes dinámicos). Esto tomará varios minutos.` });
+    res.json({ success: true, utcRange: { start, end }, message: `Se inició el proceso en background para ${imeis.length} vehículos. Rango UTC: ${start} → ${end}` });
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
