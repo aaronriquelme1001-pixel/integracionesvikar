@@ -155,25 +155,31 @@ app.get('/api/force-backfill', async (req, res) => {
 });
 
 const fs = require('fs');
+const { getMappingCache } = require('./src/pollers/gpsServer');
+
 app.get('/api/force-backfill-all', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
   try {
     const start = req.query.start;
     const end = req.query.end;
-    let configPath = './config/devices.json';
-    if (!fs.existsSync(configPath) && fs.existsSync('./src/config/devices.json')) {
-      configPath = './src/config/devices.json';
-    }
-    const rawData = fs.readFileSync(configPath, 'utf8');
-    const devices = JSON.parse(rawData).devices || JSON.parse(rawData);
     
+    // Get all devices discovered dynamically from the API (Admin, Transklett, etc)
+    const mappingCache = typeof getMappingCache === 'function' ? getMappingCache() : {};
+    const imeis = Object.keys(mappingCache);
+    
+    if (imeis.length === 0) {
+      return res.json({ success: false, message: "El servidor aún no ha escaneado la lista de camiones desde la API. Intenta en 1 minuto." });
+    }
+
     let results = [];
-    const imeis = Object.keys(devices); // Todos los dispositivos registrados en Render
+    
+    // We start the processing in background so the request doesn't timeout
     setTimeout(async () => {
       for (const imei of imeis) {
         try {
-          console.log(`[BackfillAll] Procesando ${imei}...`);
-          const count = await recoverHistory(imei, start, end, 'luisherrera', null, false);
+          const client = mappingCache[imei];
+          console.log(`[BackfillAll] Procesando ${imei} del cliente ${client}...`);
+          const count = await recoverHistory(imei, start, end, client, null, false);
           results.push({ imei, count });
           await new Promise(r => setTimeout(r, 2000)); // Pause between vehicles
         } catch(e) {
@@ -183,7 +189,7 @@ app.get('/api/force-backfill-all', async (req, res) => {
       console.log(`[BackfillAll] Terminado:`, results);
     }, 100);
 
-    res.json({ success: true, message: `Se inició el proceso en background para ${imeis.length} vehículos. Esto tomará varios minutos.` });
+    res.json({ success: true, message: `Se inició el proceso en background para ${imeis.length} vehículos (clientes dinámicos). Esto tomará varios minutos.` });
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 

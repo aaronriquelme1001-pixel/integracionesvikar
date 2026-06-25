@@ -469,5 +469,6 @@ setInterval(async () => {
 module.exports = {
   pollGpsServerLocations,
   getStatus: () => ({ lastGpsServerPollTime, lastGpsServerPollStatus }),
-  recoverHistory
+  recoverHistory,
+  getMappingCache: () => mappingCache
 };
