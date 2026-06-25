@@ -92,7 +92,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
         if (!dtStr) return NaN;
         const s = String(dtStr).trim().replace(' ', 'T');
         // Treat local time string as UTC for pure math
-        const epoch = new Date(s.includes('Z') || s.includes('+') || s.includes('-0') ? s : s + 'Z').getTime();
+        const epoch = new Date(s.includes('Z') ? s : s + 'Z').getTime();
         if (isNaN(epoch)) return NaN;
         const d = new Date(epoch + (hoursOffset * 60 * 60 * 1000));
         return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
