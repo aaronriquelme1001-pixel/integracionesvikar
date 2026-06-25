@@ -16,13 +16,14 @@ class TraccarStrategy extends BaseStrategy {
     const id = idType === 'imei' ? telemetry.imei : (deviceConfig.plate || telemetry.plate_number || telemetry.imei);
 
     // Parse date and convert to UNIX timestamp (seconds)
+    // The dateStr from GPS Server is already in UTC string format (e.g. "2026-06-25 15:04:23").
+    // We must treat it as UTC by appending 'Z' so it evaluates to the correct UTC timestamp.
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
     if (dateStr.includes('T') && dateStr.includes('Z')) {
       parsedDate = new Date(dateStr);
     } else if (dateStr.includes(' ')) {
-      const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-      parsedDate = new Date(dateStr.replace(' ', 'T') + tz);
+      parsedDate = new Date(dateStr.replace(' ', 'T') + 'Z');
     } else {
       parsedDate = new Date(dateStr);
     }
