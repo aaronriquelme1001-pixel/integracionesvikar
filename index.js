@@ -168,9 +168,7 @@ app.get('/api/force-backfill-all', async (req, res) => {
     const devices = JSON.parse(rawData).devices || JSON.parse(rawData);
     
     let results = [];
-    const imeis = Object.keys(devices).filter(imei => devices[imei].client === 'luisherrera');
-    
-    // We start the processing in background so the request doesn't timeout
+    const imeis = Object.keys(devices); // Todos los dispositivos registrados en Render
     setTimeout(async () => {
       for (const imei of imeis) {
         try {
