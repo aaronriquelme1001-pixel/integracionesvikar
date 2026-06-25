@@ -376,15 +376,16 @@ async function pollGpsServerLocations() {
                    
                    if (gapSeconds > gapThreshold && gapSeconds < 259200) {
                      systemStats.backfillerTriggers++;
-                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei} (${gapSeconds}s). Programando recuperación en 6 mins...`);
                      
-                     // Resolve the user API key for this device.
-                     // OBJECT_GET_MESSAGES only works with api=user, so we need a user-level key.
-                     // Look up by client name from mapping cache, fall back to checking all available user keys.
+                     // OBJECT_GET_MESSAGES ONLY works with api=user (api=server always returns empty).
+                     // Use GPSSERVER_USER_API_KEY (a user-level key from GPS Server settings).
+                     // Per-client keys as fallback, then last resort is masterKey (may not work).
                      const clientUpper = (client || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-                     const userApiKey = process.env[`GPSSERVER_API_KEY_${clientUpper}`]
-                       || process.env.GPSSERVER_API_KEY_LUISHERRERA  // default fallback user key
-                       || masterKey; // last resort
+                     const userApiKey = process.env.GPSSERVER_USER_API_KEY
+                       || process.env[`GPSSERVER_API_KEY_${clientUpper}`]
+                       || masterKey; // last resort — may not work if server≠user key
+                     
+                     console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei}. Usando clave: ${userApiKey === process.env.GPSSERVER_USER_API_KEY ? 'GPSSERVER_USER_API_KEY' : 'Alternative Key'}. Programando recuperación en 6 mins...`);
 
                      // Queue the backfill to run in 6 minutes, giving the tracker time to upload over GPRS
                      pendingBackfills.push({
