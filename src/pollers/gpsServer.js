@@ -112,9 +112,10 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      const apiTarget = 'user';
 
      // Helpers to format epoch back to local string for the API query
-     const sign = tz[0] === '+' ? 1 : -1;
-     const hours = parseInt(tz.substring(1, 3), 10);
-     const mins = parseInt(tz.substring(4, 6), 10);
+     const tzMatch = tz.match(/([+-]?)(\d+)(?::(\d+))?/);
+     const sign = tzMatch && tzMatch[1] === '-' ? -1 : 1;
+     const hours = tzMatch ? parseInt(tzMatch[2], 10) : 4;
+     const mins = tzMatch && tzMatch[3] ? parseInt(tzMatch[3], 10) : 0;
      const offsetMs = sign * ((hours * 60) + mins) * 60 * 1000;
      const pad = n => n.toString().padStart(2, '0');
      const fmt = epoch => {
