@@ -94,7 +94,9 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      const startEpoch = getEpoch(dt_old);
      const endEpoch = getEpoch(dt_new);
      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
-     const apiTarget = isMaster ? 'server' : 'user';
+     // CRITICAL: OBJECT_GET_MESSAGES only works with api=user.
+     // Using api=server (Master Key mode) always returns empty string.
+     const apiTarget = 'user';
 
      // Helpers to format epoch back to local string for the API query
      const sign = tz[0] === '+' ? 1 : -1;
@@ -136,8 +138,9 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          const chunkStart = fmt(currentStart);
          const chunkEnd = fmt(currentEnd);
          
+         console.log(`[Backfiller] Consultando GPS Server (api=user): OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}`);
          const response = await fetchWithRetry(GPSSERVER_API_URL, {
-            params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
+            params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
             timeout: 30000
          });
          
@@ -148,10 +151,12 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          await new Promise(r => setTimeout(r, 500));
        }
      } else {
+       console.log(`[Backfiller] Consultando GPS Server (api=user): OBJECT_GET_MESSAGES,${imei},${q_old},${q_new}`);
        const response = await fetchWithRetry(GPSSERVER_API_URL, {
-          params: { api: apiTarget, key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${q_old},${q_new}` },
+          params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${q_old},${q_new}` },
           timeout: 30000
        });
+       console.log(`[Backfiller] GPS Server respondió para ${imei}:`, typeof response.data, Array.isArray(response.data) ? response.data.length + ' puntos' : JSON.stringify(response.data).substring(0, 100));
        let resData = response.data;
        if (resData) {
           if (Array.isArray(resData)) {
@@ -373,13 +378,21 @@ async function pollGpsServerLocations() {
                      systemStats.backfillerTriggers++;
                      console.log(`[Poller] 📡 Brecha de ${gapSeconds}s detectada para ${imei} (${gapSeconds}s). Programando recuperación en 6 mins...`);
                      
+                     // Resolve the user API key for this device.
+                     // OBJECT_GET_MESSAGES only works with api=user, so we need a user-level key.
+                     // Look up by client name from mapping cache, fall back to checking all available user keys.
+                     const clientUpper = (client || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+                     const userApiKey = process.env[`GPSSERVER_API_KEY_${clientUpper}`]
+                       || process.env.GPSSERVER_API_KEY_LUISHERRERA  // default fallback user key
+                       || masterKey; // last resort
+
                      // Queue the backfill to run in 6 minutes, giving the tracker time to upload over GPRS
                      pendingBackfills.push({
                        imei: imei,
                        dt_old: lastPollerState.dt_tracker,
                        dt_new: device.dt_tracker,
                        client: client,
-                       apiKey: masterKey,
+                       apiKey: userApiKey,
                        executeAt: Date.now() + (6 * 60 * 1000)
                      });
                    }
