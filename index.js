@@ -136,20 +136,21 @@ app.get('/api/audit', async (req, res) => {
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
-const { backfillHistory } = require('./src/pollers/gpsServer');
+const { recoverHistory } = require('./src/pollers/gpsServer');
 app.get('/api/force-backfill', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
   try {
     const imei = req.query.imei;
     const client = req.query.client || 'luisherrera';
-    // Necesitamos exportar backfillHistory de gpsServer.js para que esto funcione
-    if (typeof backfillHistory === 'function') {
+    
+    if (typeof recoverHistory === 'function') {
       const start = req.query.start;
       const end = req.query.end;
-      const count = await backfillHistory(imei, start, end, client);
+      // Fetch the API key internally or pass it from env (we'll just use the default flow inside recoverHistory)
+      const count = await recoverHistory(imei, start, end, client, null, false);
       res.json({ success: true, count, message: `Se reinyectaron ${count} puntos con la hora corregida.` });
     } else {
-      res.status(500).send('backfillHistory no exportado');
+      res.status(500).send('recoverHistory no exportado');
     }
   } catch(e) { res.status(500).json({error: e.message}); }
 });

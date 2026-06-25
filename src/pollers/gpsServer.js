@@ -469,5 +469,5 @@ setInterval(async () => {
 module.exports = {
   pollGpsServerLocations,
   getStatus: () => ({ lastGpsServerPollTime, lastGpsServerPollStatus }),
-  backfillHistory
+  recoverHistory
 };
