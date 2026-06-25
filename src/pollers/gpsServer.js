@@ -172,9 +172,18 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
               const satellites = parseInt(paramsObj.gpslev || paramsObj.sat || paramsObj.satellites || 0, 10);
               const isGpsValid = satellites > 0 ? 1 : 0;
               
+              // FIX: GPS Server OBJECT_GET_MESSAGES devuelve hora LOCAL (ej: 2026-06-25 15:00:00).
+              // Si le mandamos esto crudo a B2B, Traccar lo asume como UTC y lo retrasa 4 horas.
+              // Debemos convertirlo a formato ISO UTC real restando el offset (asumiendo Chile UTC-4).
+              let dtTrackerUtc = m[0];
+              if (m[0] && m[0].includes(' ')) {
+                const localEpoch = new Date(m[0].replace(' ', 'T') + '-04:00').toISOString(); // Fuerza a interpretarlo como UTC-4
+                dtTrackerUtc = localEpoch;
+              }
+              
               return {
-                 dt_tracker: m[0],
-                 dt_server: m[0],
+                 dt_tracker: dtTrackerUtc,
+                 dt_server: dtTrackerUtc,
                  lat: m[1],
                  lng: m[2],
                  altitude: m[3] || 0,
