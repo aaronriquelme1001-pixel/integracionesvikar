@@ -410,10 +410,11 @@ app.use('/api/fleet', fleetRoute);
       if (!rows || !Array.isArray(rows)) return res.status(400).json({ error: 'Missing rows array' });
 
       // Chunk insertion (BigQuery limit is 10k rows usually, we have ~4.5k so one shot is fine but chunking is safer)
+      // Chunk insertion (BigQuery limit is 10k rows usually, we have ~4.5k so one shot is fine but chunking is safer)
       const values = [];
       const params = {};
       rows.forEach((r, i) => {
-        values.push(`(@c${i}, @i${i}, @d${i}, @o${i}, @e${i}, @g${i}, @x${i}, @m${i}, @h${i}, @f${i}, @t${i})`);
+        values.push(`(@c${i}, @i${i}, @d${i}, @o${i}, @e${i}, @g${i}, @x${i}, @m${i}, @h${i}, @f${i})`);
         params[`c${i}`] = r.client_id;
         params[`i${i}`] = r.imei;
         params[`d${i}`] = bqClient.date(r.snapshot_date.split('T')[0]);
@@ -424,10 +425,9 @@ app.use('/api/fleet', fleetRoute);
         params[`m${i}`] = r.moderate_speeding_count || 0;
         params[`h${i}`] = r.harsh_maneuvers_count || 0;
         params[`f${i}`] = r.fatigue_alerts_count || 0;
-        params[`t${i}`] = bqClient.timestamp(new Date(r.created_at));
       });
 
-      const query = `INSERT INTO \`telemetry.billing_snapshots\` (client_id, imei, snapshot_date, odometer, engine_hours, daily_grade, extreme_speeding_count, moderate_speeding_count, harsh_maneuvers_count, fatigue_alerts_count, created_at) VALUES ${values.join(', ')}`;
+      const query = `INSERT INTO \`telemetry.billing_snapshots\` (client_id, imei, snapshot_date, odometer, engine_hours, daily_grade, extreme_speeding_count, moderate_speeding_count, harsh_maneuvers_count, fatigue_alerts_count) VALUES ${values.join(', ')}`;
       await bqClient.query({ query, params });
       
       res.json({ message: `Successfully restored ${rows.length} snapshots to BigQuery.` });
