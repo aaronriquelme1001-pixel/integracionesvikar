@@ -152,9 +152,12 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
             params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
             timeout: 30000
          });
-         
-         if (response.data && Array.isArray(response.data)) {
-            allMessages = allMessages.concat(response.data);
+         if (response.data) {
+            if (Array.isArray(response.data)) {
+               allMessages = allMessages.concat(response.data);
+            } else if (typeof response.data === 'object') {
+               allMessages = allMessages.concat(Object.values(response.data));
+            }
          }
          currentStart = currentEnd;
          await new Promise(r => setTimeout(r, 500));
