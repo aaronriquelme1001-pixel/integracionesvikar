@@ -1,15 +1,19 @@
 const axios = require('axios');
-const { Pool } = require('pg');
+const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
 const path = require('path');
 
-// Setup DB Pool
-let pool = null;
-if (process.env.DATALAKE_URL) {
-  pool = new Pool({
-    connectionString: process.env.DATALAKE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
+// Setup BigQuery Client
+let bigquery = null;
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  bigquery = new BigQuery({ projectId: credentials.project_id, credentials });
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  bigquery = new BigQuery(); 
+} else if (fs.existsSync(path.join(__dirname, '../../bq-key.json'))) {
+  bigquery = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: path.join(__dirname, '../../bq-key.json') });
+} else {
+  console.warn('[Billing Cron] ⚠️ Missing BigQuery credentials.');
 }
 
 async function getDeviceMappings() {
@@ -22,21 +26,24 @@ async function getDeviceMappings() {
 }
 
 async function calculateDailyGrade(imei, snapshotDateStr) {
-  if (!pool) return 7.0;
+  if (!bigquery) return 7.0;
   
   try {
     // Buscar los puntos de velocidad y eventos de este vehículo en el día actual
     // OPTIMIZADO: Usa rango de fechas para aprovechar el índice B-Tree en dt_tracker y limita a 10000 para evitar OOM
     const query = `
       SELECT speed, event, dt_tracker 
-      FROM global_telemetry_traffic 
-      WHERE imei = $1 
-      AND dt_tracker >= $2::date 
-      AND dt_tracker < ($2::date + INTERVAL '1 day')
+      FROM \`telemetry.global_traffic\` 
+      WHERE imei = @imei 
+      AND dt_tracker >= TIMESTAMP(@snapshotDate)
+      AND dt_tracker < TIMESTAMP_ADD(TIMESTAMP(@snapshotDate), INTERVAL 1 DAY)
       ORDER BY dt_tracker ASC
       LIMIT 10000
     `;
-    const result = await pool.query(query, [imei, snapshotDateStr]);
+    const [rows] = await bigquery.query({
+      query,
+      params: { imei, snapshotDate: snapshotDateStr }
+    });
     
     let penalty = 0.0;
     
@@ -57,7 +64,7 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
     let lastPointTime = null;
     let fatiguePenalized = false;
     
-    for (const row of result.rows) {
+    for (const row of rows) {
       const speed = parseFloat(row.speed) || 0;
       const event = row.event ? row.event.toLowerCase() : null;
       const dt = new Date(row.dt_tracker).getTime();
@@ -148,8 +155,8 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
 }
 
 async function runBillingSnapshot() {
-  if (!pool) {
-    console.error('[Billing Cron] No DATALAKE_URL provided.');
+  if (!bigquery) {
+    console.error('[Billing Cron] No BigQuery configuration found.');
     return;
   }
   
@@ -254,28 +261,41 @@ async function runBillingSnapshot() {
       // Calculate driving score for today (Speed, Harsh Events, Fatigue)
       const stats = await calculateDailyGrade(imei, snapshotDate);
 
-      // Insert or Update the snapshot for today
+      // Insert or Update the snapshot for today using MERGE for BigQuery
       const query = `
-        INSERT INTO billing_snapshots (
-          client_id, imei, snapshot_date, odometer, engine_hours, daily_grade,
-          extreme_speeding_count, moderate_speeding_count, harsh_maneuvers_count, fatigue_alerts_count
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        ON CONFLICT (imei, snapshot_date) DO UPDATE SET 
-          client_id = EXCLUDED.client_id,
-          odometer = EXCLUDED.odometer, 
-          engine_hours = EXCLUDED.engine_hours,
-          daily_grade = EXCLUDED.daily_grade,
-          extreme_speeding_count = EXCLUDED.extreme_speeding_count,
-          moderate_speeding_count = EXCLUDED.moderate_speeding_count,
-          harsh_maneuvers_count = EXCLUDED.harsh_maneuvers_count,
-          fatigue_alerts_count = EXCLUDED.fatigue_alerts_count;
+        MERGE \`telemetry.billing_snapshots\` T
+        USING (SELECT @client_id as client_id, @imei as imei, DATE(@snapshot_date) as snapshot_date, @odometer as odometer, @engine_hours as engine_hours, @daily_grade as daily_grade, @extreme_speeding_count as extreme_speeding_count, @moderate_speeding_count as moderate_speeding_count, @harsh_maneuvers_count as harsh_maneuvers_count, @fatigue_alerts_count as fatigue_alerts_count) S
+        ON T.imei = S.imei AND T.snapshot_date = S.snapshot_date
+        WHEN MATCHED THEN
+          UPDATE SET 
+            client_id = S.client_id,
+            odometer = S.odometer, 
+            engine_hours = S.engine_hours,
+            daily_grade = S.daily_grade,
+            extreme_speeding_count = S.extreme_speeding_count,
+            moderate_speeding_count = S.moderate_speeding_count,
+            harsh_maneuvers_count = S.harsh_maneuvers_count,
+            fatigue_alerts_count = S.fatigue_alerts_count
+        WHEN NOT MATCHED THEN
+          INSERT (client_id, imei, snapshot_date, odometer, engine_hours, daily_grade, extreme_speeding_count, moderate_speeding_count, harsh_maneuvers_count, fatigue_alerts_count)
+          VALUES (S.client_id, S.imei, S.snapshot_date, S.odometer, S.engine_hours, S.daily_grade, S.extreme_speeding_count, S.moderate_speeding_count, S.harsh_maneuvers_count, S.fatigue_alerts_count)
       `;
       
-      await pool.query(query, [
-        clientId, imei, snapshotDate, odometer, engineHours, stats.grade,
-        stats.extremeCount, stats.moderateCount, stats.harshCount, stats.fatigueCount
-      ]);
+      await bigquery.query({
+        query,
+        params: {
+          client_id: clientId,
+          imei,
+          snapshot_date: snapshotDate,
+          odometer,
+          engine_hours: engineHours,
+          daily_grade: stats.grade,
+          extreme_speeding_count: stats.extremeCount,
+          moderate_speeding_count: stats.moderateCount,
+          harsh_maneuvers_count: stats.harshCount,
+          fatigue_alerts_count: stats.fatigueCount
+        }
+      });
       insertedCount++;
     }
     
@@ -298,7 +318,7 @@ async function runBillingSnapshot() {
 // If run directly
 if (require.main === module) {
   require('dotenv').config();
-  runBillingSnapshot().then(() => pool && pool.end());
+  runBillingSnapshot();
 }
 
 module.exports = { runBillingSnapshot, calculateDailyGrade };

@@ -1,14 +1,18 @@
 const express = require('express');
-const { Pool } = require('pg');
+const { BigQuery } = require('@google-cloud/bigquery');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
-let pool = null;
-if (process.env.DATALAKE_URL) {
-  pool = new Pool({
-    connectionString: process.env.DATALAKE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
+let bigquery = null;
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  bigquery = new BigQuery({ projectId: credentials.project_id, credentials });
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  bigquery = new BigQuery(); 
+} else if (fs.existsSync(path.join(__dirname, '../../bq-key.json'))) {
+  bigquery = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: path.join(__dirname, '../../bq-key.json') });
 }
 
 /**
@@ -28,7 +32,7 @@ router.get('/', async (req, res) => {
     return res.status(400).json({ error: 'Missing clientId parameter.' });
   }
 
-  if (!pool) {
+  if (!bigquery) {
     return res.status(500).json({ error: 'Data Lake is not configured.' });
   }
 
@@ -43,30 +47,36 @@ router.get('/', async (req, res) => {
       SELECT 
         imei, 
         MAX(odometer) - MIN(odometer) as km_driven
-      FROM billing_snapshots
-      WHERE LOWER(client_id) LIKE LOWER('%' || $1 || '%')
-      AND snapshot_date >= $2 AND snapshot_date <= $3
+      FROM \`telemetry.billing_snapshots\`
+      WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+      AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
       GROUP BY imei
     `;
-    const deltaResult = await pool.query(deltaQuery, [clientId, startOfCurrentMonth, endOfCurrentMonth]);
+    const [deltaRows] = await bigquery.query({
+      query: deltaQuery,
+      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+    });
     
     let totalKm = 0;
-    deltaResult.rows.forEach(row => {
+    deltaRows.forEach(row => {
       totalKm += parseFloat(row.km_driven) || 0;
     });
 
     // Metric 2: Active Vehicles
-    const activeVehicles = deltaResult.rows.length;
+    const activeVehicles = deltaRows.length;
 
     // Metric 3: Max Speed
     const speedQuery = `
       SELECT MAX(speed) as max_speed
-      FROM global_telemetry_traffic
-      WHERE LOWER(client_source) LIKE LOWER('%' || $1 || '%')
-      AND dt_tracker >= $2::timestamp AND dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
+      FROM \`telemetry.global_traffic\`
+      WHERE LOWER(client_source) LIKE CONCAT('%', LOWER(@clientId), '%')
+      AND dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
     `;
-    const speedResult = await pool.query(speedQuery, [clientId, startOfCurrentMonth, endOfCurrentMonth]);
-    const maxSpeed = speedResult.rows[0]?.max_speed || 0;
+    const [speedRows] = await bigquery.query({
+      query: speedQuery,
+      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+    });
+    const maxSpeed = speedRows[0]?.max_speed || 0;
 
     // Metric 4: Driver Ranking (Top Conductores)
     const rankingQuery = `
@@ -79,20 +89,23 @@ router.get('/', async (req, res) => {
         SUM(bs.moderate_speeding_count) as moderate_speeding_clustered,
         SUM(bs.harsh_maneuvers_count) as harsh_maneuvers_clustered,
         SUM(bs.fatigue_alerts_count) as fatigue_alerts_clustered
-      FROM billing_snapshots bs
+      FROM \`telemetry.billing_snapshots\` bs
       LEFT JOIN (
           SELECT imei, MAX(plate) as plate, MAX(speed) as max_speed 
-          FROM global_telemetry_traffic 
-          WHERE dt_tracker >= $2::timestamp AND dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
+          FROM \`telemetry.global_traffic\` 
+          WHERE dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
           GROUP BY imei
       ) gt ON bs.imei = gt.imei 
-      WHERE LOWER(bs.client_id) LIKE LOWER('%' || $1 || '%')
-      AND bs.snapshot_date >= $2 AND bs.snapshot_date <= $3
+      WHERE LOWER(bs.client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+      AND bs.snapshot_date >= DATE(@startDate) AND bs.snapshot_date <= DATE(@endDate)
       GROUP BY bs.imei
       ORDER BY grade ASC
     `;
-    const rankingResult = await pool.query(rankingQuery, [clientId, startOfCurrentMonth, endOfCurrentMonth]);
-    const driverRanking = rankingResult.rows.map(row => {
+    const [rankingRows] = await bigquery.query({
+      query: rankingQuery,
+      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+    });
+    const driverRanking = rankingRows.map(row => {
       const grade = parseFloat(row.grade) || 7.0;
       
       let recommendation = "Conductor Seguro. Mantener comportamiento.";
@@ -163,7 +176,7 @@ router.get('/driver-events', async (req, res) => {
     return res.status(400).json({ error: 'Missing imei or type parameter.' });
   }
 
-  if (!pool) return res.status(500).json({ error: 'Data Lake is not configured.' });
+  if (!bigquery) return res.status(500).json({ error: 'Data Lake is not configured.' });
 
   try {
     const now = new Date();
@@ -179,26 +192,34 @@ router.get('/driver-events', async (req, res) => {
 
     const query = `
       SELECT dt_tracker, speed, lat, lng, event
-      FROM global_telemetry_traffic
-      WHERE imei = $1
-      AND dt_tracker >= $2::timestamp AND dt_tracker <= ($3::timestamp + interval '23 hours 59 minutes 59 seconds')
+      FROM \`telemetry.global_traffic\`
+      WHERE imei = @imei
+      AND dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
       AND ${typeCondition}
       ORDER BY dt_tracker DESC
       LIMIT 100
     `;
     
-    const result = await pool.query(query, [imei, startOfCurrentMonth, endOfCurrentMonth]);
+    const [rows] = await bigquery.query({
+      query,
+      params: { imei, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+    });
     
     // Agrupación de eventos (Clustering) con un cooldown de 5 minutos (300,000 ms)
-    const rawEvents = result.rows.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
+    const rawEvents = rows.sort((a, b) => {
+      const dtA = a.dt_tracker.value ? a.dt_tracker.value : a.dt_tracker;
+      const dtB = b.dt_tracker.value ? b.dt_tracker.value : b.dt_tracker;
+      return new Date(dtA) - new Date(dtB);
+    });
     const clusteredEvents = [];
     let lastTime = 0;
     
     for (const row of rawEvents) {
-      const dt = new Date(row.dt_tracker).getTime();
+      const dtValue = row.dt_tracker.value ? row.dt_tracker.value : row.dt_tracker;
+      const dt = new Date(dtValue).getTime();
       if (!lastTime || (dt - lastTime) > 300000) {
         clusteredEvents.push({
-          timestamp: row.dt_tracker,
+          timestamp: row.dt_tracker.value ? row.dt_tracker.value : row.dt_tracker,
           speed: Math.round(row.speed),
           lat: row.lat,
           lng: row.lng,
