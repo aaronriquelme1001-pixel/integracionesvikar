@@ -188,10 +188,19 @@ app.get('/api/force-backfill-all', async (req, res) => {
     
     // Get all devices discovered dynamically from the API (Admin, Transklett, etc)
     const mappingCache = typeof getMappingCache === 'function' ? getMappingCache() : {};
-    const imeis = Object.keys(mappingCache);
+    let imeis = Object.keys(mappingCache);
+    
+    const targetClients = req.query.clients ? req.query.clients.toLowerCase().split(',').map(s=>s.trim()) : null;
+    if (targetClients) {
+       imeis = imeis.filter(imei => {
+           const cached = mappingCache[imei];
+           const clientName = (cached && cached.client) ? cached.client : (typeof cached === 'string' ? cached : 'unknown');
+           return targetClients.some(tc => clientName.toLowerCase().includes(tc));
+       });
+    }
     
     if (imeis.length === 0) {
-      return res.json({ success: false, message: "El servidor aún no ha escaneado la lista de camiones desde la API. Intenta en 1 minuto." });
+      return res.json({ success: false, message: "No se encontraron vehículos para los clientes especificados o el caché está vacío." });
     }
 
     let results = [];
