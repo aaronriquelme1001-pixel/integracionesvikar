@@ -69,10 +69,15 @@ class AvlChileStrategy extends BaseStrategy {
     const plate = rawPlate.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
     // Parse date and convert to UNIX timestamp
+    // GPS Server devuelve fecha LOCAL de Chile (UTC-4) con formato 'YYYY-MM-DD HH:MM:SS'.
+    // Si ya viene como ISO con offset explícito, parsear directo. De lo contrario agregar '-04:00'.
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
-    if (dateStr.includes(' ')) {
-      parsedDate = new Date(dateStr.replace(' ', 'T') + 'Z');
+    if (dateStr.includes('T') && (dateStr.includes('Z') || dateStr.match(/[+-]\d{2}:\d{2}$/))) {
+      parsedDate = new Date(dateStr);
+    } else if (dateStr.includes(' ')) {
+      // Hora local Chile sin offset: agregar -04:00
+      parsedDate = new Date(dateStr.replace(' ', 'T') + '-04:00');
     } else {
       parsedDate = new Date(dateStr);
     }

@@ -446,12 +446,15 @@ async function pollGpsServerLocations() {
                          for (const m of sorted) {
                            const paramsObj = m[6] || {};
                            const sats = parseInt(paramsObj.gpslev || paramsObj.sat || 0, 10);
-                            let dtUtc = m[0];
-                            if (m[0] && m[0].includes(' ')) {
-                              const parsedDt = new Date(m[0].replace(' ', 'T') + 'Z');
-                              if (isNaN(parsedDt.getTime())) continue; // Skip garbage dates like 0000-00-00
-                              dtUtc = parsedDt.toISOString();
-                            }
+                             let dtUtc = m[0];
+                             if (m[0] && m[0].includes(' ')) {
+                               // GPS Server devuelve hora LOCAL de Chile (UTC-4).
+                               // CRÍTICO: usar '-04:00' y NO 'Z' para evitar timestamps 4h en el pasado.
+                               if (m[0].startsWith('0000')) continue; // Skip garbage dates like 0000-00-00
+                               const parsedDt = new Date(m[0].replace(' ', 'T') + '-04:00');
+                               if (isNaN(parsedDt.getTime())) continue;
+                               dtUtc = parsedDt.toISOString();
+                             }
                            const intermediatePoint = {
                              imei, name: vehicleName, plate: vehicleName,
                              dt_tracker: dtUtc, dt_server: dtUtc,
