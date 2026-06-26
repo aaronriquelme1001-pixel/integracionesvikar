@@ -85,7 +85,20 @@ class DatalakeStrategy {
     } catch (error) {
        console.error(`[Data Lake] ❌ Error insertando en BigQuery:`, error.message);
        if (error.name === 'PartialFailureError') {
+         // Errores de validación de BQ (ej: string muy largo). No reintentar o bloquearían la cola.
          error.errors.forEach(err => console.error(JSON.stringify(err)));
+       } else {
+         // Error de red o Google caído. ¡Usar el paracaídas!
+         console.warn(`[Data Lake] ⚠️ Activando paracaídas. Reencolando ${rowsToInsert.length} puntos...`);
+         buffer = [...rowsToInsert, ...buffer];
+         
+         // Si la caída dura muchas horas, evitar que se acabe la RAM del servidor
+         if (buffer.length > 250000) {
+             console.error(`[Data Lake] 💥 Paracaídas de memoria lleno. Guardando a disco de emergencia...`);
+             if (!fs.existsSync('./data')) fs.mkdirSync('./data');
+             fs.appendFileSync('./data/bq_fallback.jsonl', JSON.stringify(buffer) + '\\n');
+             buffer = [];
+         }
        }
     }
   }
