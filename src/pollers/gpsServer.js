@@ -208,8 +208,9 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
               // Debemos convertirlo a formato ISO UTC real restando el offset (asumiendo Chile UTC-4).
               let dtTrackerUtc = m[0];
               if (m[0] && m[0].includes(' ')) {
-                const localEpoch = new Date(m[0].replace(' ', 'T') + '-04:00').toISOString(); // Fuerza a interpretarlo como UTC-4
-                dtTrackerUtc = localEpoch;
+                const parsedDt = new Date(m[0].replace(' ', 'T') + '-04:00');
+                if (isNaN(parsedDt.getTime())) return null; // Skip garbage dates like 0000-00-00
+                dtTrackerUtc = parsedDt.toISOString();
               }
               
               return {
@@ -227,7 +228,8 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
            return m;
         });
         
-        messages.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
+         messages = messages.filter(Boolean);
+         messages.sort((a, b) => new Date(a.dt_tracker) - new Date(b.dt_tracker));
 
          // FIX #2: The previous filter applied timezone offset to messages that may already be in local time,
          // causing valid recovered points to be discarded as "out of range".
@@ -444,10 +446,12 @@ async function pollGpsServerLocations() {
                          for (const m of sorted) {
                            const paramsObj = m[6] || {};
                            const sats = parseInt(paramsObj.gpslev || paramsObj.sat || 0, 10);
-                           let dtUtc = m[0];
-                           if (m[0] && m[0].includes(' ')) {
-                             dtUtc = new Date(m[0].replace(' ', 'T') + 'Z').toISOString();
-                           }
+                            let dtUtc = m[0];
+                            if (m[0] && m[0].includes(' ')) {
+                              const parsedDt = new Date(m[0].replace(' ', 'T') + 'Z');
+                              if (isNaN(parsedDt.getTime())) continue; // Skip garbage dates like 0000-00-00
+                              dtUtc = parsedDt.toISOString();
+                            }
                            const intermediatePoint = {
                              imei, name: vehicleName, plate: vehicleName,
                              dt_tracker: dtUtc, dt_server: dtUtc,
