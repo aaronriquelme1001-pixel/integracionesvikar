@@ -331,17 +331,30 @@ app.use('/api/fleet', fleetRoute);
     if (!start_date || !end_date) return res.status(400).json({ error: 'Missing start_date or end_date' });
 
     try {
-      const { Pool } = require('pg');
-      const tempPool = new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } });
+      const { BigQuery } = require('@google-cloud/bigquery');
+      let bqClient = null;
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+        const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+        bqClient = new BigQuery({ projectId: credentials.project_id, credentials });
+      } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        bqClient = new BigQuery(); 
+      } else if (require('fs').existsSync(require('path').join(__dirname, 'bq-key.json'))) {
+        bqClient = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: require('path').join(__dirname, 'bq-key.json') });
+      }
       
+      if (!bqClient) throw new Error('BigQuery client not configured');
+
       // Get all distinct IMEIs that had a snapshot in this range
-      const clientsResult = await tempPool.query(`SELECT DISTINCT imei, client_id FROM billing_snapshots WHERE snapshot_date >= $1 AND snapshot_date <= $2`, [start_date, end_date]);
+      const [clientsResult] = await bqClient.query({
+        query: `SELECT DISTINCT imei, client_id FROM \`telemetry.billing_snapshots\` WHERE snapshot_date >= DATE(@start_date) AND snapshot_date <= DATE(@end_date)`,
+        params: { start_date, end_date }
+      });
       
       const start = new Date(start_date);
       const end = new Date(end_date);
       let updatedCount = 0;
 
-      for (const row of clientsResult.rows) {
+      for (const row of clientsResult) {
         const imei = row.imei;
         const clientId = row.client_id;
         
@@ -352,16 +365,26 @@ app.use('/api/fleet', fleetRoute);
           const stats = await calculateDailyGrade(imei, snapshotDate);
           
           if (stats.extremeCount > 0 || stats.moderateCount > 0 || stats.harshCount > 0 || stats.fatigueCount > 0 || stats.grade !== 7.0) {
-            await tempPool.query(`
-              UPDATE billing_snapshots
-              SET daily_grade = $1, extreme_speeding_count = $2, moderate_speeding_count = $3, harsh_maneuvers_count = $4, fatigue_alerts_count = $5
-              WHERE imei = $6 AND snapshot_date = $7
-            `, [stats.grade, stats.extremeCount, stats.moderateCount, stats.harshCount, stats.fatigueCount, imei, snapshotDate]);
+            await bqClient.query({
+              query: `
+                UPDATE \`telemetry.billing_snapshots\`
+                SET daily_grade = @grade, extreme_speeding_count = @ext, moderate_speeding_count = @mod, harsh_maneuvers_count = @harsh, fatigue_alerts_count = @fat
+                WHERE imei = @imei AND snapshot_date = DATE(@snapshotDate)
+              `,
+              params: {
+                grade: stats.grade,
+                ext: stats.extremeCount,
+                mod: stats.moderateCount,
+                harsh: stats.harshCount,
+                fat: stats.fatigueCount,
+                imei,
+                snapshotDate
+              }
+            });
             updatedCount++;
           }
         }
       }
-      tempPool.end();
       res.json({ message: 'Backfill completed', updatedSnapshots: updatedCount });
     } catch (err) {
       console.error(err);
