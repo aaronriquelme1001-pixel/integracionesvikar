@@ -195,10 +195,10 @@ app.get('/api/force-backfill-all', async (req, res) => {
       return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
     };
     
-    const startLocal = req.query.start; // e.g. "2026-06-25 14:00"
-    const endLocal = req.query.end;     // e.g. "2026-06-25 18:00"
-    const start = startLocal; // API de GPS Server espera hora local, NO UTC!
-    const end   = endLocal;
+    const startLocal = req.query.start; // e.g. "2026-06-25 14:00" (Local Chile)
+    const endLocal = req.query.end;     // e.g. "2026-06-25 18:00" (Local Chile)
+    const start = toUtc(startLocal);    // GPS Server API expects UTC!
+    const end   = toUtc(endLocal);
     
     console.log(`[BackfillAll] Rango solicitado a API (Local Chile): ${start} → ${end}`);
     

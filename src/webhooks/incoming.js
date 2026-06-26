@@ -33,7 +33,7 @@ async function handleIncomingGps(req, res) {
         lng: parseFloat(item.lng),
         speed: parseFloat(item.speed || 0),
         angle: parseFloat(item.angle || 0),
-        dt_tracker: item.dt_tracker || new Date().toISOString(),
+        dt_tracker: item.dt_tracker ? new Date(item.dt_tracker).toISOString() : new Date().toISOString(),
         dt_server: new Date().toISOString(),
         loc_valid: 1,
         params: item.params || ''

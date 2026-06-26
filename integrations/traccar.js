@@ -16,17 +16,9 @@ class TraccarStrategy extends BaseStrategy {
     const id = idType === 'imei' ? telemetry.imei : (deviceConfig.plate || telemetry.plate_number || telemetry.imei);
 
     // Parse date and convert to UNIX timestamp
+    // We now guarantee dt_tracker is a strict ISO 8601 UTC string
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
-    let parsedDate;
-    if (dateStr.includes('T') && (dateStr.includes('Z') || dateStr.match(/[+-]\d{2}:\d{2}$/))) {
-      // Ya es ISO UTC o con offset explícito
-      parsedDate = new Date(dateStr);
-    } else if (dateStr.includes(' ')) {
-      // GPS Server devuelve UTC con espacio (YYYY-MM-DD HH:MM:SS), agregar 'Z'
-      parsedDate = new Date(dateStr.replace(' ', 'T') + 'Z');
-    } else {
-      parsedDate = new Date(dateStr);
-    }
+    const parsedDate = new Date(dateStr);
     const unixTimestamp = Math.floor((isNaN(parsedDate.getTime()) ? Date.now() : parsedDate.getTime()) / 1000);
 
     const latVal = parseFloat(telemetry.lat);

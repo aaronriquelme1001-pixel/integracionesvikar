@@ -103,26 +103,26 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      
      const pad = n => n.toString().padStart(2, '0');
-     const toLocalChileStr = (utcStr, hoursOffset = 0) => {
-        if (!utcStr) return NaN;
-        const s = String(utcStr).trim().replace(' ', 'T');
-        const epoch = new Date(s.includes('Z') ? s : s + 'Z').getTime();
+     // GPS Server API expects UTC in "YYYY-MM-DD HH:MM:SS" format.
+     const toGpsServerFormat = (utcIsoStr, hoursOffset = 0) => {
+        if (!utcIsoStr) return NaN;
+        const epoch = new Date(utcIsoStr).getTime();
         if (isNaN(epoch)) return NaN;
-        // Restar 4 horas para pasar de UTC a hora local de Chile, y sumar el offset adicional
-        const d = new Date(epoch - (4 * 3600000) + (hoursOffset * 3600000));
+        // Shift by hoursOffset if needed (for widening query windows)
+        const d = new Date(epoch + (hoursOffset * 3600000));
         return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
      };
 
-     const startEpoch = toLocalChileStr(dt_old, 0) !== NaN ? new Date(String(dt_old).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
-     const endEpoch = toLocalChileStr(dt_new, 0) !== NaN ? new Date(String(dt_new).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
+     const startEpoch = new Date(dt_old).getTime();
+     const endEpoch = new Date(dt_new).getTime();
      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
      
      // CRITICAL: OBJECT_GET_MESSAGES only works with api=user.
      const apiTarget = 'user';
 
      // Widen API query window because GPS Server API filters by dt_server (arrival time), not dt_tracker.
-     const q_old = !isNaN(startEpoch) ? toLocalChileStr(dt_old, -1) : dt_old;
-     const q_new = !isNaN(endEpoch) ? toLocalChileStr(dt_new, 3) : dt_new;
+     const q_old = !isNaN(startEpoch) ? toGpsServerFormat(dt_old, -1) : dt_old;
+     const q_new = !isNaN(endEpoch) ? toGpsServerFormat(dt_new, 3) : dt_new;
      
      console.log(`[Backfiller] Fechas parseadas para ${imei}: dt_old="${dt_old}" → q_old="${q_old}" | dt_new="${dt_new}" → q_new="${q_new}"`);
 
@@ -151,8 +151,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          if (currentEnd > finalEnd) currentEnd = finalEnd;
          
          const fmt = (epochMs) => {
-            // Subtract 4 hours to convert UTC epoch to Local Chile Time
-            const d = new Date(epochMs - (4 * 3600000));
+            const d = new Date(epochMs);
             const p = n => n.toString().padStart(2, '0');
             return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
          };
@@ -378,8 +377,8 @@ async function pollGpsServerLocations() {
               altitude: device.altitude || 0,
               angle: device.angle || 0,
               speed: device.speed || 0,
-              dt_tracker: device.dt_tracker, // Is already UTC from GET_LOCATIONS
-              dt_server: device.dt_server,   // Is already UTC from GET_LOCATIONS
+              dt_tracker: device.dt_tracker ? device.dt_tracker.replace(' ', 'T') + 'Z' : new Date().toISOString(),
+              dt_server: device.dt_server ? device.dt_server.replace(' ', 'T') + 'Z' : new Date().toISOString(),
               loc_valid: device.loc_valid,
               odometer: device.odometer,
               engine_hours: device.engine_hours,
@@ -391,14 +390,8 @@ async function pollGpsServerLocations() {
             let sentAllIntermediatePoints = false;
 
             if (lastPollerState && lastPollerState.dt_tracker) {
-               const tz = process.env.TIMEZONE_OFFSET || '-04:00';
-               const parseLocalEpoch = (ds) => {
-                 if (!ds) return NaN;
-                 if (ds.includes('T') && (ds.includes('Z') || ds.match(/[+-]\d{2}:\d{2}$/))) return new Date(ds).getTime();
-                 return new Date(ds.replace(' ', 'T') + tz).getTime();
-               };
-               const deviceEpoch = parseLocalEpoch(device.dt_tracker);
-               const lastEpoch = parseLocalEpoch(lastPollerState.dt_tracker);
+               const deviceEpoch = new Date(telemetry.dt_tracker).getTime();
+               const lastEpoch = new Date(lastPollerState.dt_tracker).getTime();
 
                if (device.dt_tracker && !isNaN(deviceEpoch) && !isNaN(lastEpoch) && deviceEpoch > lastEpoch) {
                  const timeDiffMs = deviceEpoch - lastEpoch;
@@ -415,7 +408,7 @@ async function pollGpsServerLocations() {
                       if (userApiKey) {
                        // Query all intermediate points from GPS Server (add 5s buffer each side)
                        const fmtLocal = (epochMs) => {
-                         const d = new Date(epochMs - (4 * 3600000)); // Translate UTC epoch back to Local representation
+                         const d = new Date(epochMs);
                          const p = n => n.toString().padStart(2, '0');
                          return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
                        };
@@ -475,22 +468,22 @@ async function pollGpsServerLocations() {
                  // Large offline gaps (> 10 min): schedule delayed backfill as before
                  if (gapSeconds > 600 && gapSeconds < 259200) {
                    const userApiKey = getClientApiKey(client) || masterKey;
-                   pendingBackfills.push({
-                     imei, dt_old: lastPollerState.dt_tracker, dt_new: device.dt_tracker,
-                     client, apiKey: userApiKey, executeAt: Date.now() + (6 * 60 * 1000)
-                   });
+                     pendingBackfills.push({
+                       imei, dt_old: lastPollerState.dt_tracker, dt_new: telemetry.dt_tracker,
+                       client, apiKey: userApiKey, executeAt: Date.now() + (6 * 60 * 1000)
+                     });
                    systemStats.backfillerTriggers++;
                  }
                }
             }
 
-            if (device.dt_tracker) {
-               lastDeviceTimestamps[imei] = { 
-                 dt_tracker: device.dt_tracker,
-                 lat: device.lat,
-                 lng: device.lng
-               };
-            }
+             if (telemetry.dt_tracker) {
+                lastDeviceTimestamps[imei] = { 
+                  dt_tracker: telemetry.dt_tracker,
+                  lat: telemetry.lat,
+                  lng: telemetry.lng
+                };
+             }
             // ---------------------------
 
             // Only dispatch the current point if we didn't already send all intermediate ones
