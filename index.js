@@ -149,10 +149,11 @@ app.get('/api/debug-gps', async (req, res) => {
     const axios = require('axios');
     const key = process.env.GPSSERVER_USER_API_KEY || req.query.key;
     const cmd = req.query.cmd || 'OBJECT_GET_MESSAGES,865413054274468,2026-06-25 15:00:00,2026-06-25 19:00:00';
-    const r = await axios.get(process.env.GPSSERVER_API_URL, {
+    const url = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
+    const r = await axios.get(url, {
        params: { api: 'user', key: key, cmd: cmd }
     });
-    res.json({ key_length: key ? key.length : 0, data: r.data, type: typeof r.data });
+    res.json({ url, key_length: key ? key.length : 0, data: r.data, type: typeof r.data });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
