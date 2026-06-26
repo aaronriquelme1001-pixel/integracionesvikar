@@ -367,28 +367,18 @@ async function pollGpsServerLocations() {
             totalDevicesProcessed++;
             systemStats.totalPolledPoints++;
           
-            let dtTrackerUtc = device.dt_tracker;
-            if (dtTrackerUtc && dtTrackerUtc.includes(' ')) {
-               dtTrackerUtc = new Date(dtTrackerUtc.replace(' ', 'T') + '-04:00').toISOString();
-            }
-            
-            let dtServerUtc = device.dt_server;
-            if (dtServerUtc && dtServerUtc.includes(' ')) {
-               dtServerUtc = new Date(dtServerUtc.replace(' ', 'T') + '-04:00').toISOString();
-            }
-
             const vehicleName = device.name || cachedName || imei;
             const telemetry = {
               imei: imei,
               name: vehicleName,
-              plate: vehicleName, // Expose as plate so dispatcher can resolve it
+              plate: vehicleName,
               lat: device.lat,
               lng: device.lng,
               altitude: device.altitude || 0,
               angle: device.angle || 0,
               speed: device.speed || 0,
-              dt_tracker: dtTrackerUtc,
-              dt_server: dtServerUtc,
+              dt_tracker: device.dt_tracker, // Is already UTC from GET_LOCATIONS
+              dt_server: device.dt_server,   // Is already UTC from GET_LOCATIONS
               loc_valid: device.loc_valid,
               odometer: device.odometer,
               engine_hours: device.engine_hours,
@@ -503,7 +493,7 @@ async function pollGpsServerLocations() {
               await dispatchToB2B(telemetry, client);
             }
           } catch (imeiErr) {
-            console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.message);
+            console.error(`[GPS Server Poller] Error procesando camión ${imei}:`, imeiErr.stack);
           }
         }));
       }
