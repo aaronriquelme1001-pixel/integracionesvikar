@@ -105,6 +105,18 @@ router.get('/', async (req, res) => {
       query: rankingQuery,
       params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
     });
+    
+    // Attempt to load mapping cache to get real vehicle names/plates
+    let mappingCache = {};
+    try {
+      const { getMappingCache } = require('../pollers/gpsServer');
+      if (typeof getMappingCache === 'function') {
+        mappingCache = getMappingCache() || {};
+      }
+    } catch (e) {
+      console.warn('Could not load mapping cache in billing API');
+    }
+
     const driverRanking = rankingRows.map(row => {
       const grade = parseFloat(row.grade) || 7.0;
       
@@ -113,9 +125,16 @@ router.get('/', async (req, res) => {
       else if (grade < 5.0) recommendation = "Precaución: Frecuentes violaciones de seguridad. Agendar feedback.";
       else if (grade < 6.0) recommendation = "Regular: Oportunidad de mejora en ciertas conductas de conducción.";
 
+      let plate = row.plate;
+      if (!plate || plate === 'null' || plate === '') {
+        const cached = mappingCache[row.imei];
+        if (cached && cached.plate) plate = cached.plate;
+        else if (cached && cached.name) plate = cached.name;
+      }
+      
       return {
         imei: row.imei,
-        plate: row.plate || row.imei || 'Desconocido',
+        plate: plate || row.imei || 'Desconocido',
         grade: grade,
         analysis: {
           max_speed: Math.round(row.max_speed || 0),
