@@ -122,6 +122,8 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
             }
          }
      }
+     
+     let allMessages = [];
 
      if (!isNaN(startEpoch) && !isNaN(endEpoch) && (endEpoch - startEpoch) > FOUR_HOURS_MS) {
        console.log(`[Backfiller] 📦 Rango grande detectado. Paginando historial para ${imei}...`);
