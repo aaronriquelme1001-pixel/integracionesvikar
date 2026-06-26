@@ -537,6 +537,24 @@ setInterval(async () => {
    }
 }, 30000);
 
+// --- ONE-TIME FORCED BACKFILL FOR MISSING ROUTE ---
+setTimeout(() => {
+  console.log('[Backfiller] INJECTING ONE-TIME FORCED BACKFILL FOR 869671072810474...');
+  const existing = pendingBackfills.find(t => t.imei === '869671072810474' && t.dt_old === '2026-06-26T12:00:00Z');
+  if (!existing) {
+    pendingBackfills.push({
+      imei: '869671072810474',
+      dt_old: '2026-06-26T12:00:00Z',
+      dt_new: '2026-06-26T16:02:00Z',
+      client: 'luisherrera', 
+      apiKey: process.env.GPS_SERVER_MASTER_KEY,
+      executeAt: Date.now() + 5000,
+      retries: 0
+    });
+  }
+}, 15000);
+// --------------------------------------------------
+
 module.exports = {
   pollGpsServerLocations,
   getStatus: () => ({ lastGpsServerPollTime, lastGpsServerPollStatus }),
