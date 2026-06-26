@@ -410,23 +410,27 @@ app.use('/api/fleet', fleetRoute);
       if (!rows || !Array.isArray(rows)) return res.status(400).json({ error: 'Missing rows array' });
 
       // Chunk insertion (BigQuery limit is 10k rows usually, we have ~4.5k so one shot is fine but chunking is safer)
-      const bqRows = rows.map(r => ({
-        client_id: r.client_id,
-        imei: r.imei,
-        snapshot_date: bqClient.date(r.snapshot_date.split('T')[0]),
-        odometer: r.odometer,
-        engine_hours: r.engine_hours,
-        daily_grade: r.daily_grade || 7.0,
-        extreme_speeding_count: r.extreme_speeding_count || 0,
-        moderate_speeding_count: r.moderate_speeding_count || 0,
-        harsh_maneuvers_count: r.harsh_maneuvers_count || 0,
-        fatigue_alerts_count: r.fatigue_alerts_count || 0,
-        created_at: bqClient.timestamp(new Date(r.created_at))
-      }));
+      const values = [];
+      const params = {};
+      rows.forEach((r, i) => {
+        values.push(`(@c${i}, @i${i}, @d${i}, @o${i}, @e${i}, @g${i}, @x${i}, @m${i}, @h${i}, @f${i}, @t${i})`);
+        params[`c${i}`] = r.client_id;
+        params[`i${i}`] = r.imei;
+        params[`d${i}`] = bqClient.date(r.snapshot_date.split('T')[0]);
+        params[`o${i}`] = r.odometer;
+        params[`e${i}`] = r.engine_hours;
+        params[`g${i}`] = r.daily_grade || 7.0;
+        params[`x${i}`] = r.extreme_speeding_count || 0;
+        params[`m${i}`] = r.moderate_speeding_count || 0;
+        params[`h${i}`] = r.harsh_maneuvers_count || 0;
+        params[`f${i}`] = r.fatigue_alerts_count || 0;
+        params[`t${i}`] = bqClient.timestamp(new Date(r.created_at));
+      });
 
-      await bqClient.dataset('telemetry').table('billing_snapshots').insert(bqRows);
+      const query = `INSERT INTO \`telemetry.billing_snapshots\` (client_id, imei, snapshot_date, odometer, engine_hours, daily_grade, extreme_speeding_count, moderate_speeding_count, harsh_maneuvers_count, fatigue_alerts_count, created_at) VALUES ${values.join(', ')}`;
+      await bqClient.query({ query, params });
       
-      res.json({ message: `Successfully restored ${bqRows.length} snapshots to BigQuery.` });
+      res.json({ message: `Successfully restored ${rows.length} snapshots to BigQuery.` });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message, stack: err.stack, details: err.errors });
