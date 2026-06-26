@@ -203,12 +203,11 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
               const satellites = parseInt(paramsObj.gpslev || paramsObj.sat || paramsObj.satellites || 0, 10);
               const isGpsValid = satellites > 0 ? 1 : 0;
               
-              // FIX: GPS Server OBJECT_GET_MESSAGES devuelve hora LOCAL (ej: 2026-06-25 15:00:00).
-              // Si le mandamos esto crudo a B2B, Traccar lo asume como UTC y lo retrasa 4 horas.
-              // Debemos convertirlo a formato ISO UTC real restando el offset (asumiendo Chile UTC-4).
+              // FIX: GPS Server OBJECT_GET_MESSAGES devuelve hora UTC (ej: 2026-06-25 15:00:00).
+              // Simplemente agregamos 'Z' para asegurar que Javascript lo entienda como UTC real.
               let dtTrackerUtc = m[0];
               if (m[0] && m[0].includes(' ')) {
-                const parsedDt = new Date(m[0].replace(' ', 'T') + '-04:00');
+                const parsedDt = new Date(m[0].replace(' ', 'T') + 'Z');
                 if (isNaN(parsedDt.getTime())) return null; // Skip garbage dates like 0000-00-00
                 dtTrackerUtc = parsedDt.toISOString();
               }
@@ -448,10 +447,9 @@ async function pollGpsServerLocations() {
                            const sats = parseInt(paramsObj.gpslev || paramsObj.sat || 0, 10);
                              let dtUtc = m[0];
                              if (m[0] && m[0].includes(' ')) {
-                               // GPS Server devuelve hora LOCAL de Chile (UTC-4).
-                               // CRÍTICO: usar '-04:00' y NO 'Z' para evitar timestamps 4h en el pasado.
+                               // GPS Server devuelve UTC. Agregamos 'Z'.
                                if (m[0].startsWith('0000')) continue; // Skip garbage dates like 0000-00-00
-                               const parsedDt = new Date(m[0].replace(' ', 'T') + '-04:00');
+                               const parsedDt = new Date(m[0].replace(' ', 'T') + 'Z');
                                if (isNaN(parsedDt.getTime())) continue;
                                dtUtc = parsedDt.toISOString();
                              }

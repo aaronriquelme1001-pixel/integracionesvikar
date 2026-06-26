@@ -15,17 +15,15 @@ class TraccarStrategy extends BaseStrategy {
     const idType = integrationConfig.idType || process.env.TRACCAR_ID_TYPE || 'plate';
     const id = idType === 'imei' ? telemetry.imei : (deviceConfig.plate || telemetry.plate_number || telemetry.imei);
 
-    // Parse date and convert to UNIX timestamp (seconds)
-    // GPS Server devuelve fecha LOCAL de Chile (UTC-4) con formato 'YYYY-MM-DD HH:MM:SS'.
-    // Si la fecha ya viene en formato ISO con 'Z', ya es UTC. De lo contrario agregar '-04:00'.
+    // Parse date and convert to UNIX timestamp
     const dateStr = telemetry.dt_tracker || telemetry.dt_server || new Date().toISOString();
     let parsedDate;
     if (dateStr.includes('T') && (dateStr.includes('Z') || dateStr.match(/[+-]\d{2}:\d{2}$/))) {
       // Ya es ISO UTC o con offset explícito
       parsedDate = new Date(dateStr);
     } else if (dateStr.includes(' ')) {
-      // Hora local Chile sin offset: agregar -04:00
-      parsedDate = new Date(dateStr.replace(' ', 'T') + '-04:00');
+      // GPS Server devuelve UTC con espacio (YYYY-MM-DD HH:MM:SS), agregar 'Z'
+      parsedDate = new Date(dateStr.replace(' ', 'T') + 'Z');
     } else {
       parsedDate = new Date(dateStr);
     }
