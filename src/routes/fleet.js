@@ -1,24 +1,23 @@
 const express = require('express');
-const { Pool } = require('pg');
+const { BigQuery } = require('@google-cloud/bigquery');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
-let pool = null;
-if (process.env.DATALAKE_URL) {
-  pool = new Pool({
-    connectionString: process.env.DATALAKE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
+let bigquery = null;
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  bigquery = new BigQuery({ projectId: credentials.project_id, credentials });
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  bigquery = new BigQuery(); 
+} else if (fs.existsSync(path.join(__dirname, '../../bq-key.json'))) {
+  bigquery = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: path.join(__dirname, '../../bq-key.json') });
 }
 
 // GET /api/fleet/history
-// Query Params:
-// - imei (required)
-// - start_date (required, e.g. 2026-06-19 or 2026-06-19T00:00:00)
-// - end_date (optional, defaults to end of start_date)
-// - secret (optional)
 router.get('/history', async (req, res) => {
-  if (!pool) return res.status(500).json({ error: 'Data Lake no configurado.' });
+  if (!bigquery) return res.status(500).json({ error: 'Data Lake (BigQuery) no configurado.' });
   
   const { imei, start_date, end_date } = req.query;
   
@@ -28,10 +27,10 @@ router.get('/history', async (req, res) => {
   try {
     let query = `
       SELECT lat, lng, speed, dt_tracker, plate, altitude, angle, params, loc_valid
-      FROM global_telemetry_traffic 
-      WHERE imei = $1 
+      FROM \`telemetry.global_traffic\` 
+      WHERE imei = @imei 
     `;
-    const params = [imei];
+    const params = { imei };
     
     // Helper to normalize dates
     const normalizeDate = (d) => {
@@ -51,36 +50,44 @@ router.get('/history', async (req, res) => {
     const normEnd = normalizeDate(end_date);
     
     // Parse start date
-    query += ` AND dt_tracker >= $2::timestamp`;
-    params.push(normStart);
+    query += ` AND dt_tracker >= TIMESTAMP(@normStart)`;
+    params.normStart = normStart;
     
     // Parse end date
     let finalEndDate = normEnd;
     if (!finalEndDate) {
-      if (normStart.includes('T')) {
+      if (normStart.includes('T') || normStart.includes(' ')) {
         finalEndDate = normStart; 
       } else {
-        finalEndDate = `${normStart}T23:59:59`;
+        finalEndDate = `${normStart} 23:59:59`;
       }
     }
     
     if (finalEndDate) {
       // If finalEndDate is just a date like YYYY-MM-DD and doesn't have time, make sure it covers the day
       if (finalEndDate.length === 10) {
-        finalEndDate = `${finalEndDate}T23:59:59`;
+        finalEndDate = `${finalEndDate} 23:59:59`;
       }
-      query += ` AND dt_tracker <= $3::timestamp`;
-      params.push(finalEndDate);
+      query += ` AND dt_tracker <= TIMESTAMP(@finalEndDate)`;
+      params.finalEndDate = finalEndDate;
     }
     
-    query += ` ORDER BY dt_tracker ASC LIMIT 10000`; // Limit set to 10000 to prevent OOM 500 errors on large datasets
+    query += ` ORDER BY dt_tracker ASC LIMIT 10000`; // Limit set to 10000 to prevent OOM
 
-    const result = await pool.query(query, params);
+    const [rows] = await bigquery.query({
+      query,
+      params
+    });
     
+    const formattedRows = rows.map(row => ({
+      ...row,
+      dt_tracker: row.dt_tracker.value ? row.dt_tracker.value : row.dt_tracker
+    }));
+
     res.json({
       success: true,
-      count: result.rows.length,
-      data: result.rows
+      count: formattedRows.length,
+      data: formattedRows
     });
     
   } catch (err) {
