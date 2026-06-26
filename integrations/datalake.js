@@ -58,7 +58,14 @@ class DatalakeStrategy {
       }
     }
 
-    const resolvedClient = String(client_source || client || 'B2B');
+    let resolvedClient = 'B2B';
+    if (client_source) resolvedClient = client_source;
+    else if (client) resolvedClient = client;
+    else if (resolvedConfig && resolvedConfig.client) resolvedClient = resolvedConfig.client;
+    
+    if (Math.random() < 0.05) {
+      console.log(`[Data Lake Debug] client_source: ${client_source}, client: ${client}, resolvedConfig.client: ${resolvedConfig?.client}, final: ${resolvedClient}`);
+    }
 
     const row = {
       imei: String(imei),
@@ -70,7 +77,7 @@ class DatalakeStrategy {
       angle: parseFloat(angle),
       loc_valid: Boolean(loc_valid),
       dt_tracker: parsedDate.toISOString(),
-      client_source: resolvedClient,
+      client_source: String(resolvedClient),
       created_at: new Date().toISOString(),
       params: params ? JSON.stringify(params) : null
     };
