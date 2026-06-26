@@ -87,21 +87,27 @@ app.get('/api/logs', (req, res, next) => {
   res.send(getLogs().join('\n'));
 });
 
-const { Pool } = require('pg');
-const pool = process.env.DATALAKE_URL ? new Pool({ connectionString: process.env.DATALAKE_URL, ssl: { rejectUnauthorized: false } }) : null;
-
+const { BigQuery } = require('@google-cloud/bigquery');
+let bqClient = null;
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+   const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+   bqClient = new BigQuery({ projectId: credentials.project_id, credentials });
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+   bqClient = new BigQuery();
+} else if (require('fs').existsSync('./bq-key.json')) {
+   bqClient = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: './bq-key.json' });
+}
 app.get('/api/datalake-facts', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
-  if (!process.env.DATALAKE_URL) return res.json({ error: 'Data Lake no configurado' });
+  if (!bqClient) return res.json({ error: 'BigQuery Data Lake no configurado' });
   
   try {
-    const { rows: countRows } = await pool.query('SELECT count(*) as total FROM billing_snapshots');
-    const { rows: opelOldest } = await pool.query(`SELECT dt_tracker, lat, lng, speed FROM global_telemetry_traffic WHERE imei='865413054330609' ORDER BY dt_tracker ASC LIMIT 1`);
-    const { rows: opelYesterday } = await pool.query(`SELECT dt_tracker, lat, lng, speed FROM global_telemetry_traffic WHERE imei='865413054330609' AND dt_tracker >= '2026-06-19 13:00:00' AND dt_tracker <= '2026-06-19 15:00:00' LIMIT 5`);
+    const [opelOldest] = await bqClient.query(`SELECT dt_tracker, lat, lng, speed FROM \`telemetry.global_traffic\` WHERE imei='865413054330609' ORDER BY dt_tracker ASC LIMIT 1`);
+    const [opelYesterday] = await bqClient.query(`SELECT dt_tracker, lat, lng, speed FROM \`telemetry.global_traffic\` WHERE imei='865413054330609' AND dt_tracker >= '2026-06-19 13:00:00' AND dt_tracker <= '2026-06-19 15:00:00' LIMIT 5`);
     
     res.json({
       success: true,
-      billingSnapshotsTotal: countRows[0].total,
+      billingSnapshotsTotal: 0, // Deprecated in BQ
       opelOldestPoint: opelOldest.length ? opelOldest[0] : null,
       opelYesterdaySample: opelYesterday
     });
@@ -112,27 +118,28 @@ app.get('/api/datalake-facts', async (req, res) => {
 
 app.get('/api/audit', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  if (!bqClient) return res.json({ error: 'BigQuery Data Lake no configurado' });
   try {
-    const r = await pool.query(`
+    const [r] = await bqClient.query(`
       SELECT plate, COUNT(*) as c, MAX(dt_tracker) as last_point
-      FROM global_telemetry_traffic 
-      WHERE dt_tracker > NOW() - INTERVAL '2 hours' 
+      FROM \`telemetry.global_traffic\` 
+      WHERE dt_tracker > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 HOUR)
       GROUP BY plate 
       ORDER BY c DESC
     `);
-    const outOfOrder = await pool.query(`
+    const [outOfOrder] = await bqClient.query(`
       WITH numbered AS (
-          SELECT id, plate, dt_tracker, 
-                 LAG(dt_tracker) OVER (PARTITION BY plate ORDER BY id ASC) as prev_dt
-          FROM global_telemetry_traffic
-          WHERE dt_tracker > NOW() - INTERVAL '12 hours'
+          SELECT plate, dt_tracker, 
+                 LAG(dt_tracker) OVER (PARTITION BY plate ORDER BY created_at ASC) as prev_dt
+          FROM \`telemetry.global_traffic\`
+          WHERE dt_tracker > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 12 HOUR)
       )
       SELECT plate, dt_tracker, prev_dt 
       FROM numbered 
       WHERE dt_tracker < prev_dt 
       LIMIT 100;
     `);
-    res.json({ stats: r.rows, outOfOrder: outOfOrder.rows });
+    res.json({ stats: r, outOfOrder: outOfOrder });
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 

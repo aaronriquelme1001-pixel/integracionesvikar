@@ -1,17 +1,19 @@
 const express = require('express');
-const { Pool } = require('pg');
+const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
 const router = express.Router();
 
-let pool = null;
-if (process.env.DATALAKE_URL) {
-  pool = new Pool({
-    connectionString: process.env.DATALAKE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
+let bqClient = null;
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+   const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+   bqClient = new BigQuery({ projectId: credentials.project_id, credentials });
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+   bqClient = new BigQuery();
+} else if (fs.existsSync('./bq-key.json')) {
+   bqClient = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: './bq-key.json' });
 }
 
 const templatePath = path.join(__dirname, '../templates/forensic_report.html');
@@ -38,9 +40,9 @@ function getPointColor(speed) {
 }
 
 router.get('/', async (req, res) => {
-  if (!pool) {
-    if (req.query.format === 'json') return res.status(500).json({ error: 'Data Lake no configurado.' });
-    return res.status(500).send('Data Lake no configurado.');
+  if (!bqClient) {
+    if (req.query.format === 'json') return res.status(500).json({ error: 'BigQuery Data Lake no configurado.' });
+    return res.status(500).send('BigQuery Data Lake no configurado.');
   }
   
   const { plate, imei, time, window, secret, format } = req.query;
@@ -56,31 +58,26 @@ router.get('/', async (req, res) => {
 
   try {
     // 1. Telemetry Query
-    let query = `SELECT lat, lng, speed, dt_tracker, client_source, altitude, angle, params, loc_valid FROM global_telemetry_traffic WHERE 1=1 `;
-    const params = [];
-    let paramIndex = 1;
+    let query = `SELECT lat, lng, speed, dt_tracker, client_source, altitude, angle, params, loc_valid FROM \`telemetry.global_traffic\` WHERE 1=1 `;
+    const params = {};
 
     if (imei) {
-      query += ` AND imei = $${paramIndex}`;
-      params.push(imei);
-      paramIndex++;
+      query += ` AND imei = @imei`;
+      params.imei = imei;
     } else {
-      query += ` AND REPLACE(LOWER(plate), '-', '') = REPLACE(LOWER($${paramIndex}), '-', '')`;
-      params.push(plate);
-      paramIndex++;
+      query += ` AND REPLACE(LOWER(plate), '-', '') = REPLACE(LOWER(@plate), '-', '')`;
+      params.plate = plate;
     }
 
     if (time) {
       const windowMinutes = parseInt(window) || 5;
-      query += ` AND dt_tracker >= $${paramIndex}::timestamp - interval '${windowMinutes} minutes'`;
-      query += ` AND dt_tracker <= $${paramIndex}::timestamp + interval '${windowMinutes} minutes'`;
-      params.push(time);
-      paramIndex++;
+      query += ` AND dt_tracker >= TIMESTAMP_SUB(CAST(@time AS TIMESTAMP), INTERVAL ${windowMinutes} MINUTE)`;
+      query += ` AND dt_tracker <= TIMESTAMP_ADD(CAST(@time AS TIMESTAMP), INTERVAL ${windowMinutes} MINUTE)`;
+      params.time = time;
     }
     
     query += ` ORDER BY dt_tracker ASC LIMIT 500`;
-    const result = await pool.query(query, params);
-    const rows = result.rows;
+    const [rows] = await bqClient.query({ query, params });
 
     if (rows.length === 0) {
       return res.status(404).send('No se encontraron registros en esa ventana de tiempo.');
@@ -121,7 +118,8 @@ router.get('/', async (req, res) => {
 
       if (speed === 0) timeStopped += 60; // Approximate
 
-      const dateStr = new Date(row.dt_tracker).toISOString().replace('T', ' ').substring(0, 19);
+      const rawDt = row.dt_tracker?.value || row.dt_tracker;
+      const dateStr = new Date(rawDt).toISOString().replace('T', ' ').substring(0, 19);
       chartLabels.push(dateStr.substring(11));
       chartSpeeds.push(speed);
       chartColors.push(getPointColor(speed));
