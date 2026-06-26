@@ -164,7 +164,9 @@ app.get('/api/force-backfill-all', async (req, res) => {
     const TZ_OFFSET_HOURS = parseInt(process.env.TZ_BACKFILL_OFFSET || '4', 10); // +4 to go from Chile->UTC
     const toUtc = (localStr) => {
       if (!localStr) return null;
-      const epoch = new Date(localStr.replace(' ', 'T') + ':00').getTime() + (TZ_OFFSET_HOURS * 3600000);
+      let isoStr = localStr.replace(' ', 'T');
+      if (isoStr.split(':').length === 2) isoStr += ':00'; // Append seconds only if missing
+      const epoch = new Date(isoStr).getTime() + (TZ_OFFSET_HOURS * 3600000);
       const d = new Date(epoch);
       const p = n => n.toString().padStart(2, '0');
       return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
