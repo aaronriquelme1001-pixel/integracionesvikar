@@ -392,7 +392,7 @@ app.use('/api/fleet', fleetRoute);
     }
   });
 
-  app.post('/api/restore-billing', express.json({limit: '50mb'}), async (req, res) => {
+  app.post('/api/restore-billing', async (req, res) => {
     if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
     try {
       const { BigQuery } = require('@google-cloud/bigquery');
