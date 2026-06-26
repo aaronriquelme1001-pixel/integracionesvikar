@@ -149,6 +149,9 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
             params: { api: 'user', key: apiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${chunkStart},${chunkEnd}` },
             timeout: 30000
          });
+
+         console.log(`[Backfiller] DEBUG-TRACE: apiKey length=${apiKey ? apiKey.length : 0}, response.data type=${typeof response.data}, isArray=${Array.isArray(response.data)}`);
+         
          if (response.data) {
             if (Array.isArray(response.data)) {
                allMessages = allMessages.concat(response.data);
