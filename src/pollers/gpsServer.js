@@ -367,6 +367,16 @@ async function pollGpsServerLocations() {
             totalDevicesProcessed++;
             systemStats.totalPolledPoints++;
           
+            let dtTrackerUtc = device.dt_tracker;
+            if (dtTrackerUtc && dtTrackerUtc.includes(' ')) {
+               dtTrackerUtc = new Date(dtTrackerUtc.replace(' ', 'T') + '-04:00').toISOString();
+            }
+            
+            let dtServerUtc = device.dt_server;
+            if (dtServerUtc && dtServerUtc.includes(' ')) {
+               dtServerUtc = new Date(dtServerUtc.replace(' ', 'T') + '-04:00').toISOString();
+            }
+
             const vehicleName = device.name || cachedName || imei;
             const telemetry = {
               imei: imei,
@@ -377,8 +387,8 @@ async function pollGpsServerLocations() {
               altitude: device.altitude || 0,
               angle: device.angle || 0,
               speed: device.speed || 0,
-              dt_tracker: device.dt_tracker,
-              dt_server: device.dt_server,
+              dt_tracker: dtTrackerUtc,
+              dt_server: dtServerUtc,
               loc_valid: device.loc_valid,
               odometer: device.odometer,
               engine_hours: device.engine_hours,
@@ -413,13 +423,13 @@ async function pollGpsServerLocations() {
                       
                       if (userApiKey) {
                        // Query all intermediate points from GPS Server (add 5s buffer each side)
-                       const fmt = (epochMs) => {
-                         const d = new Date(epochMs);
+                       const fmtLocal = (epochMs) => {
+                         const d = new Date(epochMs - (4 * 3600000)); // Translate UTC epoch back to Local representation
                          const p = n => n.toString().padStart(2, '0');
                          return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
                        };
-                       const qStart = fmt(lastEpoch - 5000);
-                       const qEnd   = fmt(deviceEpoch + 5000);
+                       const qStart = fmtLocal(lastEpoch - 5000);
+                       const qEnd   = fmtLocal(deviceEpoch + 5000);
                        
                        const msgResponse = await axios.get(GPSSERVER_API_URL, {
                          params: { api: 'user', key: userApiKey, cmd: `OBJECT_GET_MESSAGES,${imei},${qStart},${qEnd}` },

@@ -197,10 +197,10 @@ app.get('/api/force-backfill-all', async (req, res) => {
     
     const startLocal = req.query.start; // e.g. "2026-06-25 14:00"
     const endLocal = req.query.end;     // e.g. "2026-06-25 18:00"
-    const start = toUtc(startLocal) || startLocal;
-    const end   = toUtc(endLocal)   || endLocal;
+    const start = startLocal; // API de GPS Server espera hora local, NO UTC!
+    const end   = endLocal;
     
-    console.log(`[BackfillAll] Rango local: ${startLocal} → ${endLocal} | Convertido a UTC: ${start} → ${end}`);
+    console.log(`[BackfillAll] Rango solicitado a API (Local Chile): ${start} → ${end}`);
     
     // Get all devices discovered dynamically from the API (Admin, Transklett, etc)
     const mappingCache = typeof getMappingCache === 'function' ? getMappingCache() : {};
