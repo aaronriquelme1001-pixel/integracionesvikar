@@ -211,8 +211,13 @@ app.get('/api/force-backfill-all', async (req, res) => {
         try {
           const cached = mappingCache[imei];
           const client = (cached && cached.client) ? cached.client : (typeof cached === 'string' ? cached : 'unknown');
+          const clientUpper = client.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+          const clientApiKey = process.env[`GPSSERVER_API_KEY_${clientUpper}`];
+          if (!clientApiKey) {
+             console.warn(`[BackfillAll] ⚠️ No se encontró GPSSERVER_API_KEY_${clientUpper} para el cliente ${client}. Fallará si el masterKey no soporta historial.`);
+          }
           console.log(`[BackfillAll] Procesando ${imei} del cliente ${client} | UTC: ${start} → ${end}`);
-          const count = await recoverHistory(imei, start, end, client, null, false);
+          const count = await recoverHistory(imei, start, end, client, { key: clientApiKey }, false);
           results.push({ imei, count });
           await new Promise(r => setTimeout(r, 2000)); // Pause between vehicles
         } catch(e) {
