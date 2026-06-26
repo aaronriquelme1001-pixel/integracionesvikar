@@ -32,44 +32,46 @@ router.get('/history', async (req, res) => {
     `;
     const params = { imei };
     
-    // Helper to normalize dates
-    const normalizeDate = (d) => {
-      if (!d) return null;
-      // Handle both "DD-MM-YYYY" and "DD-MM-YYYY HH:mm"
-      const parts = d.split(' ');
+    // Helper to parse Chile local time "DD-MM-YYYY HH:mm" to a Javascript Date
+    const parseChileDate = (dStr, isEndOfDay = false) => {
+      if (!dStr) return null;
+      const parts = dStr.split(' ');
       const datePart = parts[0];
-      const timePart = parts[1] ? ' ' + parts[1] : '';
+      const timePart = parts[1] || (isEndOfDay ? '23:59:59' : '00:00:00');
+      
       const dParts = datePart.split('-');
-      if (dParts.length === 3 && dParts[0].length === 2 && dParts[2].length === 4) {
-        return `${dParts[2]}-${dParts[1]}-${dParts[0]}${timePart}`;
+      if (dParts.length === 3) {
+        // Assume DD-MM-YYYY
+        const d = dParts[0].padStart(2, '0');
+        const m = dParts[1].padStart(2, '0');
+        const y = dParts[2].length === 2 ? `20${dParts[2]}` : dParts[2];
+        
+        // Ensure timePart has seconds
+        const t = timePart.split(':').length === 2 ? `${timePart}:00` : timePart;
+        
+        // Chile standard timezone offset is roughly -04:00
+        return new Date(`${y}-${m}-${d}T${t}-04:00`);
       }
-      return d;
+      return null;
     };
 
-    const normStart = normalizeDate(start_date);
-    const normEnd = normalizeDate(end_date);
+    const normStart = parseChileDate(start_date);
+    let normEnd = parseChileDate(end_date, true);
     
-    // Parse start date
-    query += ` AND dt_tracker >= TIMESTAMP(@normStart)`;
-    params.normStart = normStart;
-    
-    // Parse end date
-    let finalEndDate = normEnd;
-    if (!finalEndDate) {
-      if (normStart.includes('T') || normStart.includes(' ')) {
-        finalEndDate = normStart; 
-      } else {
-        finalEndDate = `${normStart} 23:59:59`;
-      }
+    // Fallback if end date not provided
+    if (!normEnd && normStart) {
+       // If no end date, set to end of the same day
+       normEnd = new Date(normStart);
+       normEnd.setHours(23, 59, 59, 999);
     }
     
-    if (finalEndDate) {
-      // If finalEndDate is just a date like YYYY-MM-DD and doesn't have time, make sure it covers the day
-      if (finalEndDate.length === 10) {
-        finalEndDate = `${finalEndDate} 23:59:59`;
-      }
-      query += ` AND dt_tracker <= TIMESTAMP(@finalEndDate)`;
-      params.finalEndDate = finalEndDate;
+    // Use Javascript Date objects natively, BigQuery handles them as TIMESTAMP
+    query += ` AND dt_tracker >= @normStart`;
+    params.normStart = normStart;
+    
+    if (normEnd) {
+      query += ` AND dt_tracker <= @normEnd`;
+      params.normEnd = normEnd;
     }
     
     query += ` ORDER BY dt_tracker ASC LIMIT 10000`; // Limit set to 10000 to prevent OOM
