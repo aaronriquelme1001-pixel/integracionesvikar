@@ -228,12 +228,26 @@ app.get('/api/force-backfill-all', async (req, res) => {
           const cached = mappingCache[imei];
           const client = (cached && cached.client) ? cached.client : (typeof cached === 'string' ? cached : 'unknown');
           const clientUpper = client.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-          const clientApiKey = process.env[`GPSSERVER_API_KEY_${clientUpper}`] || process.env.GPSSERVER_USER_API_KEY;
+          
+          let clientKeys = {};
+          try { clientKeys = require('./src/config/clientKeys.json'); } catch(err) { /* ignore */ }
+          
+          // Buscar la llave: 1° en .env, 2° en clientKeys.json exacto, 3° en parte del nombre
+          let clientApiKey = process.env[`GPSSERVER_API_KEY_${clientUpper}`];
+          if (!clientApiKey) clientApiKey = clientKeys[clientUpper] || clientKeys[client.toUpperCase()];
+          
           if (!clientApiKey) {
-             console.warn(`[BackfillAll] ⚠️ No se encontró GPSSERVER_API_KEY_${clientUpper} ni GPSSERVER_USER_API_KEY para el cliente ${client}.`);
+             const foundKey = Object.keys(clientKeys).find(k => clientUpper.includes(k) || client.toUpperCase().includes(k));
+             if (foundKey) clientApiKey = clientKeys[foundKey];
+          }
+          
+          if (!clientApiKey) clientApiKey = process.env.GPSSERVER_USER_API_KEY;
+
+          if (!clientApiKey) {
+             console.warn(`[BackfillAll] ⚠️ No se encontró API KEY para el cliente ${client}.`);
           }
           console.log(`[BackfillAll] Procesando ${imei} del cliente ${client} | UTC: ${start} → ${end}`);
-          const count = await recoverHistory(imei, start, end, client, { key: clientApiKey }, false);
+          const count = await recoverHistory(imei, start, end, client, clientApiKey, false);
           results.push({ imei, count });
           await new Promise(r => setTimeout(r, 2000)); // Pause between vehicles
         } catch(e) {
