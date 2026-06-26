@@ -18,6 +18,22 @@ const waitBufferStates = {}; // { imei: firstWaitMs }
 const GPSSERVER_POLL_INTERVAL = parseInt(process.env.GPSSERVER_POLL_INTERVAL, 10) || 10000;
 const GPSSERVER_API_URL = process.env.GPSSERVER_API_URL || 'http://gsh7.net/id39/api/api.php';
 
+function getClientApiKey(client) {
+  if (!client) return process.env.GPSSERVER_USER_API_KEY || null;
+  const clientUpper = String(client).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  
+  let clientKeys = {};
+  try { clientKeys = require('../config/clientKeys.json'); } catch(err) { /* ignore */ }
+  
+  let key = process.env[`GPSSERVER_API_KEY_${clientUpper}`];
+  if (!key) key = clientKeys[clientUpper] || clientKeys[client.toUpperCase()];
+  if (!key) {
+     const foundKey = Object.keys(clientKeys).find(k => clientUpper.includes(k) || client.toUpperCase().includes(k));
+     if (foundKey) key = clientKeys[foundKey];
+  }
+  return key || process.env.GPSSERVER_USER_API_KEY || null;
+}
+
 let lastGpsServerPollTime = null;
 let lastGpsServerPollStatus = 'Waiting to start...';
 let isGpsServerPolling = false;
@@ -391,13 +407,11 @@ async function pollGpsServerLocations() {
                  // IMMEDIATE RECOVERY: If vehicle is moving and we missed intermediate points (gap > 15s),
                  // query GPS Server for ALL points in that window right now — don't wait 6 minutes.
                  // This makes Traccar receive every 10-second point, matching GPS Server's native view.
-                 if (isMoving && gapSeconds > 15 && gapSeconds < 259200) {
-                   try {
-                     const clientUpper = (client || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-                     const userApiKey = process.env.GPSSERVER_USER_API_KEY
-                       || process.env[`GPSSERVER_API_KEY_${clientUpper}`];
-                     
-                     if (userApiKey) {
+                  if (isMoving && gapSeconds > 15 && gapSeconds < 259200) {
+                    try {
+                      const userApiKey = getClientApiKey(client);
+                      
+                      if (userApiKey) {
                        // Query all intermediate points from GPS Server (add 5s buffer each side)
                        const fmt = (epochMs) => {
                          const d = new Date(epochMs);
@@ -455,10 +469,7 @@ async function pollGpsServerLocations() {
 
                  // Large offline gaps (> 10 min): schedule delayed backfill as before
                  if (gapSeconds > 600 && gapSeconds < 259200) {
-                   const clientUpper = (client || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-                   const userApiKey = process.env.GPSSERVER_USER_API_KEY
-                     || process.env[`GPSSERVER_API_KEY_${clientUpper}`]
-                     || masterKey;
+                   const userApiKey = getClientApiKey(client) || masterKey;
                    pendingBackfills.push({
                      imei, dt_old: lastPollerState.dt_tracker, dt_new: device.dt_tracker,
                      client, apiKey: userApiKey, executeAt: Date.now() + (6 * 60 * 1000)
