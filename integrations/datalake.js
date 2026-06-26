@@ -44,10 +44,21 @@ class DatalakeStrategy {
       altitude = 0,
       angle = 0,
       dt_tracker,
-      client_source = 'B2B',
+      client_source,
+      client,
       loc_valid = true,
       params = null
     } = telemetry;
+
+    let parsedDate = new Date();
+    if (dt_tracker) {
+      const dt = new Date(dt_tracker);
+      if (!isNaN(dt.getTime())) {
+        parsedDate = dt;
+      }
+    }
+
+    const resolvedClient = String(client_source || client || 'B2B');
 
     const row = {
       imei: String(imei),
@@ -58,8 +69,8 @@ class DatalakeStrategy {
       altitude: parseFloat(altitude),
       angle: parseFloat(angle),
       loc_valid: Boolean(loc_valid),
-      dt_tracker: new Date(dt_tracker).toISOString(),
-      client_source: String(client_source),
+      dt_tracker: parsedDate.toISOString(),
+      client_source: resolvedClient,
       created_at: new Date().toISOString(),
       params: params ? JSON.stringify(params) : null
     };
