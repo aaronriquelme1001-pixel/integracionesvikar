@@ -91,7 +91,7 @@ router.get('/', async (req, res) => {
         SUM(bs.fatigue_alerts_count) as fatigue_alerts_clustered
       FROM \`telemetry.billing_snapshots\` bs
       LEFT JOIN (
-          SELECT imei, MAX(plate) as plate, MAX(speed) as max_speed 
+          SELECT imei, MAX(IF(plate = 'SIN_PATENTE', NULL, plate)) as plate, MAX(speed) as max_speed 
           FROM \`telemetry.global_traffic\` 
           WHERE dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
           GROUP BY imei

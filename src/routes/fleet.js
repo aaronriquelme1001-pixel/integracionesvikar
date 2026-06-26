@@ -36,10 +36,13 @@ router.get('/history', async (req, res) => {
     // Helper to normalize dates
     const normalizeDate = (d) => {
       if (!d) return null;
-      // If it's DD-MM-YYYY, convert to YYYY-MM-DD
-      const parts = d.split('-');
-      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      // Handle both "DD-MM-YYYY" and "DD-MM-YYYY HH:mm"
+      const parts = d.split(' ');
+      const datePart = parts[0];
+      const timePart = parts[1] ? ' ' + parts[1] : '';
+      const dParts = datePart.split('-');
+      if (dParts.length === 3 && dParts[0].length === 2 && dParts[2].length === 4) {
+        return `${dParts[2]}-${dParts[1]}-${dParts[0]}${timePart}`;
       }
       return d;
     };
