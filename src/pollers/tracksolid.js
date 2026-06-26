@@ -117,6 +117,8 @@ async function pollTracksolid() {
 
         const telemetry = {
           imei: dev.imei,
+          name: dev.deviceName || dev.imei,
+          plate: dev.deviceName || dev.imei,
           plate_number: dev.deviceName || dev.imei,
           dt_tracker: gpsTime,
           lat: dev.lat,

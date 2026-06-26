@@ -205,12 +205,12 @@ router.get('/driver-events', async (req, res) => {
     let typeCondition = '';
     if (type === 'extreme_speeding') typeCondition = 'speed > 120';
     else if (type === 'moderate_speeding') typeCondition = 'speed > 90 AND speed <= 120';
-    else if (type === 'harsh_maneuvers') typeCondition = "event IN ('haccel', 'hbrake', 'hcorn')";
-    else if (type === 'fatigue_alerts') typeCondition = "event IN ('fatigue', 'tired')";
+    else if (type === 'harsh_maneuvers') typeCondition = "JSON_EXTRACT_SCALAR(params, '$.event') IN ('haccel', 'hbrake', 'hcorn')";
+    else if (type === 'fatigue_alerts') typeCondition = "JSON_EXTRACT_SCALAR(params, '$.event') IN ('fatigue', 'tired')";
     else return res.status(400).json({ error: 'Invalid type parameter.' });
 
     const query = `
-      SELECT dt_tracker, speed, lat, lng, event
+      SELECT dt_tracker, speed, lat, lng, JSON_EXTRACT_SCALAR(params, '$.event') as event
       FROM \`telemetry.global_traffic\`
       WHERE imei = @imei
       AND dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
