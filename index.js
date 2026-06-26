@@ -143,6 +143,21 @@ app.get('/api/audit', async (req, res) => {
   } catch(e) { res.status(500).json({error: e.message}); }
 });
 
+app.get('/api/debug-gps', async (req, res) => {
+  if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+  try {
+    const axios = require('axios');
+    const key = process.env.GPSSERVER_USER_API_KEY || req.query.key;
+    const cmd = req.query.cmd || 'OBJECT_GET_MESSAGES,865413054274468,2026-06-25 15:00:00,2026-06-25 19:00:00';
+    const r = await axios.get(process.env.GPSSERVER_API_URL, {
+       params: { api: 'user', key: key, cmd: cmd }
+    });
+    res.json({ key_length: key ? key.length : 0, data: r.data, type: typeof r.data });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 const { recoverHistory } = require('./src/pollers/gpsServer');
 app.get('/api/force-backfill', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
