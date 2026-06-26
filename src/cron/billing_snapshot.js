@@ -238,8 +238,8 @@ async function runBillingSnapshot() {
     
     for (const imei in objects) {
       const data = objects[imei];
-      const odometer = data.odometer || 0;
-      const engineHours = data.engine_hours || 0;
+      const odometer = parseFloat(data.odometer) || 0;
+      const engineHours = parseFloat(data.engine_hours) || 0;
       
       // Auto-assign client based on Data Lake history, fallback to config file
       let clientId = dynamicMappings[imei];
