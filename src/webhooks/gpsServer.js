@@ -21,7 +21,8 @@ async function handleGpsServerWebhook(req, res) {
   const telemetry = {
     imei: String(imei),
     plate_number: telemetryObj.plate_number || telemetryObj.plate,
-    name: telemetryObj.name,
+    plate: telemetryObj.plate || telemetryObj.name || telemetryObj.plate_number || String(imei),
+    name: telemetryObj.name || telemetryObj.plate || String(imei),
     dt_tracker: telemetryObj.dt ? telemetryObj.dt.replace(' ', 'T') + 'Z' : new Date().toISOString(),
     dt_server: telemetryObj.dt ? telemetryObj.dt.replace(' ', 'T') + 'Z' : new Date().toISOString(),
     lat: telemetryObj.lat !== undefined ? String(telemetryObj.lat) : '0',

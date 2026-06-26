@@ -28,6 +28,7 @@ async function handleIncomingGps(req, res) {
       const telemetry = {
         imei: item.plate, // Using plate as unique ID if IMEI is not provided
         name: item.plate,
+        plate: item.plate,
         plate_number: item.plate,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lng),
