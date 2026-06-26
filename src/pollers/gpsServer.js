@@ -249,7 +249,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
                  params: msg.params || ''
              };
              await dispatchToB2B(telemetry, client);
-             await new Promise(r => setTimeout(r, 1000)); // FIX: Increased to 1000ms to prevent rate limit (spam) blocks
+             await new Promise(r => setTimeout(r, 50)); // Reducido a 50ms para que no tarde horas en inyectar
           }
           console.log(`[Backfiller] ✅ Inyección de ${messages.length} puntos completada para ${imei}.`);
           return messages.length;
