@@ -1,18 +1,17 @@
 const axios = require('axios');
 const { systemStats, deviceAntiSpamState, lastDeviceTimestamps, pendingBackfills, retryQueue } = require('../core/state');
 const { dispatchToB2B } = require('../core/dispatcher');
-const { Pool } = require('pg');
+const { BigQuery } = require('@google-cloud/bigquery');
+const fs = require('fs');
 
-let pool = null;
-if (process.env.DATALAKE_URL) {
-  pool = new Pool({
-    connectionString: process.env.DATALAKE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
-  
-  pool.on('error', (err, client) => {
-    console.error('[GPS Server Poller] Unexpected database error on idle client:', err.message);
-  });
+let bqClient = null;
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+   const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+   bqClient = new BigQuery({ projectId: credentials.project_id, credentials });
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+   bqClient = new BigQuery();
+} else if (fs.existsSync('./bq-key.json')) {
+   bqClient = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: './bq-key.json' });
 }
 
 const waitBufferStates = {}; // { imei: firstWaitMs }
@@ -277,29 +276,31 @@ async function pollGpsServerLocations() {
     return;
   }
 
-  // --- HYDRATE STATE FROM DATALAKE TO SURVIVE RESTARTS ---
-  if (!isStateHydrated && pool) {
+  // --- HYDRATE STATE FROM BIGQUERY DATALAKE TO SURVIVE RESTARTS ---
+  if (!isStateHydrated && bqClient) {
     try {
-      console.log('[GPS Server Poller] Hydrating state from Datalake to survive restarts...');
+      console.log('[GPS Server Poller] Hydrating state from BigQuery to survive restarts...');
       const query = `
         SELECT imei, MAX(dt_tracker) as dt_tracker 
-        FROM global_telemetry_traffic 
-        WHERE created_at >= NOW() - INTERVAL '1 day'
+        FROM \`telemetry.global_traffic\` 
+        WHERE created_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 DAY)
         GROUP BY imei
       `;
-      const res = await pool.query(query);
-      for (const row of res.rows) {
-        if (!lastDeviceTimestamps[row.imei]) {
-          // Convert JS Date object to ISO string matching format expected by new Date() comparison
-          lastDeviceTimestamps[row.imei] = { dt_tracker: new Date(row.dt_tracker).toISOString().replace('T', ' ').substring(0, 19) };
+      const [rows] = await bqClient.query({ query });
+      for (const row of rows) {
+        if (!lastDeviceTimestamps[row.imei] && row.dt_tracker) {
+          lastDeviceTimestamps[row.imei] = { dt_tracker: new Date(row.dt_tracker.value).toISOString().replace('T', ' ').substring(0, 19) };
         }
       }
-      console.log(`[GPS Server Poller] Hydrated state for ${res.rows.length} devices. Backfiller is ready for past gaps!`);
+      console.log(`[GPS Server Poller] Hydrated state for ${rows.length} devices from BigQuery. Backfiller is ready!`);
       isStateHydrated = true;
     } catch (err) {
-      console.error('[GPS Server Poller] Failed to hydrate state:', err.message);
-      // We will try again next poll if it failed
+      console.error('[GPS Server Poller] Failed to hydrate state from BigQuery:', err.message);
     }
+  } else if (!isStateHydrated && !bqClient) {
+      // If no BQ configured, we can't hydrate
+      isStateHydrated = true;
+      console.warn('[GPS Server Poller] BigQuery not configured. State hydration skipped.');
   }
 
   if (Date.now() - lastMappingRefresh > MAPPING_REFRESH_INTERVAL || Object.keys(mappingCache).length === 0) {

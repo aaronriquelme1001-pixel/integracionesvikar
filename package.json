@@ -8,6 +8,7 @@
     "test:mock": "node test_mock.js"
   },
   "dependencies": {
+    "@google-cloud/bigquery": "^8.3.1",
     "axios": "^1.7.2",
     "body-parser": "^2.2.2",
     "dotenv": "^16.4.5",

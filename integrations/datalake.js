@@ -1,99 +1,94 @@
-const { Pool } = require('pg');
+const { BigQuery } = require('@google-cloud/bigquery');
+const fs = require('fs');
 
-let pool = null;
-let initialized = false;
+let bigquery = null;
+let datasetId = 'telemetry';
+let tableId = 'global_traffic';
+let buffer = [];
 
 class DatalakeStrategy {
   constructor() {
-    this.initPool();
+    this.initBQ();
+    // Flush to BigQuery every 5 seconds to minimize API calls
+    setInterval(() => this.flush(), 5000);
   }
 
-  async initPool() {
-    if (!process.env.DATALAKE_URL) {
-      console.warn('[Data Lake] ⚠️ DATALAKE_URL no definido. El registro global de tráfico está inactivo.');
-      return;
-    }
-
+  initBQ() {
     try {
-      pool = new Pool({
-        connectionString: process.env.DATALAKE_URL,
-        ssl: { rejectUnauthorized: false } // Required for Render/Supabase
-      });
-
-      pool.on('error', (err, client) => {
-        console.error('[Data Lake] Unexpected database error on idle client:', err.message);
-      });
-
-      // Create table if not exists
-      const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS global_telemetry_traffic (
-          id SERIAL PRIMARY KEY,
-          imei VARCHAR(50) NOT NULL,
-          plate VARCHAR(50),
-          lat NUMERIC,
-          lng NUMERIC,
-          speed NUMERIC,
-          dt_tracker TIMESTAMP,
-          client_source VARCHAR(100),
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-      `;
-      await pool.query(createTableQuery);
-      
-      // Ensure missing sensor and I/O columns exist
-      await pool.query(`ALTER TABLE global_telemetry_traffic ADD COLUMN IF NOT EXISTS altitude NUMERIC DEFAULT 0;`);
-      await pool.query(`ALTER TABLE global_telemetry_traffic ADD COLUMN IF NOT EXISTS angle NUMERIC DEFAULT 0;`);
-      await pool.query(`ALTER TABLE global_telemetry_traffic ADD COLUMN IF NOT EXISTS params TEXT;`);
-      await pool.query(`ALTER TABLE global_telemetry_traffic ADD COLUMN IF NOT EXISTS loc_valid BOOLEAN DEFAULT true;`);
-
-      // Create index for fast querying
-      await pool.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_imei ON global_telemetry_traffic(imei);`);
-      await pool.query(`CREATE INDEX IF NOT EXISTS idx_telemetry_dt ON global_telemetry_traffic(dt_tracker);`);
-
-      console.log('[Data Lake] ✅ Conectado a la base de datos central. Tabla global_telemetry_traffic lista y migrada con I/O.');
-      initialized = true;
-    } catch (err) {
-      console.error('[Data Lake] ❌ Error inicializando la conexión a PostgreSQL:', err.message);
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+         const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+         bigquery = new BigQuery({ projectId: credentials.project_id, credentials });
+      } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+         bigquery = new BigQuery(); 
+      } else if (fs.existsSync('./bq-key.json')) {
+         bigquery = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: './bq-key.json' });
+      } else {
+         console.warn('[Data Lake] ⚠️ Faltan credenciales de BigQuery. Data Lake Inactivo.');
+         return;
+      }
+      console.log('[Data Lake] ✅ Conectado a Google BigQuery (Almacenamiento Infinito).');
+    } catch(err) {
+      console.error('[Data Lake] ❌ Error inicializando BigQuery:', err);
     }
   }
 
   async execute(telemetry, deviceConfig, resolvedConfig) {
-    if (!initialized || !pool) return;
+    if (!bigquery) return { success: false, reason: 'BigQuery no configurado' };
 
+    const {
+      imei,
+      plate = 'SIN_PATENTE',
+      lat,
+      lng,
+      speed,
+      altitude = 0,
+      angle = 0,
+      dt_tracker,
+      client_source = 'B2B',
+      loc_valid = true,
+      params = null
+    } = telemetry;
+
+    const row = {
+      imei: String(imei),
+      plate: String(plate),
+      lat: parseFloat(lat),
+      lng: parseFloat(lng),
+      speed: parseFloat(speed),
+      altitude: parseFloat(altitude),
+      angle: parseFloat(angle),
+      loc_valid: Boolean(loc_valid),
+      dt_tracker: new Date(dt_tracker).toISOString(),
+      client_source: String(client_source),
+      created_at: new Date().toISOString(),
+      params: params ? JSON.stringify(params) : null
+    };
+
+    buffer.push(row);
+
+    // Force flush if buffer gets too large
+    if (buffer.length >= 500) {
+      this.flush();
+    }
+
+    return { success: true, message: 'Agregado al buffer de BigQuery' };
+  }
+  
+  async flush() {
+    if (buffer.length === 0 || !bigquery) return;
+    
+    const rowsToInsert = [...buffer];
+    buffer = [];
+    
     try {
-      // Validate dt_tracker before inserting — reject clearly invalid dates like "0000-00-00 00:00:00"
-      const dtRaw = telemetry.dt_tracker;
-      if (!dtRaw || String(dtRaw).startsWith('0000') || String(dtRaw).trim() === '') {
-        console.warn(`[Data Lake] ⚠️ Fecha inválida ignorada para IMEI ${telemetry.imei} (${deviceConfig.plate || 'SIN PLACA'}): "${dtRaw}"`);
-        return;
-      }
-
-      const query = `
-        INSERT INTO global_telemetry_traffic (imei, plate, lat, lng, speed, dt_tracker, client_source, altitude, angle, params, loc_valid)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      `;
-      
-      const values = [
-        telemetry.imei,
-        deviceConfig.plate || telemetry.plate_number || 'UNKNOWN',
-        telemetry.lat,
-        telemetry.lng,
-        telemetry.speed || 0,
-        telemetry.dt_tracker,
-        resolvedConfig.client || 'unknown',
-        telemetry.altitude || 0,
-        telemetry.angle || 0,
-        typeof telemetry.params === 'object' ? JSON.stringify(telemetry.params) : (telemetry.params || ''),
-        telemetry.loc_valid !== undefined ? Boolean(telemetry.loc_valid) : true
-      ];
-
-      // Await to ensure we don't flood the pg pool queue
-      await pool.query(query, values);
+       await bigquery.dataset(datasetId).table(tableId).insert(rowsToInsert);
     } catch (error) {
-      console.error(`[Data Lake] ❌ Error insertando punto para IMEI ${telemetry.imei} (${deviceConfig.plate || telemetry.plate_number || 'SIN PLACA'}): ${error.message}`);
+       console.error(`[Data Lake] ❌ Error insertando en BigQuery:`, error.message);
+       if (error.name === 'PartialFailureError') {
+         error.errors.forEach(err => console.error(JSON.stringify(err)));
+       }
     }
   }
-
 }
 
 module.exports = DatalakeStrategy;
