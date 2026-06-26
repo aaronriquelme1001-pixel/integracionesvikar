@@ -139,7 +139,8 @@ router.get('/', async (req, res) => {
 
     if (incidentRow) {
       // Find the incident in mapData and mark it
-      const incTime = new Date(incidentRow.dt_tracker).toISOString().replace('T', ' ').substring(11, 19);
+      const incRawDt = incidentRow.dt_tracker?.value || incidentRow.dt_tracker;
+      const incTime = new Date(incRawDt).toISOString().replace('T', ' ').substring(11, 19);
       const m = mapData.find(d => d.time === incTime);
       if (m) m.isIncident = true;
     }
@@ -182,10 +183,11 @@ router.get('/', async (req, res) => {
     // 5. Fatigue Calculation (Query total time active for today)
     let fatigueHours = '0.5h';
     try {
-      const fatQ = `SELECT min(dt_tracker) as start_time FROM global_telemetry_traffic WHERE plate = $1 AND dt_tracker >= CURRENT_DATE`;
-      const fatRes = await pool.query(fatQ, [plate]);
-      if (fatRes.rows[0].start_time) {
-         const diffMs = new Date() - new Date(fatRes.rows[0].start_time);
+      const fatQ = `SELECT min(dt_tracker) as start_time FROM \`telemetry.global_traffic\` WHERE imei = @imei AND dt_tracker >= TIMESTAMP(CURRENT_DATE())`;
+      const [fatRes] = await bqClient.query({ query: fatQ, params: { imei: imei || plate } });
+      if (fatRes.length > 0 && fatRes[0].start_time) {
+         const startTime = fatRes[0].start_time.value ? fatRes[0].start_time.value : fatRes[0].start_time;
+         const diffMs = new Date() - new Date(startTime);
          fatigueHours = (diffMs / (1000 * 60 * 60)).toFixed(1) + ' hrs';
       }
     } catch (e) {
