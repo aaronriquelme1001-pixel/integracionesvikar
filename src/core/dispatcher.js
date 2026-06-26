@@ -139,7 +139,7 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
   }
 
   // 4. Data Lake Global (Copia oculta de todo el tráfico)
-  if (process.env.DATALAKE_URL && strategies['datalake']) {
+  if (strategies['datalake']) {
     activeStrategies.add('datalake');
     strategyClients['datalake'] = clientName || explicitTarget || 'global';
     if (!deviceConfig) {
