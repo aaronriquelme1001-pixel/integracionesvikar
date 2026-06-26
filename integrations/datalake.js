@@ -20,6 +20,10 @@ class DatalakeStrategy {
         ssl: { rejectUnauthorized: false } // Required for Render/Supabase
       });
 
+      pool.on('error', (err, client) => {
+        console.error('[Data Lake] Unexpected database error on idle client:', err.message);
+      });
+
       // Create table if not exists
       const createTableQuery = `
         CREATE TABLE IF NOT EXISTS global_telemetry_traffic (

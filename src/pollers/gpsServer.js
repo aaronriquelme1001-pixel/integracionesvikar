@@ -9,6 +9,10 @@ if (process.env.DATALAKE_URL) {
     connectionString: process.env.DATALAKE_URL,
     ssl: { rejectUnauthorized: false }
   });
+  
+  pool.on('error', (err, client) => {
+    console.error('[GPS Server Poller] Unexpected database error on idle client:', err.message);
+  });
 }
 
 const waitBufferStates = {}; // { imei: firstWaitMs }
