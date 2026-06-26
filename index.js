@@ -392,6 +392,47 @@ app.use('/api/fleet', fleetRoute);
     }
   });
 
+  app.post('/api/restore-billing', express.json({limit: '50mb'}), async (req, res) => {
+    if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
+    try {
+      const { BigQuery } = require('@google-cloud/bigquery');
+      let bqClient = null;
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+        const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+        bqClient = new BigQuery({ projectId: credentials.project_id, credentials });
+      } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        bqClient = new BigQuery(); 
+      }
+      
+      if (!bqClient) throw new Error('BigQuery client not configured');
+
+      const rows = req.body.rows;
+      if (!rows || !Array.isArray(rows)) return res.status(400).json({ error: 'Missing rows array' });
+
+      // Chunk insertion (BigQuery limit is 10k rows usually, we have ~4.5k so one shot is fine but chunking is safer)
+      const bqRows = rows.map(r => ({
+        client_id: r.client_id,
+        imei: r.imei,
+        snapshot_date: bqClient.date(r.snapshot_date.split('T')[0]),
+        odometer: r.odometer,
+        engine_hours: r.engine_hours,
+        daily_grade: r.daily_grade || 7.0,
+        extreme_speeding_count: r.extreme_speeding_count || 0,
+        moderate_speeding_count: r.moderate_speeding_count || 0,
+        harsh_maneuvers_count: r.harsh_maneuvers_count || 0,
+        fatigue_alerts_count: r.fatigue_alerts_count || 0,
+        created_at: bqClient.timestamp(new Date(r.created_at))
+      }));
+
+      await bqClient.dataset('telemetry').table('billing_snapshots').insert(bqRows);
+      
+      res.json({ message: `Successfully restored ${bqRows.length} snapshots to BigQuery.` });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message, stack: err.stack, details: err.errors });
+    }
+  });
+
 app.get('/api/debug-users-objects', async (req, res) => {
   if (req.query.secret !== 'vikar2026') return res.status(403).send('Forbidden');
   const axios = require('axios');
