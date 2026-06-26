@@ -32,7 +32,7 @@ async function calculateDailyGrade(imei, snapshotDateStr) {
     // Buscar los puntos de velocidad y eventos de este vehículo en el día actual
     // OPTIMIZADO: Usa rango de fechas para aprovechar el índice B-Tree en dt_tracker y limita a 10000 para evitar OOM
     const query = `
-      SELECT speed, event, dt_tracker 
+      SELECT speed, JSON_EXTRACT_SCALAR(params, '$.event') as event, dt_tracker 
       FROM \`telemetry.global_traffic\` 
       WHERE imei = @imei 
       AND dt_tracker >= TIMESTAMP(@snapshotDate)
