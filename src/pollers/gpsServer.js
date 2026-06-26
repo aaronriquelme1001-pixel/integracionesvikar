@@ -86,31 +86,27 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
   try {
      console.log(`[Backfiller] Iniciando recuperación de historial para ${imei}. De: ${dt_old} a ${dt_new}`);
      
-     // Simple and robust local time math: 
-     // dt_old and dt_new are strings in Local Time (e.g. "2026-06-25 14:45:32").
-     // We parse them as UTC to easily add/subtract hours without timezone shifts, 
-     // then format them back to strings for the GPS Server query.
      const pad = n => n.toString().padStart(2, '0');
-     const addHours = (dtStr, hoursOffset) => {
-        if (!dtStr) return NaN;
-        const s = String(dtStr).trim().replace(' ', 'T');
-        // Treat local time string as UTC for pure math
+     const toLocalChileStr = (utcStr, hoursOffset = 0) => {
+        if (!utcStr) return NaN;
+        const s = String(utcStr).trim().replace(' ', 'T');
         const epoch = new Date(s.includes('Z') ? s : s + 'Z').getTime();
         if (isNaN(epoch)) return NaN;
-        const d = new Date(epoch + (hoursOffset * 60 * 60 * 1000));
+        // Restar 4 horas para pasar de UTC a hora local de Chile, y sumar el offset adicional
+        const d = new Date(epoch - (4 * 3600000) + (hoursOffset * 3600000));
         return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
      };
 
-     const startEpoch = addHours(dt_old, 0) !== NaN ? new Date(String(dt_old).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
-     const endEpoch = addHours(dt_new, 0) !== NaN ? new Date(String(dt_new).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
+     const startEpoch = toLocalChileStr(dt_old, 0) !== NaN ? new Date(String(dt_old).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
+     const endEpoch = toLocalChileStr(dt_new, 0) !== NaN ? new Date(String(dt_new).trim().replace(' ', 'T') + 'Z').getTime() : NaN;
      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
      
      // CRITICAL: OBJECT_GET_MESSAGES only works with api=user.
      const apiTarget = 'user';
 
      // Widen API query window because GPS Server API filters by dt_server (arrival time), not dt_tracker.
-     const q_old = !isNaN(startEpoch) ? addHours(dt_old, -1) : dt_old;
-     const q_new = !isNaN(endEpoch) ? addHours(dt_new, 3) : dt_new;
+     const q_old = !isNaN(startEpoch) ? toLocalChileStr(dt_old, -1) : dt_old;
+     const q_new = !isNaN(endEpoch) ? toLocalChileStr(dt_new, 3) : dt_new;
      
      console.log(`[Backfiller] Fechas parseadas para ${imei}: dt_old="${dt_old}" → q_old="${q_old}" | dt_new="${dt_new}" → q_new="${q_new}"`);
 
@@ -139,7 +135,8 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          if (currentEnd > finalEnd) currentEnd = finalEnd;
          
          const fmt = (epochMs) => {
-            const d = new Date(epochMs);
+            // Subtract 4 hours to convert UTC epoch to Local Chile Time
+            const d = new Date(epochMs - (4 * 3600000));
             const p = n => n.toString().padStart(2, '0');
             return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
          };
