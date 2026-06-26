@@ -177,6 +177,7 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
      }
      
      if (allMessages.length > 0) {
+        console.log(`[Backfiller] DEBUG-TRACE: allMessages.length = ${allMessages.length} antes del mapeo.`);
         let messages = allMessages.map(m => {
            if (Array.isArray(m)) {
               const paramsObj = m[6] || {};
