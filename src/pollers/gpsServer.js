@@ -133,6 +133,12 @@ async function recoverHistory(imei, dt_old, dt_new, client, apiKey, isMaster = f
          let currentEnd = currentStart + FOUR_HOURS_MS;
          if (currentEnd > finalEnd) currentEnd = finalEnd;
          
+         const fmt = (epochMs) => {
+            const d = new Date(epochMs);
+            const p = n => n.toString().padStart(2, '0');
+            return `${d.getUTCFullYear()}-${p(d.getUTCMonth()+1)}-${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
+         };
+         
          const chunkStart = fmt(currentStart);
          const chunkEnd = fmt(currentEnd);
          
