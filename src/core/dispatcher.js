@@ -22,7 +22,7 @@ fs.readdirSync(strategiesDir).forEach(file => {
 async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null) {
   const { imei } = telemetry;
   const nowMs = Date.now();
-  const PARKED_HEARTBEAT_MS = 20 * 60 * 1000; // 20 minutes
+  const PARKED_HEARTBEAT_MS = 9 * 60 * 1000; // 9 minutes to beat Traccar 10m offline timeout
   let shouldSend = true;
 
   // Filtro Inteligente Anti-Spam con Latido (Heartbeat) - Aplica a Poller y Webhooks
@@ -34,7 +34,7 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       if (timeSinceLastSend < PARKED_HEARTBEAT_MS) {
         shouldSend = false; // Bloquear spam
       } else {
-        console.log(`[B2B Dispatch] Enviando latido de 20 minutos para estacionado: ${imei}`);
+        console.log(`[B2B Dispatch] Enviando latido de 9 minutos para estacionado: ${imei}`);
       }
     }
     
