@@ -109,12 +109,11 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       const envVarName = `GPSSERVER_POLL_${strategyName.toUpperCase()}_CLIENTS`;
       const wildcardClients = (process.env[envVarName] || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
       
-      if (wildcardClients.includes(clientLower)) {
+      if (wildcardClients.some(c => clientLower.includes(c))) {
         activeStrategies.add(strategyName);
         strategyClients[strategyName] = clientLower;
         
         if (!deviceConfig) {
-          deviceConfig = {
             plate: telemetry.plate_number || telemetry.name || telemetry.plate || 'SIN_PATENTE',
             carrier: telemetry.carrier || 'VIKARGPS',
             integrations: {}
