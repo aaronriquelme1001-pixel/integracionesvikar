@@ -109,7 +109,7 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       const envVarName = `GPSSERVER_POLL_${strategyName.toUpperCase()}_CLIENTS`;
       const wildcardClients = (process.env[envVarName] || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
       
-      if (wildcardClients.some(c => clientLower.includes(c))) {
+      if (wildcardClients.includes(clientLower)) {
         activeStrategies.add(strategyName);
         strategyClients[strategyName] = clientLower;
         
