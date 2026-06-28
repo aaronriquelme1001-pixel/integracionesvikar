@@ -118,6 +118,7 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
         strategyClients[strategyName] = clientLower;
         
         if (!deviceConfig) {
+          deviceConfig = {
             plate: telemetry.plate_number || telemetry.name || telemetry.plate || 'SIN_PATENTE',
             carrier: telemetry.carrier || 'VIKARGPS',
             integrations: {}
