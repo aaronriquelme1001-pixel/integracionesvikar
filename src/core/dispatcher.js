@@ -109,6 +109,10 @@ async function dispatchToB2B(telemetry, clientName = null, explicitTarget = null
       const envVarName = `GPSSERVER_POLL_${strategyName.toUpperCase()}_CLIENTS`;
       const wildcardClients = (process.env[envVarName] || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
       
+      if (clientLower.includes('vicat')) {
+          console.log(`[DEBUG-VICAT] IMEI: ${imei}, clientLower: '${clientLower}', Strategy: ${strategyName}, EnvVar: '${process.env[envVarName]}', wildcardClients:`, wildcardClients);
+      }
+      
       if (wildcardClients.includes(clientLower)) {
         activeStrategies.add(strategyName);
         strategyClients[strategyName] = clientLower;
