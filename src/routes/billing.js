@@ -138,7 +138,7 @@ router.get('/', async (req, res) => {
           WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
           AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
         ) client_imeis ON gt.imei = client_imeis.imei
-        WHERE gt.dt_tracker >= TIMESTAMP(@trafficStart)
+        WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
           AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
       `;
       const [speedRows] = await bigquery.query({
@@ -207,7 +207,7 @@ router.get('/', async (req, res) => {
             WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
             AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
           ) client_imeis ON gt.imei = client_imeis.imei
-          WHERE gt.dt_tracker >= TIMESTAMP(@trafficStart)
+          WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
             AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
           GROUP BY gt.imei
       ) gt ON bs.imei = gt.imei
