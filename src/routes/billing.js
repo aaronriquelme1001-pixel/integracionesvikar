@@ -65,12 +65,18 @@ router.get('/', async (req, res) => {
     // Metric 2: Active Vehicles
     const activeVehicles = deltaRows.length;
 
-    // Metric 3: Max Speed
+    // Metric 3: Max Speed — scoped to client IMEIs from billing_snapshots (avoids full-table scan via client_source LIKE)
     const speedQuery = `
-      SELECT MAX(speed) as max_speed
-      FROM \`telemetry.global_traffic\`
-      WHERE LOWER(client_source) LIKE CONCAT('%', LOWER(@clientId), '%')
-      AND dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
+      SELECT MAX(gt.speed) as max_speed
+      FROM \`telemetry.global_traffic\` gt
+      INNER JOIN (
+        SELECT DISTINCT imei
+        FROM \`telemetry.billing_snapshots\`
+        WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+        AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
+      ) client_imeis ON gt.imei = client_imeis.imei
+      WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
+        AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
     `;
     const [speedRows] = await bigquery.query({
       query: speedQuery,
@@ -91,11 +97,18 @@ router.get('/', async (req, res) => {
         SUM(bs.fatigue_alerts_count) as fatigue_alerts_clustered
       FROM \`telemetry.billing_snapshots\` bs
       LEFT JOIN (
-          SELECT imei, MAX(IF(plate = 'SIN_PATENTE', NULL, plate)) as plate, MAX(speed) as max_speed 
-          FROM \`telemetry.global_traffic\` 
-          WHERE dt_tracker >= TIMESTAMP(@startDate) AND dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
-          GROUP BY imei
-      ) gt ON bs.imei = gt.imei 
+          SELECT gt.imei, MAX(IF(gt.plate = 'SIN_PATENTE', NULL, gt.plate)) as plate, MAX(gt.speed) as max_speed
+          FROM \`telemetry.global_traffic\` gt
+          INNER JOIN (
+            SELECT DISTINCT imei
+            FROM \`telemetry.billing_snapshots\`
+            WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+            AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
+          ) client_imeis ON gt.imei = client_imeis.imei
+          WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
+            AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
+          GROUP BY gt.imei
+      ) gt ON bs.imei = gt.imei
       WHERE LOWER(bs.client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
       AND bs.snapshot_date >= DATE(@startDate) AND bs.snapshot_date <= DATE(@endDate)
       GROUP BY bs.imei

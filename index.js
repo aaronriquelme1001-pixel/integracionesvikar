@@ -494,11 +494,11 @@ app.listen(PORT, async () => {
   }
   setTimeout(pollGpsServerLocations, 5000);
   
-  // Start Billing Cron Job (Every 20 minutes)
+  // Start Billing Cron Job (Every 6 hours, at :00)
   const { runBillingSnapshot } = require('./src/cron/billing_snapshot');
   setInterval(() => {
     const now = new Date();
-    if (now.getMinutes() % 20 === 0) {
+    if (now.getMinutes() === 0 && now.getHours() % 6 === 0) {
       runBillingSnapshot().catch(err => {
         console.error('[System] ❌ Error in background billing snapshot:', err.message);
       });
