@@ -10,20 +10,56 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
   bigquery = new BigQuery({ projectId: credentials.project_id, credentials });
 } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-  bigquery = new BigQuery(); 
+  bigquery = new BigQuery();
 } else if (fs.existsSync(path.join(__dirname, '../../bq-key.json'))) {
   bigquery = new BigQuery({ projectId: 'vikargpsdatos', keyFilename: path.join(__dirname, '../../bq-key.json') });
 }
 
+/** Month bounds for the current calendar month (YYYY-MM-DD). */
+function currentMonthBounds() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+  return { start, end, now };
+}
+
+/**
+ * Parse optional `since` query param (ISO date or datetime).
+ * Returns YYYY-MM-DD for snapshot filtering and a TIMESTAMP boundary for global_traffic.
+ */
+function parseSinceParam(sinceRaw, monthStart) {
+  if (!sinceRaw || typeof sinceRaw !== 'string') {
+    return { sinceDate: null, sinceTs: null };
+  }
+  const trimmed = sinceRaw.trim();
+  let d = new Date(trimmed);
+  if (Number.isNaN(d.getTime())) {
+    // Accept YYYY-MM-DD without time
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      d = new Date(`${trimmed}T00:00:00Z`);
+    } else {
+      return { sinceDate: null, sinceTs: null };
+    }
+  }
+  const sinceDate = d.toISOString().split('T')[0];
+  // Clamp to current month start
+  const sinceTs = sinceDate < monthStart ? monthStart : sinceDate;
+  return { sinceDate: sinceTs, sinceTs };
+}
+
 /**
  * GET /api/billing-stats
- * Returns the Value-Added Metrics for a given client in the current month.
- * Required query params: clientId, secret
+ * Returns Value-Added Metrics for a client (month-to-date).
+ *
+ * Query params:
+ *   clientId, secret (required)
+ *   since (optional ISO datetime) — only scan global_traffic from this point for vmax/ranking speed;
+ *         km and event counts still come from billing_snapshots for the full month.
+ *   known_max (optional number) — cached vmax from a prior checkpoint; merged as MAX(known_max, gap_max).
  */
 router.get('/', async (req, res) => {
-  const { clientId, secret } = req.query;
+  const { clientId, secret, since: sinceRaw, known_max: knownMaxRaw } = req.query;
 
-  // Basic security to avoid public scraping
   if (!secret || secret !== (process.env.API_SECRET || 'vikar2026')) {
     return res.status(403).json({ error: 'Forbidden. Invalid secret.' });
   }
@@ -37,15 +73,14 @@ router.get('/', async (req, res) => {
   }
 
   try {
-    const now = new Date();
-    // Calculate the start and end of the CURRENT month (Month-to-Date)
-    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    const { start: startOfCurrentMonth, end: endOfCurrentMonth } = currentMonthBounds();
+    const { sinceDate, sinceTs } = parseSinceParam(sinceRaw, startOfCurrentMonth);
+    const knownMax = knownMaxRaw != null && knownMaxRaw !== '' ? parseFloat(knownMaxRaw) : null;
 
-    // Metric 1: Total KM (Current Month)
+    // ── Metric 1 & 2: KM + active vehicles (billing_snapshots only, full month) ──
     const deltaQuery = `
-      SELECT 
-        imei, 
+      SELECT
+        imei,
         MAX(odometer) - MIN(odometer) as km_driven
       FROM \`telemetry.billing_snapshots\`
       WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
@@ -54,39 +89,106 @@ router.get('/', async (req, res) => {
     `;
     const [deltaRows] = await bigquery.query({
       query: deltaQuery,
-      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth },
     });
-    
+
     let totalKm = 0;
-    deltaRows.forEach(row => {
+    deltaRows.forEach((row) => {
       totalKm += parseFloat(row.km_driven) || 0;
     });
-
-    // Metric 2: Active Vehicles
     const activeVehicles = deltaRows.length;
 
-    // Metric 3: Max Speed — scoped to client IMEIs from billing_snapshots (avoids full-table scan via client_source LIKE)
-    const speedQuery = `
-      SELECT MAX(gt.speed) as max_speed
-      FROM \`telemetry.global_traffic\` gt
-      INNER JOIN (
-        SELECT DISTINCT imei
-        FROM \`telemetry.billing_snapshots\`
-        WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
-        AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
-      ) client_imeis ON gt.imei = client_imeis.imei
-      WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
-        AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
+    // ── Last snapshot date: gap detection for incremental global_traffic ──
+    const lastSnapQuery = `
+      SELECT MAX(snapshot_date) as last_snap
+      FROM \`telemetry.billing_snapshots\`
+      WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+      AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
     `;
-    const [speedRows] = await bigquery.query({
-      query: speedQuery,
-      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+    const [lastSnapRows] = await bigquery.query({
+      query: lastSnapQuery,
+      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth },
     });
-    const maxSpeed = speedRows[0]?.max_speed || 0;
+    const lastSnapVal = lastSnapRows[0]?.last_snap;
+    const lastSnapDate = lastSnapVal?.value ? lastSnapVal.value : (lastSnapVal || null);
 
-    // Metric 4: Driver Ranking (Top Conductores)
+    // Traffic scan start: prefer explicit `since`, else day after last snapshot, else month start
+    let trafficStart = startOfCurrentMonth;
+    if (sinceTs) {
+      trafficStart = sinceTs;
+    } else if (lastSnapDate) {
+      const nextDay = new Date(lastSnapDate);
+      nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+      const nextDayStr = nextDay.toISOString().split('T')[0];
+      if (nextDayStr > trafficStart) trafficStart = nextDayStr;
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const needsTrafficScan = trafficStart <= todayStr;
+
+    // ── Metric 3: Max speed (incremental global_traffic when possible) ──
+    let maxSpeed = 0;
+    if (needsTrafficScan) {
+      const speedQuery = `
+        SELECT MAX(gt.speed) as max_speed
+        FROM \`telemetry.global_traffic\` gt
+        INNER JOIN (
+          SELECT DISTINCT imei
+          FROM \`telemetry.billing_snapshots\`
+          WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+          AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
+        ) client_imeis ON gt.imei = client_imeis.imei
+        WHERE gt.dt_tracker >= TIMESTAMP(@trafficStart)
+          AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
+      `;
+      const [speedRows] = await bigquery.query({
+        query: speedQuery,
+        params: {
+          clientId,
+          startDate: startOfCurrentMonth,
+          endDate: endOfCurrentMonth,
+          trafficStart,
+        },
+      });
+      maxSpeed = parseFloat(speedRows[0]?.max_speed) || 0;
+    }
+
+    // If client sent a cached vmax, merge (vmax can only go up within the month)
+    if (knownMax != null && Number.isFinite(knownMax)) {
+      maxSpeed = Math.max(maxSpeed, knownMax);
+    }
+
+    // If incremental `since` but no known_max, we still need pre-since vmax once.
+    // Snapshots don't store vmax; do a bounded pre-since scan only when since > month start.
+    if (sinceTs && sinceTs > startOfCurrentMonth && (knownMax == null || !Number.isFinite(knownMax))) {
+      const preSinceQuery = `
+        SELECT MAX(gt.speed) as max_speed
+        FROM \`telemetry.global_traffic\` gt
+        INNER JOIN (
+          SELECT DISTINCT imei
+          FROM \`telemetry.billing_snapshots\`
+          WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
+          AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
+        ) client_imeis ON gt.imei = client_imeis.imei
+        WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
+          AND gt.dt_tracker < TIMESTAMP(@sinceTs)
+      `;
+      const [preRows] = await bigquery.query({
+        query: preSinceQuery,
+        params: {
+          clientId,
+          startDate: startOfCurrentMonth,
+          endDate: endOfCurrentMonth,
+          sinceTs,
+        },
+      });
+      const preMax = parseFloat(preRows[0]?.max_speed) || 0;
+      maxSpeed = Math.max(maxSpeed, preMax);
+    }
+
+    // ── Metric 4: Driver ranking (snapshots + incremental traffic for plate/vmax) ──
     const rankingQuery = `
-      SELECT 
+      SELECT
         bs.imei,
         ROUND(AVG(bs.daily_grade), 1) as grade,
         MAX(gt.plate) as plate,
@@ -105,7 +207,7 @@ router.get('/', async (req, res) => {
             WHERE LOWER(client_id) LIKE CONCAT('%', LOWER(@clientId), '%')
             AND snapshot_date >= DATE(@startDate) AND snapshot_date <= DATE(@endDate)
           ) client_imeis ON gt.imei = client_imeis.imei
-          WHERE gt.dt_tracker >= TIMESTAMP(@startDate)
+          WHERE gt.dt_tracker >= TIMESTAMP(@trafficStart)
             AND gt.dt_tracker <= TIMESTAMP_ADD(TIMESTAMP(@endDate), INTERVAL 23*3600+59*60+59 SECOND)
           GROUP BY gt.imei
       ) gt ON bs.imei = gt.imei
@@ -116,10 +218,14 @@ router.get('/', async (req, res) => {
     `;
     const [rankingRows] = await bigquery.query({
       query: rankingQuery,
-      params: { clientId, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+      params: {
+        clientId,
+        startDate: startOfCurrentMonth,
+        endDate: endOfCurrentMonth,
+        trafficStart,
+      },
     });
-    
-    // Attempt to load mapping cache to get real vehicle names/plates
+
     let mappingCache = {};
     try {
       const { getMappingCache } = require('../pollers/gpsServer');
@@ -130,13 +236,13 @@ router.get('/', async (req, res) => {
       console.warn('Could not load mapping cache in billing API');
     }
 
-    const driverRanking = rankingRows.map(row => {
+    const driverRanking = rankingRows.map((row) => {
       const grade = parseFloat(row.grade) || 7.0;
-      
-      let recommendation = "Conductor Seguro. Mantener comportamiento.";
-      if (grade < 4.0) recommendation = "ALERTA CRÍTICA: Requiere intervención inmediata y re-capacitación.";
-      else if (grade < 5.0) recommendation = "Precaución: Frecuentes violaciones de seguridad. Agendar feedback.";
-      else if (grade < 6.0) recommendation = "Regular: Oportunidad de mejora en ciertas conductas de conducción.";
+
+      let recommendation = 'Conductor Seguro. Mantener comportamiento.';
+      if (grade < 4.0) recommendation = 'ALERTA CRÍTICA: Requiere intervención inmediata y re-capacitación.';
+      else if (grade < 5.0) recommendation = 'Precaución: Frecuentes violaciones de seguridad. Agendar feedback.';
+      else if (grade < 6.0) recommendation = 'Regular: Oportunidad de mejora en ciertas conductas de conducción.';
 
       let plate = row.plate;
       if (!plate || plate === 'null' || plate === '') {
@@ -144,28 +250,29 @@ router.get('/', async (req, res) => {
         if (cached && cached.plate) plate = cached.plate;
         else if (cached && cached.name) plate = cached.name;
       }
-      
+
       return {
         imei: row.imei,
         plate: plate || row.imei || 'Desconocido',
-        grade: grade,
+        grade,
         analysis: {
           max_speed: Math.round(row.max_speed || 0),
-          extreme_speeding_events: parseInt(row.extreme_speeding_clustered || 0),
-          moderate_speeding_events: parseInt(row.moderate_speeding_clustered || 0),
-          harsh_maneuvers: parseInt(row.harsh_maneuvers_clustered || 0),
-          fatigue_alerts: parseInt(row.fatigue_alerts_clustered || 0),
-          recommendation: recommendation
-        }
+          extreme_speeding_events: parseInt(row.extreme_speeding_clustered || 0, 10),
+          moderate_speeding_events: parseInt(row.moderate_speeding_clustered || 0, 10),
+          harsh_maneuvers: parseInt(row.harsh_maneuvers_clustered || 0, 10),
+          fatigue_alerts: parseInt(row.fatigue_alerts_clustered || 0, 10),
+          recommendation,
+        },
       };
     });
 
-    // Month formatting for UI (e.g. "mayo de 2026")
     const dateObj = new Date(startOfCurrentMonth);
     const formatter = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-    const currentMonthText = formatter.format(dateObj); // "junio de 2026"
+    const currentMonthText = formatter.format(dateObj);
 
-    // Construct the UI-ready response
+    const checkpointUntil = new Date().toISOString();
+    const incremental = Boolean(sinceTs) || (lastSnapDate && trafficStart > startOfCurrentMonth);
+
     return res.json({
       period: `Mes Actual (${currentMonthText})`,
       client: clientId,
@@ -173,20 +280,25 @@ router.get('/', async (req, res) => {
         total_kilometers: Math.round(totalKm),
         active_vehicles: activeVehicles,
         max_speed_kmh: Math.round(maxSpeed),
-        driver_ranking: driverRanking
+        driver_ranking: driverRanking,
       },
       ui_texts: {
-        title1: "Kilometraje del Mes",
+        title1: 'Kilometraje del Mes',
         desc1: `Tus vehículos han recorrido ${Math.round(totalKm).toLocaleString()} km en lo que va de ${currentMonthText}.`,
-        title2: "Activos en el Mes",
+        title2: 'Activos en el Mes',
         desc2: `${activeVehicles} vehículos registrados activos en el mes en curso.`,
-        title3: "Prevención de Riesgos",
+        title3: 'Prevención de Riesgos',
         desc3: `Velocidad Máxima detectada este mes: ${Math.round(maxSpeed)} km/h.`,
         title4: `Ranking de Conductores (${currentMonthText})`,
-        desc4: `Lista de la flota. Ordenados desde los peores evaluados hacia los mejores, basado en su telemetría del mes en curso.`
-      }
+        desc4: 'Lista de la flota. Ordenados desde los peores evaluados hacia los mejores, basado en su telemetría del mes en curso.',
+      },
+      checkpoint: {
+        until: checkpointUntil,
+        incremental,
+        traffic_from: trafficStart,
+        last_snapshot: lastSnapDate || null,
+      },
     });
-
   } catch (error) {
     console.error('[Billing API] Error calculating stats:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -211,9 +323,7 @@ router.get('/driver-events', async (req, res) => {
   if (!bigquery) return res.status(500).json({ error: 'Data Lake is not configured.' });
 
   try {
-    const now = new Date();
-    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    const { start: startOfCurrentMonth, end: endOfCurrentMonth } = currentMonthBounds();
 
     let typeCondition = '';
     if (type === 'extreme_speeding') typeCondition = 'speed > 120';
@@ -231,13 +341,12 @@ router.get('/driver-events', async (req, res) => {
       ORDER BY dt_tracker DESC
       LIMIT 100
     `;
-    
+
     const [rows] = await bigquery.query({
       query,
-      params: { imei, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth }
+      params: { imei, startDate: startOfCurrentMonth, endDate: endOfCurrentMonth },
     });
-    
-    // Agrupación de eventos (Clustering) con un cooldown de 5 minutos (300,000 ms)
+
     const rawEvents = rows.sort((a, b) => {
       const dtA = a.dt_tracker.value ? a.dt_tracker.value : a.dt_tracker;
       const dtB = b.dt_tracker.value ? b.dt_tracker.value : b.dt_tracker;
@@ -245,7 +354,7 @@ router.get('/driver-events', async (req, res) => {
     });
     const clusteredEvents = [];
     let lastTime = 0;
-    
+
     for (const row of rawEvents) {
       const dtValue = row.dt_tracker.value ? row.dt_tracker.value : row.dt_tracker;
       const dt = new Date(dtValue).getTime();
@@ -255,20 +364,19 @@ router.get('/driver-events', async (req, res) => {
           speed: Math.round(row.speed),
           lat: row.lat,
           lng: row.lng,
-          event: row.event
+          event: row.event,
         });
         lastTime = dt;
       }
     }
-    
-    // Ordenar de más reciente a más antiguo
+
     clusteredEvents.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     return res.json({
       imei,
       type,
       count: clusteredEvents.length,
-      events: clusteredEvents
+      events: clusteredEvents,
     });
   } catch (err) {
     console.error('[Billing API] Error fetching driver events:', err);
